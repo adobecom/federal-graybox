@@ -46,7 +46,7 @@
       "containerId": "tools",
       "id": "graybox-promote",
       "title": "Graybox Promote",
-      "environments": [ "preview" ],
+      "environments": [ "edit" ],
       "url": "https://main--federal-graybox--adobecom.hlx.page/tools/graybox-promote?milolibs=grayboxui",
       "isPalette": true,
       "passReferrer": true,

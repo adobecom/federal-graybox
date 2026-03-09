@@ -1,0 +1,35 @@
+/* =========================================
+   Gnav Cards Container
+   ========================================= */
+
+.feds-popup .feds-gnav-cards {
+  list-style: none;
+  margin: 0;
+  padding: var(--s2a-spacing-sm) var(--s2a-spacing-lg) var(--s2a-spacing-lg);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s2a-spacing-2xs);
+  align-items: start;
+}
+
+.feds-popup .feds-gnav-cards > li {
+  min-width: 0;
+}
+
+/* =========================================
+   Responsive: Desktop (min-width: 1024px)
+   ========================================= */
+
+@media (min-width: 1024px) {
+  .feds-popup .feds-gnav-cards {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--s2a-spacing-xs);
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .feds-popup .feds-gnav-cards > li {
+    flex: 0 0 auto;
+  }
+}

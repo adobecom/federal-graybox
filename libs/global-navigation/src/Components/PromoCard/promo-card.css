@@ -1,0 +1,136 @@
+/* =========================================
+   Promo Card
+   ========================================= */
+
+.feds-gnav-cards .promo-card {
+  position: relative;
+  height: 199px;
+}
+
+.feds-gnav-cards .promo-card__bg {
+  height: 100%;
+  width: 100%;
+  display: block;
+}
+
+.feds-gnav-cards .promo-card__bg-image {
+  border-radius: var(--s2a-border-radius-24);
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.feds-gnav-cards .promo-card__content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+.feds-gnav-cards .promo-card__icon {
+  position: absolute;
+  top: var(--s2a-spacing-md);
+  left: var(--s2a-spacing-md);
+  width: var(--s2a-spacing-lg);
+  height: var(--s2a-spacing-lg);
+}
+
+.feds-gnav-cards .promo-card__text-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: block;
+  padding: var(--s2a-spacing-md);
+}
+
+.feds-gnav-cards .promo-card__price,
+.feds-gnav-cards .promo-card__title {
+  margin: 0;
+  color: var(--s2a-color-gray-25);
+}
+
+.feds-gnav-cards .promo-card__price {
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-font-size-md);
+  line-height: var(--s2a-font-line-height-24);
+  /* No token for percentage */
+  letter-spacing: -1%;
+}
+
+.feds-gnav-cards .promo-card__title {
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
+  font-size: var(--s2a-font-size-xl);
+  line-height: 100%;
+  /* No token for percentage */
+  letter-spacing: -1%;
+}
+
+/* =========================================
+   Promo Card CTA
+   ========================================= */
+
+.feds-gnav-cards .promo-card__cta {
+  display: block;
+  margin-top: var(--s2a-spacing-lg);
+}
+
+.feds-gnav-cards .promo-card__cta .feds-secondary-cta {
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-font-size-sm);
+  line-height: 130%;
+  letter-spacing: 0;
+  border: none;
+  background: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  padding: 3px var(--s2a-spacing-lg);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.feds-gnav-cards .promo-card__cta .feds-secondary-cta:hover,
+.feds-gnav-cards .promo-card__cta .feds-secondary-cta:focus {
+  background: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+}
+
+/* =========================================
+   Responsive: Desktop (min-width: 1024px)
+   ========================================= */
+
+@media (min-width: 1024px) {
+  .feds-gnav-cards .promo-card {
+    height: 100%;
+  }
+
+  .feds-gnav-cards .promo-card__bg-image {
+    border-radius: var(--s2a-border-radius-md);
+  }
+
+  .feds-gnav-cards .promo-card__cta {
+    margin-top: var(--s2a-spacing-md);
+  }
+}
+
+/* =========================================
+   Responsive: Large Desktop (min-width: 1280px)
+   ========================================= */
+
+@media (min-width: 1280px) {
+  .feds-gnav-cards .promo-card__bg-image {
+    border-radius: var(--s2a-border-radius-12);
+  }
+
+  .feds-gnav-cards .promo-card__text-content {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .feds-gnav-cards .promo-card__cta {
+    position: absolute;
+    bottom: var(--s2a-spacing-md);
+    right: var(--s2a-spacing-md);
+    margin-top: 0;
+  }
+}

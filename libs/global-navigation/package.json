@@ -1,0 +1,34 @@
+{
+  "name": "global-navigation",
+  "version": "0.0.1",
+  "description": "global-navigation for adobe.com",
+  "main": "dist/main.js",
+  "type": "module",
+  "engines": {
+    "node": "22.16.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "dev": "./dev.sh",
+    "clean": "rm -rf dist",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "pretest": "node build-test-exports.js",
+    "test": "web-test-runner 'test/**/*.test.js' --node-resolve",
+    "test:watch": "node build-test-exports.js --watch & npm test -- --watch",
+    "test:coverage": "npm test -- --coverage"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@esm-bundle/chai": "^4.3.4-fix.0",
+    "@web/test-runner": "^0.20.2",
+    "esbuild": "^0.25.6",
+    "eslint": "^9.29.0",
+    "sinon": "^21.0.1",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.0"
+  }
+}

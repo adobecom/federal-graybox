@@ -1,0 +1,3 @@
+[submodule "libs/global-navigation/consonant"]
+	path = libs/global-navigation/consonant
+	url = https://github.com/adobecom/consonant

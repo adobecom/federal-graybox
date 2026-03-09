@@ -41,10 +41,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 1024px)
+   Responsive: Desktop (min-width: 767px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 767px) {
   .feds-gnav-cards > li:has(> :nth-child(2)) {
     gap: var(--s2a-spacing-xs);
   }

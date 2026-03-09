@@ -257,7 +257,7 @@
    Responsive: Mobile (max-width: 1023px)
    ========================================= */
 
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
   .panels {
     display: block !important;
     grid-template-columns: none !important;

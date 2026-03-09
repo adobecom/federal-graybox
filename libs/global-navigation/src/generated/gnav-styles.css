@@ -461,7 +461,7 @@ body:has(:popover-open) {
   color: var(--s2a-color-content-default);
 }
 
-@media(max-width: 1023px) {
+@media(max-width: 767px) {
 
   .feds-popup .feds-link-group {
     border-radius: var(--s2a-border-radius-24);
@@ -604,7 +604,7 @@ body:has(:popover-open) {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 1024px)
+   Responsive: Desktop (min-width: 767px)
    ========================================= */
 
 @media (min-width: 767px) {
@@ -673,7 +673,7 @@ body:has(:popover-open) {
    Responsive: Mobile (max-width: 1023px)
    ========================================= */
 
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
     width: 100%;
     justify-content: space-between;
@@ -752,7 +752,7 @@ body:has(:popover-open) {
 
     header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) {
       animation: none;
-      background-color: rgba(255, 255, 255);
+      background-color: var(--s2a-color-gray-25);
       border-radius: 6px;
       width: calc(100% - var(--s2a-spacing-xs));
       margin: var(--s2a-spacing-2xs) var(--s2a-spacing-2xs) 0;
@@ -859,10 +859,10 @@ li.feds-brand-wrapper {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 1024px)
+   Responsive: Desktop (min-width: 767px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 767px) {
   li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;
@@ -930,10 +930,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 1024px)
+   Responsive: Desktop (min-width: 767px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 767px) {
   .feds-gnav-cards > li:has(> :nth-child(2)) {
     gap: var(--s2a-spacing-xs);
   }
@@ -1003,10 +1003,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 1024px)
+   Responsive: Desktop (min-width: 767px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 767px) {
   .feds-popup .feds-gnav-cards {
     display: flex;
     flex-wrap: nowrap;
@@ -1118,10 +1118,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 1024px)
+   Responsive: Desktop (min-width: 767px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 767px) {
   .feds-gnav-cards .promo-card {
     height: 100%;
   }
@@ -1220,10 +1220,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 1024px)
+   Responsive: Desktop (min-width: 767px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 767px) {
   .feds-popup .links-card {
     border-radius: var(--s2a-border-radius-16); /* Don't have a token */
   }
@@ -1361,10 +1361,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 1024px)
+   Responsive: Desktop (min-width: 767px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 767px) {
   .feds-popup .product-list {
     grid-template-columns: 1fr minmax(0, 3fr);
     gap: var(--s2a-spacing-xs);
@@ -1651,7 +1651,7 @@ ul.tabs .product-links {
    Responsive: Mobile (max-width: 1023px)
    ========================================= */
 
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
   .panels {
     display: block !important;
     grid-template-columns: none !important;
@@ -1756,10 +1756,10 @@ ul.tabs .product-links {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 1024px)
+   Responsive: Desktop (min-width: 767px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (min-width: 767px) {
   .feds-popup .featured-card {
     /* No token: 12px radius on desktop */
     border-radius: 12px;
@@ -1797,7 +1797,7 @@ ul.tabs .product-links {
    Hover: Desktop with pointer device only
    ========================================= */
 
-@media (min-width: 1024px) and (hover: hover) {
+@media (min-width: 767px) and (hover: hover) {
   .featured-card,
   .featured-card .featured-eyebrow,
   .featured-card h4,

@@ -9,6 +9,7 @@ const renderCard = ({
   iconSrc,
   title,
   cta,
+  price,
 }: PromoCardData): HTML => `
   <article class="promo-card" daa-lh="promo-card">
     ${
@@ -28,8 +29,7 @@ const renderCard = ({
           : ""
       }
       <div class="promo-card__text-content">
-        <!-- Placeholder price, replace with actual price data when available -->
-        <p class="promo-card__price">US$29.99/mo</p>
+        <p class="promo-card__price">${price}</p>
         <p class="promo-card__title" role="heading" aria-level="2">
           ${title}
         </p>

@@ -17,10 +17,10 @@
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 767px)
+   Responsive: Desktop (min-width: 768px)
    ========================================= */
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
   .feds-popup .feds-gnav-cards {
     display: flex;
     flex-wrap: nowrap;

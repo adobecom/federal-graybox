@@ -52,7 +52,7 @@ const parseCard = (
     footerCTA,
     ctaErrors
   ] = parseSecondaryCTA(element) as Parsed<SecondaryCTA, RecoverableError>;
-  
+  footerCTA.daaLl = `${titleElement.textContent ?? ''} - ${footerCTA?.daaLl}`;
   return [
     {
       type: "Card",

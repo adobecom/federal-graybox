@@ -18,8 +18,6 @@ export type LinkGroupLink = {
   href: string;
   subtitle: string;
   badges?: string[];
-  oldPrice?: string | null;
-  newPrice?: string | null;
   daaLl: string | null;
   daaLh: string | null;
 }
@@ -112,15 +110,12 @@ const parseLinkGroupLink = (
 
   // TO change this after we know where do we get the price values from
   const badges = [];
-  let oldPrice = null;
-  let newPrice = null;
+ 
   if (element.classList.contains('new')) {
     badges.push('New');
   }
   if (element.classList.contains('show-offer')) {
     badges.push('Save 20%');
-    oldPrice = '$29.99';
-    newPrice = '$19.99';
   }
 
   const [iconHref, iconAlt = null] = (element
@@ -138,8 +133,6 @@ const parseLinkGroupLink = (
       href,
       subtitle,
       badges,
-      oldPrice,
-      newPrice,
       daaLl,
       daaLh
     },

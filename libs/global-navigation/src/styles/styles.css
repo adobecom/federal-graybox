@@ -466,10 +466,10 @@ body:has(:popover-open) {
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 767px)
+   Responsive: Desktop (min-width: 768px)
    ========================================= */
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
   .global-navigation nav .feds-nav-toggle {
     display: none;
   }
@@ -607,7 +607,7 @@ body:has(:popover-open) {
     animation-range: 0px 100px;
   }
 
-  @media (max-width: 766px) {
+  @media (max-width: 767px) {
     header.global-navigation:has(.unav-comp-app-switcher-open) {
       animation: none;
     }

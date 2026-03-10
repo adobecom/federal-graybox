@@ -81,10 +81,10 @@
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 767px)
+   Responsive: Desktop (min-width: 768px)
    ========================================= */
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
   .feds-popup .featured-card {
     /* No token: 12px radius on desktop */
     border-radius: 12px;
@@ -122,7 +122,7 @@
    Hover: Desktop with pointer device only
    ========================================= */
 
-@media (min-width: 767px) and (hover: hover) {
+@media (min-width: 768px) and (hover: hover) {
   .featured-card,
   .featured-card .featured-eyebrow,
   .featured-card h4,

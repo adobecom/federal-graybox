@@ -62,7 +62,9 @@ const parseCard = (
         return [null, []];
       }
     })();
-
+  if (footerCTA) {
+    footerCTA.daaLl = `${titleElement.textContent ?? ''} - ${footerCTA?.daaLl}`;
+  }
   return [
     {
       type: "LinksCardItem",

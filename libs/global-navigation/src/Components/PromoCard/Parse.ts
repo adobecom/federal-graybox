@@ -13,6 +13,7 @@ export type PromoCardData = {
   iconSrc: string;
   title: string;
   cta: SecondaryCTA | null;
+  price: string;
 };
 
 const Errors = {
@@ -78,6 +79,9 @@ export const parsePromoCard = (
     if (secondaryCtaAnchor === null)
       errors.add(new RecoverableError(Errors.MissingSecondaryCtaAnchor));
 
+    // Replace with actual price data when available
+    const price = "$29.90/mo"
+
     const [cta, ctaErrors]
       = (() : Parsed<SecondaryCTA | null, RecoverableError> => {
         try {
@@ -90,7 +94,9 @@ export const parsePromoCard = (
         }
       })();
     ctaErrors.forEach(e => errors.add(e));
-
+    if (cta) {
+      cta.daaLl = `${title} - ${cta?.daaLl}`;
+    }
     return [
       {
         type: "PromoCard",
@@ -101,6 +107,7 @@ export const parsePromoCard = (
           iconSrc,
           title,
           cta,
+          price,
         },
       },
       [...errors]

@@ -130,10 +130,10 @@
 }
 
 /* =========================================
-   Responsive: Desktop (min-width: 767px)
+   Responsive: Desktop (min-width: 768px)
    ========================================= */
 
-@media (min-width: 767px) {
+@media (min-width: 768px) {
   .feds-popup .product-list {
     grid-template-columns: 1fr minmax(0, 3fr);
     gap: var(--s2a-spacing-xs);
@@ -151,7 +151,6 @@
 
   .product-list .tabs button.tab {
     width: auto;
-    white-space: normal;
     min-height: 44px;
     margin-bottom: var(--s2a-spacing-2xs);
   }

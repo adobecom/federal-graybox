@@ -38,8 +38,8 @@ const parseCTA = (
       type: type.type,
       text,
       href,
-      daaLl,
-      ariaLabel
+      ariaLabel,
+      daaLl: typeof daaLl === 'string' && daaLl.trim() !== '' ? daaLl : text,
     },
     es
   ]

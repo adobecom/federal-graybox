@@ -1,0 +1,34 @@
+# dependencies
+node_modules/
+
+# builds
+build/
+dist/*
+!dist/packages/
+dist/packages/*
+!dist/packages/tokens/
+dist/packages/tokens/*
+!dist/packages/tokens/**
+.out/
+.nx/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env files
+.env
+.env.*
+
+# tests/coverage
+coverage/
+
+# misc
+.DS_Store
+*.tgz
+!releases/*.tgz
+.idea/
+
+*storybook.log
+storybook-static

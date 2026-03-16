@@ -60,7 +60,6 @@
 .featured-card a.feds-secondary-cta {
   background: var(--s2a-color-gray-1000);
   color: var(--s2a-color-gray-25);
-  padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
 }
 
 /* =========================================

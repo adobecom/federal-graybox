@@ -562,8 +562,8 @@ header.global-navigation:has(:popover-open) nav {
 @media (min-width: 1920px) {
   header.global-navigation nav {
     &:has(:popover-open) {
-      padding-left: calc(8px + (100vw - 1920px) *  0.5);
-      padding-right: calc(8px + (100vw - 1920px) *  0.5);
+      padding-left: calc(var(--s2a-spacing-md) + (100vw - 1920px) *  0.5);
+      padding-right: calc((100vw - 1920px) *  0.5);
       margin-left: 0;
       margin-right: 0;
     }

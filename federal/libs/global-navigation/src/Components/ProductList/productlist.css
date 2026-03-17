@@ -175,3 +175,13 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+/* =========================================
+   Responsive: Very Large Desktop (min-width: 1920px)
+   ========================================= */
+
+@media (min-width: 1920px) {
+  .product-list .tab-content [role="tabpanel"] {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}

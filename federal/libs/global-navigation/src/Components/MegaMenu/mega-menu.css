@@ -24,8 +24,6 @@
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: 18px;
   white-space: nowrap;
-  margin-top: var(--s2a-spacing-lg);
-  margin-bottom: var(--s2a-spacing-lg);
   padding: 0;
   font-family: var(--s2a-font-family-adobe-clean);
 }

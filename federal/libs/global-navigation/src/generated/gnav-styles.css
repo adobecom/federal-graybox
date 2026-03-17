@@ -147,7 +147,8 @@ header.global-navigation {
   width: 100%;
   background: transparent;
   visibility: visible;
-  display: block;
+  display: flex;
+  justify-content: center;
   position: fixed;
   top: 0;
   left: 0;
@@ -190,6 +191,7 @@ header.feds-header-scrolled .feds-link {
   display: flex;
   align-items: center;
   height: var(--s2a-spacing-64);
+  width: 100%;
   justify-content: flex-start;
 }
 
@@ -658,6 +660,7 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
 header.global-navigation nav {
   padding: 0 0 0 var(--s2a-spacing-md);
   margin: var(--s2a-spacing-xs) var(--s2a-spacing-xs) 0 var(--s2a-spacing-xs);
+  max-width: calc(1920px - var(--s2a-spacing-xs) - var(--s2a-spacing-xs));
   border-radius: var(--s2a-border-radius-16);
   transition: all 0.48s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -668,6 +671,7 @@ header.global-navigation:has(:popover-open) nav {
   padding: var(--s2a-spacing-xs) var(--s2a-spacing-xs) 0 calc(var(--s2a-spacing-md) + var(--s2a-spacing-xs));
   backdrop-filter: blur(0);
   background-color: var(--s2a-color-gray-75);
+  max-width: 100%;
 }
 
 @supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {

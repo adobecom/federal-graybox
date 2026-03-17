@@ -81,9 +81,11 @@ header.feds-header-scrolled .feds-link {
    ========================================= */
 
 .feds-link {
-  font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   font-family: var(--s2a-font-family);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
   display: flex;
   align-items: center;
   border: 0;
@@ -383,13 +385,13 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
   align-items: center;
   justify-content: center;
   width: fit-content;
-  min-height: 34px;
-  padding: 0 14px;
+  padding: 11px 14px 10px;
   border: var(--s2a-border-width-sm) solid var(--s2a-color-content-default);
   border-radius: var(--s2a-border-radius-round);
-  font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  line-height: 1;
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
   color: var(--s2a-color-content-default);
   text-decoration: none;
 }

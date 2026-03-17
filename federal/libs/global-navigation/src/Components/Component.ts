@@ -26,7 +26,7 @@ export const parseComponent = (
 
   const brandElem = element.querySelector('.gnav-brand');
   if (brandElem !== null) 
-    return parseBrand(element)
+    return parseBrand(brandElem);
 
   const largeMenu = element.querySelector('.large-menu');
   if (largeMenu !== null)

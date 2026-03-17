@@ -19,34 +19,19 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 }
 
 /* =========================================
-   Brand / Logo
+   Brand
    ========================================= */
 
-.feds-brand,
-.feds-logo {
+.feds-brand {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
   padding: 0 var(--s2a-spacing-lg) 0 0;
   column-gap: 10px;
 }
 
-
-.feds-brand-image picture,
-.feds-brand-image img,
-.feds-brand-image svg,
-.feds-logo-image picture,
-.feds-logo-image img,
-.feds-logo-image svg {
+.feds-brand-image svg {
   width: 100%;
   display: block;
-}
-
-.feds-brand-label,
-.feds-logo-label {
-  flex-shrink: 0;
-  font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  font-size: var(--s2a-font-size-lg);
-  color: var(--s2a-color-brand-adobe-red);
 }
 
 /* =========================================
@@ -65,12 +50,35 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
   display: inherit;
 }
 
-.feds-brand-image.brand-image-only.mobile-brand svg {
+.feds-brand-image.mobile-brand svg {
   height: var(--s2a-spacing-md);
+  width: 18px; /* no token for 18px */
 }
 
-.feds-brand-image.brand-image-only.desktop-brand svg {
+.feds-brand-image.desktop-brand svg {
   width: 67px;
+}
+
+/* For light background */
+.feds-brand-image {
+  & img:nth-child(1) { display: inherit; }
+  & img:nth-child(2) { display: none; }
+}
+
+/* For dark background */
+.feds-dark-bg {
+  & .feds-brand-image {
+    & img:nth-child(1) { display: none; }
+    & img:nth-child(2) { display: inherit; }
+  }
+}
+
+/* same behavior for both "scrolled" and "popup open" states (considering for transparent-white/light background only)*/
+:is(.feds-header-scrolled, .global-navigation:has(.feds-popup:popover-open)) {
+  & .feds-brand-wrapper .feds-brand-image {
+    & img:nth-child(1) { display: inherit; }
+    & img:nth-child(2) { display: none; }
+  }
 }
 
 /* =========================================
@@ -114,10 +122,6 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
     flex-direction: row;
     justify-content: flex-start;
     padding-left: 0;
-  }
-
-  .feds-brand-image + .feds-brand-label {
-    display: flex;
   }
 
   .feds-brand-image.desktop-brand {

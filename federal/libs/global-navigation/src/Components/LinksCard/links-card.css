@@ -71,6 +71,10 @@
     border-radius: var(--s2a-border-radius-16); /* Don't have a token */
     padding: var(--s2a-spacing-lg) var(--s2a-spacing-lg) var(--s2a-spacing-md);
   }
+  .feds-popup .links-card .links-card-footer .feds-secondary-cta:hover {
+    color: var(--s2a-color-gray-25);
+    background-color:var(--s2a-color-gray-1000);
+  }
 }
 
 /* =========================================

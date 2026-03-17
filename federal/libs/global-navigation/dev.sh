@@ -34,7 +34,7 @@ node build.js --watch &
 BUILD_PID=$!
 sleep 1
 
-(cd ../.. && aem up &> /dev/null) &
+(cd ../../.. && aem up &> /dev/null) &
 AEM_PID=$!
 
 echo -e "You can find the built file at ${GREEN}http://localhost:3000/libs/global-navigation/dist/main.js${NC}"

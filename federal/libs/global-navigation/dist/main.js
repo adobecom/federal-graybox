@@ -774,7 +774,7 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
     font-size: var(--s2a-font-size-sm);
   }
 
-  .global-navigation .feds-gnav-items > li > .feds-link {
+  .global-navigation.site-pivot:not(:has(:popover-open)) .feds-gnav-items:has(.feds-link:hover) > li > .feds-link:not(:hover) {
     opacity: 0.65;
   }
 
@@ -980,7 +980,7 @@ header.global-navigation:has(:popover-open) nav {
   
   .feds-popup:popover-open::backdrop {
     opacity: 1;
-    background-color: rgba(0, 0, 0, 0.72);
+    background-color: rgba(0, 0, 0, 0.60);
     backdrop-filter: blur(32px);
   }
   
@@ -1783,6 +1783,10 @@ ul.tabs .product-links {
     border-radius: var(--s2a-border-radius-16); /* Don't have a token */
     padding: var(--s2a-spacing-lg) var(--s2a-spacing-lg) var(--s2a-spacing-md);
   }
+  .feds-popup .links-card .links-card-footer .feds-secondary-cta:hover {
+    color: var(--s2a-color-gray-25);
+    background-color:var(--s2a-color-gray-1000);
+  }
 }
 
 /* =========================================
@@ -2367,40 +2371,14 @@ ul.tabs .product-links {
    ========================================= */
 
 @media (min-width: 1024px) and (hover: hover) {
-  .featured-card,
-  .featured-card .featured-eyebrow,
-  .featured-card h4,
-  .featured-card .featured-subtitle,
-  .featured-card .feds-link,
   .featured-card a.feds-secondary-cta {
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
 
-  .featured-card:hover {
+  .featured-card a.feds-secondary-cta:hover {
     background: var(--s2a-color-gray-1000);
-  }
-
-  .featured-card:hover .featured-eyebrow {
-    /* No token: design uses transparent-white/700 */
-    color: rgba(255, 255, 255, 0.66);
-  }
-
-  .featured-card:hover h4,
-  .featured-card:hover .featured-subtitle,
-  .featured-card:hover .feds-link {
     color: var(--s2a-color-gray-25);
-  }
-
-  .featured-card:hover a.feds-secondary-cta {
-    background: var(--s2a-color-gray-25);
-    color: var(--s2a-color-gray-1000);
     border-color: var(--s2a-color-gray-25);
-  }
-  .featured-card .footer-container a.feds-secondary-cta:hover {
-    background: var(--s2a-color-gray-25);
-  }
-  .featured-card:hover span svg {
-    color: var(--s2a-color-gray-25);
   }
 }
 `,ue=document.createElement("style");ue.textContent=rr;document.head.appendChild(ue);var Po=async n=>{let{gnavSource:e,mountpoint:r,unavEnabled:t,miloConfig:a,personalization:o}=n;if(!(e instanceof URL))throw E(`gnavSource is invalid: ${e}`),new c("gnavSource needs to be a URL object");try{pn(a)}catch(b){throw E(`Failed to initialize MiloConfig: ${b}`),new c(`Failed to initialize MiloConfig: ${b}`)}Sn(o),An(n.localizeLink??(b=>b)),En(kn(n));let i=await ge(n);if(i instanceof c)throw E(i.message),i;let{mainNav:s,aside:l}=i;if(s instanceof c)throw E(s.message),s;let d=de(s,t);if(d instanceof c)throw E(d.message),d;return await tr(d)(r),or(n)},tr=n=>async e=>{let r=ar(n);e.innerHTML=r,e.classList.add("site-pivot");let t=[...e.querySelectorAll(".mega-menu ~ .feds-popup")];t.forEach(s=>{s.innerHTML=""});let a=n.components.filter(s=>s.type==="MegaMenu"),o=a.map(s=>s.content),i=await Promise.all(o.map(async(s,l)=>{let[d,b]=await s,x=a[l].title;return t[l].innerHTML=ae(d,t[l].id,x),b}).flat());return e},ar=({components:n,productCTA:e,unavEnabled:r})=>`

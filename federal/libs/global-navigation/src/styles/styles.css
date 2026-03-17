@@ -445,7 +445,7 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
     font-size: var(--s2a-font-size-sm);
   }
 
-  .global-navigation .feds-gnav-items > li > .feds-link {
+  .global-navigation.site-pivot:not(:has(:popover-open)) .feds-gnav-items:has(.feds-link:hover) > li > .feds-link:not(:hover) {
     opacity: 0.65;
   }
 
@@ -651,7 +651,7 @@ header.global-navigation:has(:popover-open) nav {
   
   .feds-popup:popover-open::backdrop {
     opacity: 1;
-    background-color: rgba(0, 0, 0, 0.72);
+    background-color: rgba(0, 0, 0, 0.60);
     backdrop-filter: blur(32px);
   }
   

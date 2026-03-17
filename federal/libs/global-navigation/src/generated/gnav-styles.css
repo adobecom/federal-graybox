@@ -2158,6 +2158,7 @@ ul.tabs .product-links {
   padding: var(--s2a-spacing-md) 0;
   color: var(--s2a-color-gray-1000);
   display: inline-flex;
+  gap: 6px;
 }
 
 .featured-card span {

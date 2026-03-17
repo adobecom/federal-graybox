@@ -20,7 +20,7 @@ const renderCard = ({
       <div class="featured-eyebrow">${eyeBrow}</div>
       <h4>${title}</h4>
       <div class="featured-subtitle">${subtitle}</div>
-      <span>${link(bodyLink)}${icons.chevronRight}</span>
+      <span>${link({ ...bodyLink, svgIcon: icons.chevronRight })}</span>
     </div>
     <div class="footer-container">
       ${secondaryCTA(footerCTA)}

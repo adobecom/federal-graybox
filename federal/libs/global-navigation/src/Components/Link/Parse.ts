@@ -6,6 +6,7 @@ export type Link = {
   href: string;
   daaLl?: string | null;
   ariaLabel?: string;
+  svgIcon?: string;
 };
 
 const ERRORS = {

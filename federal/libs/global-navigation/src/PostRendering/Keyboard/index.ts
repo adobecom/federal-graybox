@@ -1,0 +1,223 @@
+function $$(root: Element, selector: string): HTMLElement[] {
+  return [...root.querySelectorAll<HTMLElement>(selector)];
+}
+
+function setTabindex(root: Element, selector: string, enabled: boolean): void {
+  $$(root, selector).forEach((el) =>
+    enabled ? el.removeAttribute('tabindex') : el.setAttribute('tabindex', '-1'),
+  );
+}
+
+const ARROW_DELTA: Record<string, 1 | -1> = {
+  ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1, ArrowDown: 1,
+};
+const HORIZONTAL = new Set(['ArrowLeft', 'ArrowRight']);
+const VERTICAL = new Set(['ArrowUp', 'ArrowDown']);
+const SELECTED_TAB = '.tabs [role="tab"][aria-selected="true"]';
+
+function wrapIndex(index: number, delta: number, length: number): number {
+  return (index + delta + length) % length;
+}
+
+function gridNextIndex(
+  items: HTMLElement[], index: number, key: string, grid: HTMLElement,
+): number | null {
+  const delta = ARROW_DELTA[key];
+  if (HORIZONTAL.has(key)) {
+    const next = index + delta;
+    return next >= 0 && next < items.length ? next : null;
+  }
+  const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+  const children = [...grid.children];
+  const cellOf = (i: number): number => {
+    const parent = items[i].parentElement;
+    return parent ? children.indexOf(parent) : -1;
+  };
+  const currentCol = cellOf(index) % cols;
+  const targetRow = Math.floor(cellOf(index) / cols) + (key === 'ArrowDown' ? 1 : -1);
+  const maxRow = Math.floor((children.length - 1) / cols);
+  if (targetRow < 0 || targetRow > maxRow) return null;
+  let best: number | null = null;
+  let bestDist = Infinity;
+  for (let j = 0; j < items.length; j++) {
+    const dist = Math.abs(cellOf(j) % cols - currentCol);
+    if (Math.floor(cellOf(j) / cols) === targetRow && dist < bestDist) {
+      bestDist = dist;
+      best = j;
+    }
+  }
+  return best;
+}
+
+export function initKeyboardNav(gnav: HTMLElement): () => void {
+  setTabindex(gnav, '.tab-content [role="tabpanel"] a', false);
+  const cleanups: (() => void)[] = [];
+  $$(gnav, '.feds-popup[popover]').forEach((popup) => {
+    const onToggle = (): void => {
+      if (!popup.matches(':popover-open')) setTabindex(popup, '[role="tabpanel"] a', false);
+    };
+    popup.addEventListener('toggle', onToggle);
+    cleanups.push(() => popup.removeEventListener('toggle', onToggle));
+  });
+
+  const focusAndPrevent = (target: HTMLElement, event: KeyboardEvent): void => {
+    target.focus(); event.preventDefault();
+  };
+  const openPopup = (): HTMLElement | null => gnav.querySelector<HTMLElement>('.feds-popup:popover-open');
+  const selectedTab = (
+    scope: Element
+  ): HTMLElement | null => scope.querySelector<HTMLElement>(SELECTED_TAB);
+  const visiblePanel = (scope: Element): HTMLElement | null =>
+    scope.querySelector<HTMLElement>('[role="tabpanel"]:not([hidden])');
+
+  function handleEscape(event: KeyboardEvent): boolean {
+    const popup = openPopup();
+    const menuWrapper = gnav.querySelector<HTMLElement>('#feds-menu-wrapper');
+    if (!menuWrapper) return false;
+    const popover = popup ?? (menuWrapper?.matches(':popover-open') ? menuWrapper : null);
+    if (!popover) return false;
+    (popover as HTMLElement & { hidePopover?: () => void }).hidePopover?.();
+    const trigger = popup
+      ? `[popovertarget="${popover.id}"]`
+      : '.feds-nav-toggle';
+    gnav.querySelector<HTMLElement>(trigger)?.focus();
+    event.preventDefault();
+    return true;
+  }
+
+  function handleTopBar(
+    el: HTMLElement,
+    key: string,
+    event: KeyboardEvent
+  ): boolean {
+    if (!HORIZONTAL.has(key)) return false;
+    const items = $$(gnav, '.feds-gnav-items > li > .feds-link');
+    const index = items.indexOf(el);
+    if (index < 0) return false;
+    focusAndPrevent(
+      items[wrapIndex(index, ARROW_DELTA[key], items.length)], event
+    );
+    return true;
+  }
+
+  function handleTabs(
+    el: HTMLElement, popup: HTMLElement, key: string, event: KeyboardEvent,
+  ): boolean {
+    const items = $$(popup, '.tabs :is([role="tab"], .product-links a)');
+    const index = items.indexOf(el);
+    if (index < 0) return false;
+
+    if (ARROW_DELTA[key]) {
+      const next = items[wrapIndex(index, ARROW_DELTA[key], items.length)];
+      if (next.matches('[role="tab"]')) next.click();
+      focusAndPrevent(next, event);
+      return true;
+    }
+
+    if (key === 'Tab' && !event.shiftKey && el.matches('[aria-selected="true"]')) {
+      const panel = visiblePanel(popup);
+      if (!panel) return false;
+      setTabindex(panel, 'a', true);
+      const firstLink = panel.querySelector<HTMLElement>('a');
+      if (firstLink) focusAndPrevent(firstLink, event);
+      return true;
+    }
+
+    return false;
+  }
+
+  function handlePanel(
+    el: HTMLElement, popup: HTMLElement, key: string, event: KeyboardEvent,
+  ): boolean {
+    const panel = visiblePanel(popup);
+    if (!panel) return false;
+    const items = $$(panel, 'a');
+    const index = items.indexOf(el);
+    if (index < 0) return false;
+
+    if (ARROW_DELTA[key]) {
+      const nextIndex = gridNextIndex(items, index, key, panel);
+      if (nextIndex !== null) {
+        focusAndPrevent(items[nextIndex], event);
+        return true;
+      }
+      if (key === 'ArrowUp') {
+        setTabindex(panel, 'a', false);
+        focusAndPrevent(selectedTab(popup) ?? items[0], event);
+        return true;
+      }
+      return false;
+    }
+
+    if (key === 'Tab' && !event.shiftKey) {
+      if (index + 1 < items.length) {
+        focusAndPrevent(items[index + 1], event);
+      } else {
+        const allTabs = $$(popup, '.tabs [role="tab"]');
+        const selected = selectedTab(popup);
+        const nextTarget = allTabs[allTabs.indexOf(selected as HTMLElement) + 1]
+          ?? popup.querySelector<HTMLElement>('.product-links a');
+          
+        // eslint is disabled because it complains that nextTarget
+        // is always true, but it could be nullish sometimes
+        // eslint-disable-next-line
+        if (nextTarget)
+          focusAndPrevent(nextTarget, event);
+
+        else return false;
+      }
+      return true;
+    }
+
+    if (key === 'Tab' && event.shiftKey) {
+      if (index > 0) {
+        focusAndPrevent(items[index - 1], event);
+      } else {
+        setTabindex(panel, 'a', false);
+        const target = selectedTab(popup)
+          ?? $$(popup, '.tabs :is([role="tab"], .product-links a)')[0];
+        // eslint is disabled because it complains that nextTarget
+        // is always true, but it could be nullish sometimes
+        // eslint-disable-next-line
+        if (target) focusAndPrevent(target, event);
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  function handleCards(
+    el: HTMLElement, popup: HTMLElement, key: string, event: KeyboardEvent,
+  ): boolean {
+    if (!VERTICAL.has(key)) return false;
+    const items = $$(popup, '.feds-gnav-cards a');
+    const index = items.indexOf(el);
+    if (index < 0) return false;
+    focusAndPrevent(
+      items[wrapIndex(index, ARROW_DELTA[key], items.length)], event
+    );
+    return true;
+  }
+
+  function onKeydown(event: KeyboardEvent): void {
+    const el = (document.activeElement ?? event.target) as HTMLElement;
+    if (event.key === 'Escape') { handleEscape(event); return; }
+
+    const popup = openPopup();
+    if (popup) {
+      if (popup.matches(':has(.product-list)')) {
+        if (handleTabs(el, popup, event.key, event)) return;
+        if (handlePanel(el, popup, event.key, event)) return;
+      }
+      if (popup.matches(':has(.feds-gnav-cards)')) {
+        if (handleCards(el, popup, event.key, event)) return;
+      }
+    }
+    handleTopBar(el, event.key, event);
+  }
+
+  gnav.addEventListener('keydown', onKeydown);
+  cleanups.push(() => gnav.removeEventListener('keydown', onKeydown));
+  return () => cleanups.forEach((fn) => fn());
+}

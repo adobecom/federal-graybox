@@ -4,6 +4,10 @@
   "type": "module",
   "version": "1.0.0",
   "description": "Website foundation technology.",
+  "engines": {
+    "node": "22.16.0",
+    "npm": ">=10.0.0"
+  },
   "scripts": {
     "test": "wtr \"./test/**/*.test.js\" --node-resolve --port=2000 --coverage",
     "test:watch": "npm test -- --watch",

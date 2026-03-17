@@ -1,0 +1,96 @@
+/* Mega Menu grid structure for links-card and promo-card */
+
+/* =========================================
+   Gnav Cards Grid (base)
+   ========================================= */
+
+.feds-gnav-cards > li:has(> :nth-child(2)) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2a-spacing-2xs);
+}
+
+/* =========================================
+   Product Link in mobile on product list
+   ========================================= */
+
+.feds-popup-header .product-links .feds-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--s2a-color-content-default);
+  text-decoration: none;
+  font-size: var(--s2a-font-size-sm);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  line-height: 18px;
+  white-space: nowrap;
+  margin-top: var(--s2a-spacing-lg);
+  margin-bottom: var(--s2a-spacing-lg);
+  padding: 0;
+  font-family: var(--s2a-font-family-adobe-clean);
+}
+
+.feds-popup-header .product-links .feds-link svg {
+  width: 3px;
+  height: 6px;
+  flex-shrink: 0;
+}
+
+ul.tabs .product-links {
+  display: none;
+}
+
+/* =========================================
+   Responsive: Desktop (min-width: 1024px)
+   ========================================= */
+
+@media (min-width: 1024px) {
+  .feds-gnav-cards > li:has(> :nth-child(2)) {
+    gap: var(--s2a-spacing-xs);
+  }
+
+  .feds-popup .feds-gnav-cards:has(.promo-card, .links-card) {
+    align-items: stretch;
+  }
+
+  .feds-popup .feds-gnav-cards:has(.promo-card, .links-card) article {
+    height: 100%;
+  }
+
+  .feds-gnav-cards > li:has(.promo-card, .links-card) {
+    width: calc(33.33% - 5.33px);
+  }
+  .feds-popup-header .product-links {
+    display: none;
+  }
+  ul.tabs .product-links {
+    display: block;
+  }
+  ul.tabs .product-links .feds-link{
+    font-family: var(--s2a-font-family-adobe-clean);
+    padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
+  }
+}
+
+/* =========================================
+   Responsive: Large Desktop (min-width: 1280px)
+   ========================================= */
+
+@media (min-width: 1280px) {
+  .feds-gnav-cards > li:has(.promo-card, .links-card) {
+    width: calc(25% - 6px);
+  }
+
+  .feds-gnav-cards > li:has(.promo-card) {
+    width: calc(50% - 4px);
+  }
+
+  .feds-gnav-cards > li:has(> :nth-child(2)) {
+    width: calc(50% - 4px);
+    flex-direction: row;
+  }
+
+  .feds-gnav-cards > li:has(> :nth-child(2)) article {
+    width: calc(50% - 4px);
+  }
+}

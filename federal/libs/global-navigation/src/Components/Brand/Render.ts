@@ -1,21 +1,5 @@
-import { Brand } from "./Parse";
-import { localizeHref } from "../../Utils/Utils";
-type ImageData = Extract<Brand['data'], { image: unknown }>['image'];
-
-const renderImage = (image: ImageData, imageOnly: boolean): string => {
-  const cls = `feds-brand-image${imageOnly ? ' brand-image-only' : ''}`;
-  
-  if (image.type === 'inline-svg') {
-    return `<span class="${cls}">${image.svgContent}</span>`;
-  }
-
-  const alt = image.alt ? ` alt="${image.alt}"` : '';
-  return `<span class="${cls}"><img src="${image.src}"${alt} /></span>`;
-};
-
-// WARNING: For the test we're going to hardcode our logos
-// This most likely will change post test. We'll also refactor
-// this component.
+import { Brand, ImageData } from "./Parse";
+import { federateUrl } from "../../Utils/Utils";
 
 const DESKTOP_SVG = `
 <?xml
@@ -31,57 +15,68 @@ const MOBILE_SVG = `
 </svg>
 `.trim();
 
-const renderBrand = (href: string, _content: string, ariaLabel = ''): HTML =>
-  `<div class="feds-brand-container">
-    <a href="${localizeHref(href)}" class="feds-brand" daa-ll="Brand"${ariaLabel}>
-      <span class="feds-brand-image brand-image-only desktop-brand">
-        ${DESKTOP_SVG}
+type RenderBrandData = {
+  href: string;
+  label: string;
+  isDarkBg: boolean;
+  imageData: ImageData;
+};
+
+const renderBrand = (data: RenderBrandData): HTML => {
+const { href, label, isDarkBg, imageData } = data;
+
+  // Fallback behavior:
+  // - If only light exists, use it for dark too
+  // - If only dark exists, use it for light too
+  const desktopLightSrc = imageData.lightThemeImageSrc?.trim() || imageData.darkThemeImageSrc?.trim() || '';
+  const desktopDarkSrc = imageData.darkThemeImageSrc?.trim() || imageData.lightThemeImageSrc?.trim() || '';
+  const mobileLightSrc = imageData.mobileLightThemeImageSrc?.trim() || imageData.mobileDarkThemeImageSrc?.trim() || '';
+  const mobileDarkSrc = imageData.mobileDarkThemeImageSrc?.trim() || imageData.mobileLightThemeImageSrc?.trim() || '';
+
+  const desktopLightAlt = imageData.lightThemeImageAlt || imageData.darkThemeImageAlt || '';
+  const desktopDarkAlt = imageData.darkThemeImageAlt || imageData.lightThemeImageAlt || '';
+  const mobileLightAlt = imageData.mobileLightThemeImageAlt || imageData.mobileDarkThemeImageAlt || '';
+  const mobileDarkAlt = imageData.mobileDarkThemeImageAlt || imageData.mobileLightThemeImageAlt || '';
+
+  const hasDesktopLight = !!desktopLightSrc;
+  const hasDesktopDark = !!desktopDarkSrc;
+  const hasMobileLight = !!mobileLightSrc;
+  const hasMobileDark = !!mobileDarkSrc;
+
+  const desktopLightImg = hasDesktopLight
+    ? `<img src="${federateUrl(desktopLightSrc)}" alt="${desktopLightAlt}" />`
+    : '';
+  const desktopDarkImg = hasDesktopDark
+    ? `<img src="${federateUrl(desktopDarkSrc)}" alt="${desktopDarkAlt}" />`
+    : '';
+
+  const mobileLightImg = hasMobileLight
+    ? `<img src="${federateUrl(mobileLightSrc)}" alt="${mobileLightAlt}" />`
+    : '';
+  const mobileDarkImg = hasMobileDark
+    ? `<img src="${federateUrl(mobileDarkSrc)}" alt="${mobileDarkAlt}" />`
+    : '';
+
+  const desktopSvg = hasDesktopLight && hasDesktopDark ? '' : DESKTOP_SVG;
+  const mobileSvg = hasMobileLight && hasMobileDark ? '' : MOBILE_SVG;
+
+  return `<div class="feds-brand-container${isDarkBg ? ' feds-dark-bg' : ''}">
+    <a href="${href}" class="feds-brand" daa-ll="Brand" aria-label="${label}">
+      <span class="feds-brand-image desktop-brand">
+        ${desktopLightImg}
+        ${desktopDarkImg}
+        ${desktopSvg}
       </span>
-      <span class="feds-brand-image brand-image-only mobile-brand">
-        ${MOBILE_SVG}
+      <span class="feds-brand-image mobile-brand">
+        ${mobileLightImg}
+        ${mobileDarkImg}
+        ${mobileSvg}
       </span>
     </a>
   </div>`.trim();
+};
 
 export const brand = (brandData: Brand): HTML => {
   const { data } = brandData;
-  switch (data.type) {
-    case 'LabelledBrand':
-      return renderBrand(
-        data.href,
-        renderImage(data.image, false) +
-        `<span class="feds-brand-label">${data.label}</span>`
-      );
-
-    case 'BrandImageOnly': {
-      const aria = data.alt ? ` aria-label="${data.alt}"` : '';
-      return renderBrand(
-        data.href,
-        renderImage(data.image, true),
-        aria
-      );
-    }
-
-    case 'ImageOnlyBrand': {
-      const aria = data.alt ? ` aria-label="${data.alt}"` : '';
-      return renderBrand(
-        data.href,
-        renderImage(data.image, false),
-        aria
-      );
-    }
-
-    case 'BrandLabelOnly':
-      return renderBrand(
-        data.href,
-        `<span class="feds-brand-label">${data.label}</span>`
-      );
-
-    case 'NoRender':
-      return '';
-
-    default:
-      data satisfies never;
-      return '';
-  }
+  return renderBrand(data);
 };

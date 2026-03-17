@@ -121,7 +121,6 @@
   --s2a-font-size-xs: var(--s2a-font-size-12);
   --s2a-font-size-sm: var(--s2a-font-size-14);
   --s2a-font-size-md: var(--s2a-font-size-16);
-  --s2a-font-size-lg: var(--s2a-font-size-18);
   --s2a-font-size-xl: var(--s2a-font-size-20);
   --s2a-font-size-2xl: var(--s2a-font-size-24);
   --s2a-font-size-3xl: var(--s2a-font-size-32);
@@ -582,7 +581,7 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
     font-size: var(--s2a-font-size-sm);
   }
 
-  .global-navigation .feds-gnav-items > li > .feds-link {
+  .global-navigation.site-pivot:not(:has(:popover-open)) .feds-gnav-items:has(.feds-link:hover) > li > .feds-link:not(:hover) {
     opacity: 0.65;
   }
 
@@ -788,7 +787,7 @@ header.global-navigation:has(:popover-open) nav {
   
   .feds-popup:popover-open::backdrop {
     opacity: 1;
-    background-color: rgba(0, 0, 0, 0.72);
+    background-color: rgba(0, 0, 0, 0.60);
     backdrop-filter: blur(32px);
   }
   
@@ -1124,34 +1123,19 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 }
 
 /* =========================================
-   Brand / Logo
+   Brand
    ========================================= */
 
-.feds-brand,
-.feds-logo {
+.feds-brand {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
   padding: 0 var(--s2a-spacing-lg) 0 0;
   column-gap: 10px;
 }
 
-
-.feds-brand-image picture,
-.feds-brand-image img,
-.feds-brand-image svg,
-.feds-logo-image picture,
-.feds-logo-image img,
-.feds-logo-image svg {
+.feds-brand-image svg {
   width: 100%;
   display: block;
-}
-
-.feds-brand-label,
-.feds-logo-label {
-  flex-shrink: 0;
-  font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  font-size: var(--s2a-font-size-lg);
-  color: var(--s2a-color-brand-adobe-red);
 }
 
 /* =========================================
@@ -1170,12 +1154,35 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
   display: inherit;
 }
 
-.feds-brand-image.brand-image-only.mobile-brand svg {
+.feds-brand-image.mobile-brand svg {
   height: var(--s2a-spacing-md);
+  width: 18px; /* no token for 18px */
 }
 
-.feds-brand-image.brand-image-only.desktop-brand svg {
+.feds-brand-image.desktop-brand svg {
   width: 67px;
+}
+
+/* For light background */
+.feds-brand-image {
+  & img:nth-child(1) { display: inherit; }
+  & img:nth-child(2) { display: none; }
+}
+
+/* For dark background */
+.feds-dark-bg {
+  & .feds-brand-image {
+    & img:nth-child(1) { display: none; }
+    & img:nth-child(2) { display: inherit; }
+  }
+}
+
+/* same behavior for both "scrolled" and "popup open" states (considering for transparent-white/light background only)*/
+:is(.feds-header-scrolled, .global-navigation:has(.feds-popup:popover-open)) {
+  & .feds-brand-wrapper .feds-brand-image {
+    & img:nth-child(1) { display: inherit; }
+    & img:nth-child(2) { display: none; }
+  }
 }
 
 /* =========================================
@@ -1221,10 +1228,6 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
     padding-left: 0;
   }
 
-  .feds-brand-image + .feds-brand-label {
-    display: flex;
-  }
-
   .feds-brand-image.desktop-brand {
     display: inherit;
   }
@@ -1237,7 +1240,6 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
     display: none;
   }
 }
-
 /* Mega Menu grid structure for links-card and promo-card */
 
 /* =========================================
@@ -1590,6 +1592,10 @@ ul.tabs .product-links {
   .feds-popup .links-card {
     border-radius: var(--s2a-border-radius-16); /* Don't have a token */
     padding: var(--s2a-spacing-lg) var(--s2a-spacing-lg) var(--s2a-spacing-md);
+  }
+  .feds-popup .links-card .links-card-footer .feds-secondary-cta:hover {
+    color: var(--s2a-color-gray-25);
+    background-color:var(--s2a-color-gray-1000);
   }
 }
 
@@ -2175,39 +2181,13 @@ ul.tabs .product-links {
    ========================================= */
 
 @media (min-width: 1024px) and (hover: hover) {
-  .featured-card,
-  .featured-card .featured-eyebrow,
-  .featured-card h4,
-  .featured-card .featured-subtitle,
-  .featured-card .feds-link,
   .featured-card a.feds-secondary-cta {
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
 
-  .featured-card:hover {
+  .featured-card a.feds-secondary-cta:hover {
     background: var(--s2a-color-gray-1000);
-  }
-
-  .featured-card:hover .featured-eyebrow {
-    /* No token: design uses transparent-white/700 */
-    color: rgba(255, 255, 255, 0.66);
-  }
-
-  .featured-card:hover h4,
-  .featured-card:hover .featured-subtitle,
-  .featured-card:hover .feds-link {
     color: var(--s2a-color-gray-25);
-  }
-
-  .featured-card:hover a.feds-secondary-cta {
-    background: var(--s2a-color-gray-25);
-    color: var(--s2a-color-gray-1000);
     border-color: var(--s2a-color-gray-25);
-  }
-  .featured-card .footer-container a.feds-secondary-cta:hover {
-    background: var(--s2a-color-gray-25);
-  }
-  .featured-card:hover span svg {
-    color: var(--s2a-color-gray-25);
   }
 }

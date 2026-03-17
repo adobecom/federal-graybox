@@ -122,39 +122,13 @@
    ========================================= */
 
 @media (min-width: 1024px) and (hover: hover) {
-  .featured-card,
-  .featured-card .featured-eyebrow,
-  .featured-card h4,
-  .featured-card .featured-subtitle,
-  .featured-card .feds-link,
   .featured-card a.feds-secondary-cta {
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
 
-  .featured-card:hover {
+  .featured-card a.feds-secondary-cta:hover {
     background: var(--s2a-color-gray-1000);
-  }
-
-  .featured-card:hover .featured-eyebrow {
-    /* No token: design uses transparent-white/700 */
-    color: rgba(255, 255, 255, 0.66);
-  }
-
-  .featured-card:hover h4,
-  .featured-card:hover .featured-subtitle,
-  .featured-card:hover .feds-link {
     color: var(--s2a-color-gray-25);
-  }
-
-  .featured-card:hover a.feds-secondary-cta {
-    background: var(--s2a-color-gray-25);
-    color: var(--s2a-color-gray-1000);
     border-color: var(--s2a-color-gray-25);
-  }
-  .featured-card .footer-container a.feds-secondary-cta:hover {
-    background: var(--s2a-color-gray-25);
-  }
-  .featured-card:hover span svg {
-    color: var(--s2a-color-gray-25);
   }
 }

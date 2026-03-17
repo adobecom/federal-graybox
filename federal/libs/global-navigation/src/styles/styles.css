@@ -31,7 +31,8 @@ header.feds-header-scrolled .feds-link {
 }
 
 .global-navigation.site-pivot:has(:popover-open) .universal-nav-container .profile-signed-out button,
-.global-navigation.site-pivot .universal-nav-container .profile-signed-out button:hover {
+.global-navigation.site-pivot .universal-nav-container .profile-signed-out button:hover,
+.global-navigation.site-pivot .universal-nav-container .profile-signed-out button:focus-visible {
   color: inherit;
 }
 
@@ -172,7 +173,8 @@ header.feds-header-scrolled .feds-link {
   fill: var(--s2a-color-gray-1000);
 }
 
-.global-navigation .unav-comp-app-switcher.unav-comp-icon:hover svg {
+.global-navigation .unav-comp-app-switcher.unav-comp-icon:hover svg,
+.global-navigation .unav-comp-app-switcher.unav-comp-icon:focus-visible svg {
   fill: var(--s2a-color-gray-1000);
 }
 

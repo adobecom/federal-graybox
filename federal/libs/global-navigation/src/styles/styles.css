@@ -488,6 +488,9 @@ header.global-navigation:has(:popover-open) .unav-comp-tooltip {
     display: none;
   }
 
+  .feds-popup > div {
+    max-width: 1920px;
+  }
   .feds-popup .feds-product-card__title {
     font-weight: var(--s2a-font-weight-adobe-clean-bold);
     font-size: var(--s2a-typography-font-size-eyebrow);
@@ -554,7 +557,20 @@ header.global-navigation:has(:popover-open) nav {
   padding: var(--s2a-spacing-xs) var(--s2a-spacing-xs) 0 calc(var(--s2a-spacing-md) + var(--s2a-spacing-xs));
   backdrop-filter: blur(0);
   background-color: var(--s2a-color-gray-75);
-  max-width: 100%;
+}
+
+@media (min-width: 1920px) {
+  header.global-navigation nav {
+    &:has(:popover-open) {
+      padding-left: calc(8px + (100vw - 1920px) *  0.5);
+      padding-right: calc(8px + (100vw - 1920px) *  0.5);
+      margin-left: 0;
+      margin-right: 0;
+    }
+    & .feds-popup > div {
+      margin: 0 auto;
+    }
+  }
 }
 
 @supports ((animation-timeline: scroll()) and (animation-range: 0% 100%)) {

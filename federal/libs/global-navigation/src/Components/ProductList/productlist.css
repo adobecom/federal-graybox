@@ -69,7 +69,7 @@
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: 8px;
   color: var(--s2a-color-content-default);
-  background: var(--s2a-color-transparent-black-08);
+  background: rgb(0 0 0 / 4%);
   cursor: pointer;
 }
 

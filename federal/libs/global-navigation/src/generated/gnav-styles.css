@@ -18,7 +18,6 @@
   --s2a-color-blue-900: #3b63fb;
   --s2a-color-red-900: #d73220;
   --s2a-color-transparent-black-64: rgb(0 0 0 / 64%);
-  --s2a-color-transparent-black-08: rgb(0 0 0 / 8%);
   --s2a-color-brand-adobe-red: #eb1000;
   --s2a-border-radius-0: 0;
   --s2a-border-radius-2: 2px;
@@ -129,6 +128,7 @@
 :root[data-theme="light"] {
   --s2a-color-content-default: var(--s2a-color-gray-800);
   --s2a-color-content-subtle: var(--s2a-color-gray-700);
+  --s2a-color-content-body-subtle: var(--s2a-color-transparent-black-64);
 }
 
 /* ========== Gnav component styles ========== */
@@ -264,7 +264,6 @@ header.feds-header-scrolled .feds-link {
 
 .global-navigation nav .feds-nav-toggle {
   margin: 0;
-  margin-left: var(--s2a-spacing-2xs);
   padding: 0;
   border: none;
   background: transparent;
@@ -538,9 +537,9 @@ header.global-navigation .universal-nav-container #universal-nav {
   border: var(--s2a-border-width-sm) solid var(--s2a-color-content-default);
   border-radius: var(--s2a-border-radius-round);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  font-size: var(--s2a-typography-font-size-body-sm);
-  line-height: var(--s2a-typography-line-height-body-sm);
-  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
   color: var(--s2a-color-content-default);
   text-decoration: none;
 }
@@ -1171,7 +1170,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 .feds-brand {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
-  padding: 0 var(--s2a-spacing-lg) 0 0;
+  padding-right: var(--s2a-spacing-sm);
   column-gap: 10px;
 }
 
@@ -1622,6 +1621,8 @@ ul.tabs .product-links {
   width: 100%;
   box-sizing: border-box;
   justify-content: center;
+  color: var(--s2a-color-gray-25);
+  background-color:var(--s2a-color-gray-1000);
 }
 
 /* =========================================
@@ -1632,6 +1633,11 @@ ul.tabs .product-links {
   .feds-popup .links-card {
     border-radius: var(--s2a-border-radius-16); /* Don't have a token */
     padding: var(--s2a-spacing-lg) var(--s2a-spacing-lg) var(--s2a-spacing-md);
+  }
+
+  .feds-popup .links-card .links-card-footer .feds-secondary-cta {
+    color: var(--s2a-color-gray-1000);
+    background-color: transparent;
   }
   .feds-popup .links-card .links-card-footer .feds-secondary-cta:hover {
     color: var(--s2a-color-gray-25);
@@ -1720,7 +1726,7 @@ ul.tabs .product-links {
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: 8px;
   color: var(--s2a-color-content-default);
-  background: var(--s2a-color-transparent-black-08);
+  background: rgb(0 0 0 / 4%);
   cursor: pointer;
 }
 
@@ -2138,18 +2144,21 @@ ul.tabs .product-links {
 
 .feds-popup .featured-card .featured-eyebrow {
   /* No token: design uses custom gray; using content-subtle */
-  color: var(--s2a-color-content-subtle);
+  color: var(--s2a-color-content-body-subtle);
   font-family: var(--body-font-family);
-  font-size: var(--s2a-font-size-sm);
+  font-size: var(--s2a-typography-font-size-label);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  line-height: var(--s2a-typography-line-height-label);
 }
 
 .feds-popup .featured-card h4 {
   margin: 0;
   font-family: var(--s2a-font-family-heading);
-  font-size: var(--s2a-font-size-2xl);
-  line-height: 24px;
-  color: var(--s2a-color-gray-1000);
+  font-size: var(--s2a-typography-font-size-title-4);
+  line-height: var(--s2a-typography-line-height-title-4);
+  letter-spacing: var(--s2a-typography-letter-spacing-title-4);
+  color: var(--s2a-color-content-default);
   padding: var(--s2a-spacing-md) 0 var(--s2a-spacing-xs) 0;
   font-weight: var(--s2a-font-weight-adobe-clean-black);
 }

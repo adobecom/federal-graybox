@@ -19,9 +19,9 @@ const renderCard = (card: GnavColumn["cards"][number]): HTML => {
 export const gnavCards = ({
   sections
 }: GnavCards): HTML => `
-  <ul class="feds-gnav-cards">
+  <div class="feds-gnav-cards">
     ${sections.map((column) => 
       `<li>${column.cards.map((card) => renderCard(card)).join("")}</li>`
     ).join("")}
-  </ul>
+  </div>
 `;

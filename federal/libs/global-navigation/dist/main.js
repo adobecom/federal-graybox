@@ -1576,7 +1576,7 @@ ul.tabs .product-links {
 .feds-popup .feds-gnav-cards {
   list-style: none;
   margin: 0;
-  padding: var(--s2a-spacing-sm) var(--s2a-spacing-lg) var(--s2a-spacing-lg);
+  padding: 0 var(--s2a-spacing-lg) var(--s2a-spacing-lg);
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--s2a-spacing-2xs);
@@ -1877,6 +1877,7 @@ ul.tabs .product-links {
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  background-color: transparent;
 }
 
 .feds-popup .product-list .tabs {
@@ -1940,7 +1941,7 @@ ul.tabs .product-links {
 .product-list .tab-content [role="tabpanel"] {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--s2a-spacing-xs);
+  gap: var(--s2a-spacing-2xs);
   padding: 0;
   margin: 0;
   list-style: none;
@@ -2016,6 +2017,7 @@ ul.tabs .product-links {
 
   .product-list .tab-content [role="tabpanel"] {
     grid-template-columns: repeat(3, 1fr);
+    gap: var(--s2a-spacing-xs);
   }
 }
 

@@ -34,6 +34,7 @@
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  background-color: transparent;
 }
 
 .feds-popup .product-list .tabs {
@@ -97,7 +98,7 @@
 .product-list .tab-content [role="tabpanel"] {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--s2a-spacing-xs);
+  gap: var(--s2a-spacing-2xs);
   padding: 0;
   margin: 0;
   list-style: none;
@@ -173,6 +174,7 @@
 
   .product-list .tab-content [role="tabpanel"] {
     grid-template-columns: repeat(3, 1fr);
+    gap: var(--s2a-spacing-xs);
   }
 }
 

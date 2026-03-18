@@ -2352,9 +2352,10 @@ ul.tabs .product-links {
 .feds-popup .featured-card h4 {
   margin: 0;
   font-family: var(--s2a-font-family-heading);
-  font-size: var(--s2a-font-size-2xl);
-  line-height: 24px;
-  color: var(--s2a-color-gray-1000);
+  font-size: var(--s2a-typography-font-size-title-4);
+  line-height: var(--s2a-typography-line-height-title-4);
+  letter-spacing: var(--s2a-typography-letter-spacing-title-4);
+  color: var(--s2a-color-content-default);
   padding: var(--s2a-spacing-md) 0 var(--s2a-spacing-xs) 0;
   font-weight: var(--s2a-font-weight-adobe-clean-black);
 }

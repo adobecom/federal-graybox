@@ -11,7 +11,7 @@
  */
 
 import { setLibs } from './utils.js';
-import locales from './locales.js';
+import locales from '../federal/utils/locales.js';
 
 // Add project-wide style path here.
 const STYLES = '';

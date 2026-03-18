@@ -127,9 +127,9 @@ version="1.0" encoding="UTF-8"?>
     </div>
   </article>
 `.trim();var Fe=n=>{switch(n.type){case"FeaturedCard":return Zn(n);case"LinksCard":return Xn(n);case"PromoCard":return Kn(n);default:}return""},Vn=({sections:n})=>`
-  <ul class="feds-gnav-cards">
+  <div class="feds-gnav-cards">
     ${n.map(e=>`<li>${e.cards.map(r=>Fe(r)).join("")}</li>`).join("")}
-  </ul>
+  </div>
 `;var Yn=({categories:n,links:e})=>{let r=`
     <ul class="tabs" role="tablist">
       ${n.map(We).join("")}
@@ -214,7 +214,6 @@ version="1.0" encoding="UTF-8"?>
   --s2a-color-blue-900: #3b63fb;
   --s2a-color-red-900: #d73220;
   --s2a-color-transparent-black-64: rgb(0 0 0 / 64%);
-  --s2a-color-transparent-black-08: rgb(0 0 0 / 8%);
   --s2a-color-brand-adobe-red: #eb1000;
   --s2a-border-radius-0: 0;
   --s2a-border-radius-2: 2px;
@@ -325,6 +324,7 @@ version="1.0" encoding="UTF-8"?>
 :root[data-theme="light"] {
   --s2a-color-content-default: var(--s2a-color-gray-800);
   --s2a-color-content-subtle: var(--s2a-color-gray-700);
+  --s2a-color-content-body-subtle: var(--s2a-color-transparent-black-64);
 }
 
 /* ========== Gnav component styles ========== */
@@ -1818,6 +1818,8 @@ ul.tabs .product-links {
   width: 100%;
   box-sizing: border-box;
   justify-content: center;
+  color: var(--s2a-color-gray-25);
+  background-color:var(--s2a-color-gray-1000);
 }
 
 /* =========================================
@@ -1828,6 +1830,11 @@ ul.tabs .product-links {
   .feds-popup .links-card {
     border-radius: var(--s2a-border-radius-16); /* Don't have a token */
     padding: var(--s2a-spacing-lg) var(--s2a-spacing-lg) var(--s2a-spacing-md);
+  }
+
+  .feds-popup .links-card .links-card-footer .feds-secondary-cta {
+    color: var(--s2a-color-gray-1000);
+    background-color: transparent;
   }
   .feds-popup .links-card .links-card-footer .feds-secondary-cta:hover {
     color: var(--s2a-color-gray-25);
@@ -1916,7 +1923,7 @@ ul.tabs .product-links {
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: 8px;
   color: var(--s2a-color-content-default);
-  background: var(--s2a-color-transparent-black-08);
+  background: rgb(0 0 0 / 4%);
   cursor: pointer;
 }
 
@@ -2334,10 +2341,12 @@ ul.tabs .product-links {
 
 .feds-popup .featured-card .featured-eyebrow {
   /* No token: design uses custom gray; using content-subtle */
-  color: var(--s2a-color-content-subtle);
+  color: var(--s2a-color-content-body-subtle);
   font-family: var(--body-font-family);
-  font-size: var(--s2a-font-size-sm);
+  font-size: var(--s2a-typography-font-size-label);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  line-height: var(--s2a-typography-line-height-label);
 }
 
 .feds-popup .featured-card h4 {

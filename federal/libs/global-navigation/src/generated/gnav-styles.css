@@ -264,7 +264,6 @@ header.feds-header-scrolled .feds-link {
 
 .global-navigation nav .feds-nav-toggle {
   margin: 0;
-  margin-left: var(--s2a-spacing-2xs);
   padding: 0;
   border: none;
   background: transparent;
@@ -538,9 +537,9 @@ header.global-navigation .universal-nav-container #universal-nav {
   border: var(--s2a-border-width-sm) solid var(--s2a-color-content-default);
   border-radius: var(--s2a-border-radius-round);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  font-size: var(--s2a-typography-font-size-body-sm);
-  line-height: var(--s2a-typography-line-height-body-sm);
-  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
   color: var(--s2a-color-content-default);
   text-decoration: none;
 }
@@ -1171,7 +1170,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 .feds-brand {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
-  padding: 0 var(--s2a-spacing-lg) 0 0;
+  padding-right: var(--s2a-spacing-sm);
   column-gap: 10px;
 }
 

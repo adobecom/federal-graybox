@@ -25,7 +25,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 .feds-brand {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
-  padding: 0 var(--s2a-spacing-lg) 0 0;
+  padding-right: var(--s2a-spacing-sm);
   column-gap: 10px;
 }
 

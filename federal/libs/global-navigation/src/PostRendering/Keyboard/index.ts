@@ -74,6 +74,19 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     const popup = openPopup();
     const menuWrapper = gnav.querySelector<HTMLElement>('#feds-menu-wrapper');
     if (!menuWrapper) return false;
+
+    // On mobile subscreen, Esc should behave like clicking "Back".
+    const gnavItems = menuWrapper.querySelector<HTMLElement>('.feds-gnav-items');
+    const backButton = popup
+      ? popup.querySelector<HTMLElement>('.feds-popup-back-button')
+      : null;
+    const isSubscreenOpening = gnavItems?.classList.contains('subscreen-opening') === true;
+    if (popup !== null && isSubscreenOpening && backButton !== null) {
+      backButton.click();
+      event.preventDefault();
+      return true;
+    }
+
     const popover = popup ?? (menuWrapper?.matches(':popover-open') ? menuWrapper : null);
     if (!popover) return false;
     (popover as HTMLElement & { hidePopover?: () => void }).hidePopover?.();

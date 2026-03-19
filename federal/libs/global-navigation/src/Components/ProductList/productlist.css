@@ -8,8 +8,6 @@
   align-items: start;
   gap: var(--s2a-spacing-lg);
   padding: var(--s2a-spacing-lg);
-  /* No token: design #f6f6f6; using gray-75 */
-  background-color: var(--s2a-color-gray-75);
   border-radius: var(--s2a-border-radius-md);
   width: 100%;
 }
@@ -183,7 +181,13 @@
    ========================================= */
 
 @media (min-width: 1920px) {
-  .product-list .tab-content [role="tabpanel"] {
+  .feds-popup .product-list {
+    grid-template-columns: auto minmax(0,3fr);
+  }
+  .feds-popup .product-list .tab-content [role="tabpanel"] {
     grid-template-columns: repeat(5, 1fr);
+  }
+  .feds-popup .product-list .tabs {
+    margin-right: var(--s2a-spacing-4xl);
   }
 }

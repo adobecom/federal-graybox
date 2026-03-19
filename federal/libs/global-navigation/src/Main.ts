@@ -12,9 +12,7 @@ import './generated/gnav-styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
-
-// TODO implement Analytcs
-
+ 
 type GlobalNavigation = {
   closeEverything: () => void;
   reloadUnav: () => void;
@@ -114,6 +112,7 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
+  mountpoint.querySelector('nav')?.showPopover();
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
   ]
@@ -137,7 +136,7 @@ export const renderGnavString = ({
   unavEnabled,
 }: GlobalNavigationData
 ): string => `
-<nav>
+<nav popover="manual">
   <ul>
     ${((): string => {
       const brandComponent = components.find((c) =>
@@ -331,7 +330,10 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   menuWrapper?.addEventListener("toggle", updateHeaderState);
 };
 
-const initHeaderAnalytics = (mountpoint: HTMLElement, mepMartech: string): void => {
+const initHeaderAnalytics = (
+  mountpoint: HTMLElement,
+  mepMartech: string
+): void => {
   const header = mountpoint.closest("header");
   if (header === null) return;
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);

@@ -13,9 +13,9 @@ const injectCSSPlugin = {
 
       const contents = `
         const css = ${JSON.stringify(css)};
-        const style = document.createElement('style');
-        style.textContent = css;
-        document.head.appendChild(style);
+        const sheet = new CSSStyleSheet();
+        sheet.replaceSync(String.raw\`${css}\`);
+        document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
       `;
 
       return { contents, loader: 'js' };

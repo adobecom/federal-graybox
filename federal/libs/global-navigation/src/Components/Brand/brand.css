@@ -13,8 +13,8 @@ li.feds-brand-wrapper {
   justify-content: flex-start;
 }
 
-header.global-navigation:has(:popover-open) nav .feds-brand-image svg,
-header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
+header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) nav .feds-brand-image svg,
+header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) nav .feds-nav-toggle svg {
   color: var(--s2a-color-gray-1000);
 }
 
@@ -25,7 +25,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
 .feds-brand {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
-  padding-right: var(--s2a-spacing-sm);
+  padding: 0 var(--s2a-spacing-sm) 0 var(--s2a-spacing-md);
   column-gap: 10px;
 }
 
@@ -94,7 +94,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
       opacity: 0;
     }
   }
-  header.global-navigation:has(:popover-open) .feds-brand {
+  header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-brand {
     animation: brand-fade 0.3s;
     opacity: 0;
     pointer-events: none;
@@ -103,8 +103,8 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
     transform: translateX(0);
     transition: transform 0.3s ease;
   }
-  header.global-navigation:has(:popover-open) .feds-nav-toggle {
-    transform: translateX(-34px);
+  header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-nav-toggle {
+    transform: translateX(-30px);
   }
 }
 
@@ -128,7 +128,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
     display: inherit;
   }
 
-  header:has(:popover-open) .feds-brand-image svg {
+  header:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-brand-image svg {
     color: var(--s2a-color-gray-1000);
   }
 

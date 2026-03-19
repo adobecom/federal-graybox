@@ -90,7 +90,8 @@ header.global-navigation nav::after {
   backdrop-filter: blur(0px);
   border-radius: var(--s2a-border-radius-16);
   z-index: -1;
-  transition: all 0.48s cubic-bezier(0.42, 0, 0.2, 1);
+  transition: all 0.48s cubic-bezier(0.42, 0, 0.2, 1),
+              height 0.35s ease;
 }
 
 header.global-navigation.feds-header-scrolled nav::after {

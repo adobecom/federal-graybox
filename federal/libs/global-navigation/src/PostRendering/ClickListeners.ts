@@ -20,6 +20,7 @@ export const initClickListeners = (
       tabPanels[i]?.removeAttribute('hidden');
       button.setAttribute('aria-selected', 'true');
       
+      if (!popover) return;
       if (!isDesktop.matches) return;
       const popoverBackgroundRule = getPopoverBackgroundRule()
       if (!popoverBackgroundRule) return;
@@ -43,7 +44,7 @@ export const initClickListeners = (
   };
 };
 
-const getPopoverBackgroundRule = () => 
+const getPopoverBackgroundRule = () =>
   [...document.adoptedStyleSheets.flatMap(sheet => [...sheet.cssRules])]
     .find(rule => 
           (rule as CSSStyleRule)?.selectorText === 'header.global-navigation nav::after');
@@ -55,32 +56,32 @@ const animations = (gnav: HTMLElement): void => {
 
   // popover height animations
   const popoverBackgroundRule = getPopoverBackgroundRule();
+  const resizeObserver = new ResizeObserver(entries => {
+    if (entries.length < 1) return;
+    const openPopover = gnav.querySelector('.feds-popup:popover-open');
+    if (!openPopover) {
+      (popoverBackgroundRule as CSSStyleRule).style.height = '100%';
+      return;
+    }
+    const resetPopoverHeight = openPopover.clientHeight < 1;
+    const height = resetPopoverHeight ? '100%' : `${openPopover.clientHeight + 72}px`;
+    (popoverBackgroundRule as CSSStyleRule).style.height = height;
+  });
 
   mainMenuButtons.forEach(button => {
     if (!popoverBackgroundRule) return;
     const popup = button.nextElementSibling;
     if (!popup) return;
-
-    // @ts-expect-error popup is a popover that has a toggle event
+    resizeObserver.observe(popup);
+    // @ts-expect-error popup is a popover with a toggle event
     popup.addEventListener('toggle', (event: ToggleEvent) => {
-      if (event.newState === 'open') {
-        const newHeight = (popup as HTMLElement).offsetHeight ?? 0;
-        (popoverBackgroundRule as CSSStyleRule).style.height = `${newHeight + 72}px`;
-      } else {
+      if (event.newState !== 'open' && !gnav.querySelector('.feds-popup:popover-open')) {
         (popoverBackgroundRule as CSSStyleRule).style.height = '100%';
-        // Bandaid for using escape for closing the popup in mobile
-        if (isDesktop.matches) return;
-        fedsGnavItems?.classList.remove('subscreen-opening');
-        fedsGnavItems?.classList.add('subscreen-closing');
+      } else {
+        // in case the resize observer fails
+        (popoverBackgroundRule as CSSStyleRule).style.height = `${popup.clientHeight + 72}px`;
       }
     });
-  });
-  window.addEventListener('resize', () => {
-    if (!popoverBackgroundRule) return;
-    const popup = gnav.querySelector('.feds-popup:popover-open');
-    if (!popup) return;
-    const newHeight = (popup as HTMLElement).offsetHeight ?? 0;
-    (popoverBackgroundRule as CSSStyleRule).style.height = `${newHeight + 72}px`;
   });
 
   // Mobile subscreen animations

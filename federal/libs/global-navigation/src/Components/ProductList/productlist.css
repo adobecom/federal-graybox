@@ -105,7 +105,6 @@
 .product-list .tab-content [role="tabpanel"] .feds-product-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-height: 120px;
   height: auto;
   background-color: var(--s2a-color-gray-25);

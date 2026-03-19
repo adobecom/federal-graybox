@@ -115,6 +115,7 @@
   --s2a-spacing-md: var(--s2a-spacing-16);
   --s2a-spacing-lg: var(--s2a-spacing-24);
   --s2a-spacing-xl: var(--s2a-spacing-32);
+  --s2a-spacing-2xl: var(--s2a-spacing-40);
   --s2a-spacing-3xl: var(--s2a-spacing-48);
   --s2a-spacing-4xl: var(--s2a-spacing-64);
   --s2a-font-family-heading: var(--s2a-font-family-adobe-clean-display);
@@ -458,11 +459,11 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
 .feds-popup .feds-product-card {
   display: grid;
   grid-template-columns: var(--s2a-spacing-xl) minmax(0, 1fr);
-  gap: var(--s2a-spacing-sm);
+  gap: var(--s2a-spacing-lg);
   min-height: 52px;
   align-items: start;
   border-radius: var(--s2a-border-radius-md);
-  padding: var(--s2a-spacing-md);
+  padding: var(--s2a-spacing-lg);
   text-decoration: none;
   color: var(--s2a-color-content-default);
 }
@@ -504,14 +505,14 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
 .feds-popup .feds-product-card__badge {
   display: inline-flex;
   align-items: center;
-  min-height: 28px;
-  padding: 0 14px;
-  border: var(--s2a-border-width-sm) solid var(--s2a-color-content-default);
+  padding: 4px 8px;
+  border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
   border-radius: var(--s2a-border-radius-sm);
   font-size: var(--s2a-font-size-xs);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  line-height: 1;
-  color: var(--s2a-color-content-default);
+  line-height: var(--s2a-typography-line-height-caption);
+  color: var(--s2a-color-gray-1000);
+  letter-spacing: var(--s2a-typography-letter-spacing-caption);
 }
 
 .feds-popup .feds-product-card__badge--filled {
@@ -522,11 +523,11 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
 
 .feds-popup .feds-product-card__subtitle {
   margin-top: var(--s2a-spacing-2xs);
-  font-size: var(--s2a-font-size-xs);
+  font-size: var(--s2a-typography-font-size-body-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-regular);
-  line-height: 1.35;
-  /* No token: design uses custom gray; using content-subtle */
-  color: var(--s2a-color-content-subtle);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  color: var(--s2a-color-content-body-subtle);
 }
 
 .feds-popup .feds-product-card__price {
@@ -726,6 +727,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
   }
 
   .feds-popup .feds-product-card {
+    gap: var(--s2a-spacing-2xl);     
     border-radius: var(--s2a-border-radius-24);
   }
 
@@ -735,6 +737,10 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
 
   header.global-navigation nav:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open)::after {
     border-radius: 0;
+  }
+
+  .feds-popup .feds-product-card__subtitle {
+    margin-top: var(--s2a-spacing-xs);
   }
 }
 
@@ -1297,8 +1303,8 @@ header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popove
 }
 
 .feds-popup-header .product-links .feds-link svg {
-  width: 3px;
-  height: 6px;
+  width: 5px;
+  height: 8px;
   flex-shrink: 0;
 }
 
@@ -1748,7 +1754,6 @@ ul.tabs .product-links {
 .product-list .tab-content [role="tabpanel"] .feds-product-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-height: 120px;
   height: auto;
   background-color: var(--s2a-color-gray-25);
@@ -2177,6 +2182,8 @@ ul.tabs .product-links {
 .featured-card span svg {
   margin-top: 2px;
   color: var(--s2a-color-gray-1000);
+  width: 3px;
+  height: 8px;
 }
 
 .featured-card a.feds-secondary-cta {

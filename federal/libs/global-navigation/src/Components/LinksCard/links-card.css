@@ -19,6 +19,7 @@
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   color: var(--s2a-color-gray-1000);
+  font-family: var(--s2a-font-family-heading);
 }
 
 

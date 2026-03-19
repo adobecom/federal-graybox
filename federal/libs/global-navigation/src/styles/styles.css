@@ -836,6 +836,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     visibility: hidden;
     color: var(--s2a-color-gray-1000);
     background-color: transparent;
+    padding: 0;
   }
   
   .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {

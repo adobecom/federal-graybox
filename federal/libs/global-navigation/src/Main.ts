@@ -112,6 +112,7 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
+  mountpoint.querySelector('nav')?.showPopover();
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
   ]
@@ -135,7 +136,7 @@ export const renderGnavString = ({
   unavEnabled,
 }: GlobalNavigationData
 ): string => `
-<nav>
+<nav popover="manual">
   <ul>
     ${((): string => {
       const brandComponent = components.find((c) =>

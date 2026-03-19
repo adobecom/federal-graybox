@@ -399,7 +399,7 @@ header.global-navigation .universal-nav-container #universal-nav {
   justify-content: center;
   width: fit-content;
   padding: 11px 14px 10px;
-  border: var(--s2a-border-width-sm) solid var(--s2a-color-content-default);
+  border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
   border-radius: var(--s2a-border-radius-round);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   font-size: var(--s2a-typography-font-size-label);

@@ -534,7 +534,7 @@ header.global-navigation .universal-nav-container #universal-nav {
   justify-content: center;
   width: fit-content;
   padding: 11px 14px 10px;
-  border: var(--s2a-border-width-sm) solid var(--s2a-color-content-default);
+  border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
   border-radius: var(--s2a-border-radius-round);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   font-size: var(--s2a-typography-font-size-label);
@@ -1249,7 +1249,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
     transition: transform 0.3s ease;
   }
   header.global-navigation:has(:popover-open) .feds-nav-toggle {
-    transform: translateX(-47px);
+    transform: translateX(-34px);
   }
 }
 
@@ -1383,7 +1383,7 @@ ul.tabs .product-links {
 .feds-popup .feds-gnav-cards {
   list-style: none;
   margin: 0;
-  padding: 0 var(--s2a-spacing-lg) var(--s2a-spacing-lg);
+  padding: var(--s2a-spacing-lg);
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--s2a-spacing-2xs);
@@ -1405,6 +1405,7 @@ ul.tabs .product-links {
     gap: var(--s2a-spacing-xs);
     overflow-x: auto;
     width: 100%;
+    padding-top: 0;
   }
 
   .feds-popup .feds-gnav-cards > li {

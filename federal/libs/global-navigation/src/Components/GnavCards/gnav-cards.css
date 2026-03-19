@@ -5,7 +5,7 @@
 .feds-popup .feds-gnav-cards {
   list-style: none;
   margin: 0;
-  padding: 0 var(--s2a-spacing-lg) var(--s2a-spacing-lg);
+  padding: var(--s2a-spacing-lg);
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--s2a-spacing-2xs);
@@ -27,6 +27,7 @@
     gap: var(--s2a-spacing-xs);
     overflow-x: auto;
     width: 100%;
+    padding-top: 0;
   }
 
   .feds-popup .feds-gnav-cards > li {

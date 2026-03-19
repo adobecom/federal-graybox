@@ -302,6 +302,7 @@ header.global-navigation .universal-nav-container #universal-nav {
   font-size: var(--s2a-typography-font-size-title-4);
   line-height: var(--s2a-typography-line-height-title-4);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
+  font-family: var(--s2a-font-family-heading);
 }
 
 .feds-popup .feds-product-card__badges {

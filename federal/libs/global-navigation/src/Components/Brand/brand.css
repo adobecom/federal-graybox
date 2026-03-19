@@ -104,7 +104,7 @@ header.global-navigation:has(:popover-open) nav .feds-nav-toggle svg {
     transition: transform 0.3s ease;
   }
   header.global-navigation:has(:popover-open) .feds-nav-toggle {
-    transform: translateX(-47px);
+    transform: translateX(-34px);
   }
 }
 

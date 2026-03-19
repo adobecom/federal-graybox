@@ -114,10 +114,6 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
    ========================================= */
 
 @media (min-width: 1024px) {
-  .feds-brand,
-  .feds-logo {
-    padding: 0 var(--s2a-spacing-xs);
-  }
   li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;

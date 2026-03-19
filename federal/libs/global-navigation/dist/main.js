@@ -442,7 +442,7 @@ header.global-navigation nav:has(.feds-popup:popover-open, .feds-menu-wrapper:po
 
 @media (max-width: 1023px) {
   header.global-navigation nav:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open)::after {
-    height: 100vh;
+    height: calc(100dvh + var(--s2a-spacing-xs));
   }
 }
 
@@ -967,7 +967,6 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
     background-color: transparent;
     opacity: 0;
     max-height: calc(100dvh - var(--s2a-spacing-64));
-    overflow: hidden;
     clip-path: polygon(0 0, 100% 0, 100% 0%, 0 0%);
     transition:
       display 0.48s allow-discrete,
@@ -1170,6 +1169,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     visibility: hidden;
     color: var(--s2a-color-gray-1000);
     background-color: transparent;
+    padding: 0;
   }
   
   .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
@@ -1446,10 +1446,6 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
    ========================================= */
 
 @media (min-width: 1024px) {
-  .feds-brand,
-  .feds-logo {
-    padding: 0 var(--s2a-spacing-xs);
-  }
   li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;
@@ -2463,8 +2459,8 @@ ul.tabs .product-links {
     border-color: var(--s2a-color-gray-25);
   }
 }
-`);document.adoptedStyleSheets=[...document.adoptedStyleSheets,de];var yo=async n=>{let{gnavSource:e,mountpoint:a,unavEnabled:r,miloConfig:t,personalization:o}=n;if(!(e instanceof URL))throw L(`gnavSource is invalid: ${e}`),new p("gnavSource needs to be a URL object");try{ln(t)}catch(v){throw L(`Failed to initialize MiloConfig: ${v}`),new p(`Failed to initialize MiloConfig: ${v}`)}En(o),Sn(n.localizeLink??(v=>v)),wn(yn(n));let i=await le(n);if(i instanceof p)throw L(i.message),i;let{mainNav:s,aside:l}=i;if(s instanceof p)throw L(s.message),s;let d=te(s,r);if(d instanceof p)throw L(d.message),d;return await Ke(d)(a),Je(n)},Ke=n=>async e=>{let a=Ye(n);e.innerHTML=a,e.classList.add("site-pivot");let r=[...e.querySelectorAll(".mega-menu ~ .feds-popup")];r.forEach(s=>{s.innerHTML=""});let t=n.components.filter(s=>s.type==="MegaMenu"),o=t.map(s=>s.content),i=await Promise.all(o.map(async(s,l)=>{let[d,v]=await s,y=t[l].title;return r[l].innerHTML=Qn(d,r[l].id,y),v}).flat());return e},Ye=({components:n,productCTA:e,unavEnabled:a})=>`
-<nav>
+`);document.adoptedStyleSheets=[...document.adoptedStyleSheets,de];var yo=async n=>{let{gnavSource:e,mountpoint:a,unavEnabled:r,miloConfig:t,personalization:o}=n;if(!(e instanceof URL))throw L(`gnavSource is invalid: ${e}`),new p("gnavSource needs to be a URL object");try{ln(t)}catch(v){throw L(`Failed to initialize MiloConfig: ${v}`),new p(`Failed to initialize MiloConfig: ${v}`)}En(o),Sn(n.localizeLink??(v=>v)),wn(yn(n));let i=await le(n);if(i instanceof p)throw L(i.message),i;let{mainNav:s,aside:l}=i;if(s instanceof p)throw L(s.message),s;let d=te(s,r);if(d instanceof p)throw L(d.message),d;return await Ke(d)(a),Je(n)},Ke=n=>async e=>{let a=Ye(n);e.innerHTML=a,e.classList.add("site-pivot"),e.querySelector("nav")?.showPopover();let r=[...e.querySelectorAll(".mega-menu ~ .feds-popup")];r.forEach(s=>{s.innerHTML=""});let t=n.components.filter(s=>s.type==="MegaMenu"),o=t.map(s=>s.content),i=await Promise.all(o.map(async(s,l)=>{let[d,v]=await s,y=t[l].title;return r[l].innerHTML=Qn(d,r[l].id,y),v}).flat());return e},Ye=({components:n,productCTA:e,unavEnabled:a})=>`
+<nav popover="manual">
   <ul>
     ${(()=>{let r=n.find(l=>l.type==="Brand")??null,t=n.filter(l=>l.type!=="Brand"),o=`
         <button

@@ -279,7 +279,7 @@ header.global-navigation.feds-header-scrolled nav::after {
 
 .feds-link {
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  font-family: var(--s2a-font-family);
+  font-family: var(--s2a-font-family-adobe-clean);
   font-size: var(--s2a-typography-font-size-body-sm);
   line-height: var(--s2a-typography-line-height-body-sm);
   letter-spacing: var(--s2a-typography-letter-spacing-body-sm);

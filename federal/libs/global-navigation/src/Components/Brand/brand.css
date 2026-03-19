@@ -14,7 +14,8 @@ li.feds-brand-wrapper {
 }
 
 header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) nav .feds-brand-image svg,
-header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) nav .feds-nav-toggle svg {
+header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) nav .feds-nav-toggle svg,
+header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   color: var(--s2a-color-gray-1000);
 }
 

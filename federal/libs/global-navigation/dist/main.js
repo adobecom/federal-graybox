@@ -1346,7 +1346,8 @@ li.feds-brand-wrapper {
 }
 
 header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) nav .feds-brand-image svg,
-header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) nav .feds-nav-toggle svg {
+header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) nav .feds-nav-toggle svg,
+header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   color: var(--s2a-color-gray-1000);
 }
 
@@ -1666,10 +1667,9 @@ ul.tabs .product-links {
 
 .feds-gnav-cards .promo-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
-  font-size: var(--s2a-font-size-xl);
-  line-height: 100%;
-  /* No token for percentage */
-  letter-spacing: -1%;
+  font-size: var(--s2a-typography-font-size-title-4);
+  line-height: var(--s2a-typography-line-height-title-4);
+  letter-spacing: var(--s2a-typography-letter-spacing-title-4);
 }
 
 /* =========================================
@@ -1686,7 +1686,11 @@ ul.tabs .product-links {
   border: none;
   background: var(--s2a-color-gray-25);
   color: var(--s2a-color-gray-1000);
-  padding: 11px var(--s2a-spacing-lg);
+  padding: 11px var(--s2a-spacing-lg) var(--s2a-spacing-sm);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 

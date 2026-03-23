@@ -206,11 +206,14 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   // initStaggeredAnimations(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
-
-  //Todo: Fix this after the modal has changed to dialog
-  window.addEventListener('milo:modal:loaded', () => {
+  const handleModalLoaded = () => {
     document.querySelector('nav[popover]')?.removeAttribute('popover');
-  });
+  };
+  if (document.querySelector('.dialog-modal')) {
+    handleModalLoaded();
+  }
+  //Todo: Fix this after the modal has changed to dialog
+  window.addEventListener('milo:modal:loaded', handleModalLoaded);
 
   window.addEventListener('milo:modal:closed', () => {
     const nav = document.querySelector<HTMLElement & { showPopover?: () => void }>('nav');

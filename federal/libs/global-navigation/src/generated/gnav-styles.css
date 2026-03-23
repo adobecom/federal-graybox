@@ -879,9 +879,10 @@ header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) 
   background: var(--s2a-color-gray-75);
 }
 
-header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-app-switcher-tray {
+/* Todo: Discuss with Raghav why he added this */
+/* header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-app-switcher-tray {
   bottom: calc(var(--s2a-spacing-xs) + var(--s2a-spacing-64) - 100vh);
-}
+} */
 
 header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-overlay {
   height: 100vh;

@@ -31,6 +31,11 @@
   }
 
   .feds-popup .feds-gnav-cards > li {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .feds-popup .feds-gnav-cards:has(.promo-card) > li {
     flex: 0 0 auto;
   }
 }

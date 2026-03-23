@@ -234,7 +234,8 @@ header.global-navigation.feds-header-scrolled nav::after {
   fill: var(--s2a-color-gray-1000);
 }
 
-.global-navigation.feds-header-scrolled .unav-comp-app-switcher.unav-comp-icon svg {
+.global-navigation.feds-header-scrolled .unav-comp-app-switcher.unav-comp-icon svg,
+.global-navigation.feds-header-scrolled .unav-comp-external-notifications svg path {
   fill: var(--s2a-color-gray-1000);
 }
 
@@ -249,7 +250,8 @@ header.global-navigation.feds-header-scrolled nav::after {
   border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
 }
 
-header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg {
+header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg,
+header.global-navigation:has(.feds-popup:popover-open) .unav-comp-external-notifications svg path {
   fill: inherit;
 }
 

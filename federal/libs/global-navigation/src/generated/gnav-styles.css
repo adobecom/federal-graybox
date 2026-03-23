@@ -371,7 +371,8 @@ header.global-navigation.feds-header-scrolled nav::after {
   fill: var(--s2a-color-gray-1000);
 }
 
-.global-navigation.feds-header-scrolled .unav-comp-app-switcher.unav-comp-icon svg {
+.global-navigation.feds-header-scrolled .unav-comp-app-switcher.unav-comp-icon svg,
+.global-navigation.feds-header-scrolled .unav-comp-external-notifications svg path {
   fill: var(--s2a-color-gray-1000);
 }
 
@@ -386,7 +387,8 @@ header.global-navigation.feds-header-scrolled nav::after {
   border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
 }
 
-header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg {
+header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg,
+header.global-navigation:has(.feds-popup:popover-open) .unav-comp-external-notifications svg path {
   fill: inherit;
 }
 
@@ -1403,7 +1405,7 @@ ul.tabs .product-links {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--s2a-spacing-2xs);
-  align-items: start;
+  align-items: stretch;
 }
 
 .feds-popup .feds-gnav-cards > li {
@@ -1791,6 +1793,7 @@ ul.tabs .product-links {
   min-height: 120px;
   height: auto;
   background-color: var(--s2a-color-gray-25);
+  justify-content: space-between;
 }
 
 .feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover {

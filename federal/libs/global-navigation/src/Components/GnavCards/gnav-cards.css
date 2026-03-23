@@ -9,7 +9,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--s2a-spacing-2xs);
-  align-items: start;
+  align-items: stretch;
 }
 
 .feds-popup .feds-gnav-cards > li {

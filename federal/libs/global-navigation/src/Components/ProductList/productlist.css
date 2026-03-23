@@ -108,6 +108,7 @@
   min-height: 120px;
   height: auto;
   background-color: var(--s2a-color-gray-25);
+  justify-content: space-between;
 }
 
 .feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover {

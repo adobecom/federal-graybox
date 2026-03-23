@@ -213,6 +213,12 @@ export const postRenderingTasks = async (
   if (document.querySelector('.dialog-modal')) {
     handleModalLoaded();
   }
+
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('a[href*="#openPrivacy"]')) {
+      handleModalLoaded();
+    }
+  });
   //Todo: Fix this after the modal has changed to dialog
   window.addEventListener('milo:modal:loaded', handleModalLoaded);
   window.addEventListener('milo:modal:closed', () => {

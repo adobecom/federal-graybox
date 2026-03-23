@@ -12,6 +12,7 @@
   justify-content: space-between;
   align-items: flex-start;
   overflow: hidden;
+  height: 100%;
 }
 
 .feds-popup .featured-card .featured-eyebrow {

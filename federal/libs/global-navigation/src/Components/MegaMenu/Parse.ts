@@ -92,7 +92,7 @@ const parseGnavCards = (
       "No mega menu items found (did you forget to add them correctly?)"
     );
   }
-  
+
   // Parse each column div and its child cards
   const [sections, errors]
     = parseListAndAccumulateErrors(columnDivs, 

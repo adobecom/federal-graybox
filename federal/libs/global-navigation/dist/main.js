@@ -2484,7 +2484,7 @@ ul.tabs .product-links {
   }
 }
 `);document.adoptedStyleSheets=[...document.adoptedStyleSheets,de];var yo=async n=>{let{gnavSource:e,mountpoint:a,unavEnabled:r,miloConfig:t,personalization:i}=n;if(!(e instanceof URL))throw L(`gnavSource is invalid: ${e}`),new p("gnavSource needs to be a URL object");try{ln(t)}catch(v){throw L(`Failed to initialize MiloConfig: ${v}`),new p(`Failed to initialize MiloConfig: ${v}`)}En(i),Sn(n.localizeLink??(v=>v)),wn(yn(n));let o=await le(n);if(o instanceof p)throw L(o.message),o;let{mainNav:s,aside:l}=o;if(s instanceof p)throw L(s.message),s;let d=te(s,r);if(d instanceof p)throw L(d.message),d;return await Ke(d)(a),Je(n)},Ke=n=>async e=>{let a=Ye(n);e.innerHTML=a,e.classList.add("site-pivot"),e.querySelector("nav")?.showPopover();let r=[...e.querySelectorAll(".mega-menu ~ .feds-popup")];r.forEach(s=>{s.innerHTML=""});let t=n.components.filter(s=>s.type==="MegaMenu"),i=t.map(s=>s.content),o=await Promise.all(i.map(async(s,l)=>{let[d,v]=await s,y=t[l].title;return r[l].innerHTML=Qn(d,r[l].id,y),v}).flat());return e},Ye=({components:n,productCTA:e,unavEnabled:a})=>`
-<nav popover="manual">
+<nav popover="manual" data-lenis-prevent>
   <ul>
     ${(()=>{let r=n.find(l=>l.type==="Brand")??null,t=n.filter(l=>l.type!=="Brand"),i=`
         <button

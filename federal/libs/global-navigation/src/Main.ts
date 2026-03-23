@@ -136,7 +136,7 @@ export const renderGnavString = ({
   unavEnabled,
 }: GlobalNavigationData
 ): string => `
-<nav popover="manual">
+<nav popover="manual" data-lenis-prevent>
   <ul>
     ${((): string => {
       const brandComponent = components.find((c) =>

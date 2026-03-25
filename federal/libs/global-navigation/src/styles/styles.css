@@ -568,6 +568,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
     font-size: var(--s2a-typography-font-size-eyebrow);
     line-height: var(--s2a-typography-line-height-eyebrow);
     letter-spacing: var(--s2a-typography-letter-spacing-eyebrow);
+    font-family: var(--s2a-font-family-adobe-clean);
   }
 }
 

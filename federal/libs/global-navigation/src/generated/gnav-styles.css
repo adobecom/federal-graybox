@@ -876,6 +876,26 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
     animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
   }
 
+  .product-list .tab-content [role="tabpanel"] {
+    opacity: 0;
+    transition:
+      display 0.48s allow-discrete,
+      overlay 0.48s allow-discrete,
+      opacity 0.48s cubic-bezier(0.4, 0, 0.2, 1);
+    &[hidden] {
+      transition: unset;
+    }
+  }
+
+  .product-list .tab-content [role="tabpanel"]:not([hidden]) {
+    opacity: 1;
+  }
+
+  @starting-style {
+    .product-list .tab-content [role="tabpanel"]:not([hidden]) {
+      opacity: 0;
+    }
+  }
 }
 /* =========================================
    Unav App Switcher Fix

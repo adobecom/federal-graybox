@@ -339,6 +339,10 @@ version="1.0" encoding="UTF-8"?>
 /* =========================================
    Header Shell
    ========================================= */
+:root {
+  --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
+  --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
+}
 
 header.global-navigation {
   width: 100%;
@@ -482,7 +486,7 @@ header.global-navigation.feds-header-scrolled nav::after {
 
 .feds-link {
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  font-family: var(--s2a-font-family-adobe-clean);
+  font-family: var(--feds-font-family);
   font-size: var(--s2a-typography-font-size-body-sm);
   line-height: var(--s2a-typography-line-height-body-sm);
   letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
@@ -656,7 +660,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
   line-height: var(--s2a-typography-line-height-title-2);
   letter-spacing: var(--s2a-typography-letter-spacing-title-2);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
-  font-family: var(--s2a-font-family-heading);
+  font-family: var(--feds-heading-font-family);
   color: var(--s2a-color-content-default);
   margin-left: 10px; /* replace with token if we find one later */
 }
@@ -700,7 +704,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
   font-size: var(--s2a-typography-font-size-title-4);
   line-height: var(--s2a-typography-line-height-title-4);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
-  font-family: var(--s2a-font-family-heading);
+  font-family: var(--feds-heading-font-family);
 }
 
 .feds-popup .feds-product-card__badges {
@@ -901,7 +905,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
     font-size: var(--s2a-typography-font-size-eyebrow);
     line-height: var(--s2a-typography-line-height-eyebrow);
     letter-spacing: var(--s2a-typography-letter-spacing-eyebrow);
-    font-family: var(--s2a-font-family-adobe-clean);
+    font-family: var(--feds-font-family);
   }
 }
 
@@ -917,7 +921,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
   }
 
   .global-navigation.site-pivot .feds-gnav-items > li > .feds-link {
-    font-family: var(--s2a-font-family-adobe-clean-display);
+    font-family: var(--feds-heading-font-family);
     font-weight: var(--s2a-font-weight-adobe-clean-black);
   }
 
@@ -1076,8 +1080,8 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
     opacity: 0;
     transition:
       display 0.48s allow-discrete,
-      overlay 0.48s allow-discrete,
       opacity 0.48s cubic-bezier(0.4, 0, 0.2, 1);
+    transition-delay: 0.2s;
     &[hidden] {
       transition: unset;
     }
@@ -1527,7 +1531,7 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   line-height: 18px;
   white-space: nowrap;
   padding: 0;
-  font-family: var(--s2a-font-family-adobe-clean);
+  font-family: var(--feds-font-family);
 }
 
 .feds-popup-header .product-links .feds-link svg {
@@ -1583,7 +1587,7 @@ ul.tabs .product-links {
   }
 
   ul.tabs .product-links .feds-link {
-    font-family: var(--s2a-font-family-adobe-clean);
+    font-family: var(--feds-font-family);
     padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
   }
 }
@@ -1824,7 +1828,7 @@ ul.tabs .product-links {
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   color: var(--s2a-color-gray-1000);
-  font-family: var(--s2a-font-family-heading);
+  font-family: var(--feds-heading-font-family);
 }
 
 
@@ -1964,7 +1968,7 @@ ul.tabs .product-links {
   border-radius: 75px;
   padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
   text-align: center;
-  font-family: var(--s2a-font-family-adobe-clean);
+  font-family: var(--feds-font-family);
   font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: 8px;
@@ -2127,7 +2131,7 @@ ul.tabs .product-links {
 }
 
 .panels h4 {
-  font-family: var(--s2a-font-family-heading);
+  font-family: var(--feds-heading-font-family);
   font-size: var(--s2a-font-size-2xl);
   line-height: var(--s2a-font-line-height-20);
   margin-left: var(--s2a-spacing-lg);
@@ -2325,7 +2329,7 @@ ul.tabs .product-links {
 }
 
 .image-panel .text span:last-child {
-  font-family: var(--s2a-font-family-heading);
+  font-family: var(--feds-heading-font-family);
   font-size: 21px;
   font-weight: var(--s2a-font-weight-adobe-clean-extrabold);
   line-height: 1.2;
@@ -2404,7 +2408,7 @@ ul.tabs .product-links {
 
 .feds-popup .featured-card h4 {
   margin: 0;
-  font-family: var(--s2a-font-family-heading);
+  font-family: var(--feds-heading-font-family);
   font-size: var(--s2a-typography-font-size-title-4);
   line-height: var(--s2a-typography-line-height-title-4);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);

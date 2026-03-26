@@ -25,7 +25,7 @@
   line-height: 18px;
   white-space: nowrap;
   padding: 0;
-  font-family: var(--s2a-font-family-adobe-clean);
+  font-family: var(--feds-font-family);
 }
 
 .feds-popup-header .product-links .feds-link svg {
@@ -81,7 +81,7 @@ ul.tabs .product-links {
   }
 
   ul.tabs .product-links .feds-link {
-    font-family: var(--s2a-font-family-adobe-clean);
+    font-family: var(--feds-font-family);
     padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
   }
 }

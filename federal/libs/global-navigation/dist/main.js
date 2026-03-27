@@ -344,6 +344,7 @@ version="1.0" encoding="UTF-8"?>
   --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
 }
 
+
 header.global-navigation {
   width: 100%;
   background: transparent;
@@ -947,6 +948,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
 
   body:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) {
     overflow: hidden;
+    scrollbar-gutter: stable;
   }
 
   header.global-navigation nav:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open)::after {
@@ -983,6 +985,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
     border-bottom-right-radius: 18px;
     background-color: transparent;
     opacity: 0;
+    overflow: hidden;
     max-height: calc(100dvh - var(--s2a-spacing-64));
     clip-path: polygon(0 0, 100% 0, 100% 0%, 0 0%);
     transition:
@@ -997,6 +1000,11 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
     opacity: 1;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     transition-delay: 0.15s;
+  }
+
+  .feds-popup:popover-open > :not(.feds-popup-header) {
+    overflow-y: auto;
+    max-height: calc(100dvh - var(--s2a-spacing-64));
   }
 
   @starting-style {

@@ -22,8 +22,8 @@ export const megaMenu = ({
 export const popup = (
   data: MegaMenuContent,
   _popupId: string,
-  title: string,
 ): HTML => {
+  const { megaMenuTitle: title } = data;
   const headerContent = `
         <button
           type="button"

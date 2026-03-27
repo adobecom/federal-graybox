@@ -5,6 +5,7 @@ import { Link, parseLink } from "../Link/Parse";
 
 export type ProductList = {
   type: "ProductList";
+  megaMenuTitle: string;
   categories: List<ProductCategory>;
   links: List<Link>;
 };
@@ -18,6 +19,7 @@ export type ProductCategory = {
 
 export const parseProductList = (
   element: HTMLElement | Element,
+  megaMenuTitle = '',
 ): Parsed<ProductList, RecoverableError> => {
   const unparsedCategories = [...element.querySelectorAll('li > div')];
   const unparsedLinks = [...element.querySelectorAll('li > a')];
@@ -32,6 +34,7 @@ export const parseProductList = (
   return [
     {
       type: "ProductList",
+      megaMenuTitle,
       categories,
       links,
     },

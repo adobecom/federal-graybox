@@ -1,3 +1,5 @@
+import { isDesktop } from "../../Utils/Utils";
+
 function $$(root: Element, selector: string): HTMLElement[] {
   return [...root.querySelectorAll<HTMLElement>(selector)];
 }
@@ -58,6 +60,31 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     };
     popup.addEventListener('toggle', onToggle);
     cleanups.push(() => popup.removeEventListener('toggle', onToggle));
+
+    // Track if Tab key was pressed (without Shift)
+    let tabPressed = false;
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Tab' && !event.shiftKey) {
+        tabPressed = true;
+      }
+    };
+    popup.addEventListener('keydown', onKeyDown);
+    cleanups.push(() => popup.removeEventListener('keydown', onKeyDown));
+
+    // Auto-close popup when focus leaves it via Tab key (not Shift+Tab)
+    const onFocusOut = (event: FocusEvent): void => {
+      if (tabPressed && !popup.contains(event.relatedTarget as Node)) {
+        (popup as HTMLElement & { hidePopover?: () => void }).hidePopover?.();
+        if (!isDesktop.matches) {
+          const gnavItems = popup.closest('.feds-gnav-items');
+          gnavItems?.classList.remove('subscreen-opening');
+          gnavItems?.classList.add('subscreen-closing');
+        }
+        tabPressed = false;
+      }
+    };
+    popup.addEventListener('focusout', onFocusOut);
+    cleanups.push(() => popup.removeEventListener('focusout', onFocusOut));
   });
 
   const focusAndPrevent = (target: HTMLElement, event: KeyboardEvent): void => {
@@ -165,20 +192,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     if (key === 'Tab' && !event.shiftKey) {
       if (index + 1 < items.length) {
         focusAndPrevent(items[index + 1], event);
-      } else {
-        const allTabs = $$(popup, '.tabs [role="tab"]');
-        const selected = selectedTab(popup);
-        const nextTarget = allTabs[allTabs.indexOf(selected as HTMLElement) + 1]
-          ?? popup.querySelector<HTMLElement>('.product-links a');
-          
-        // eslint is disabled because it complains that nextTarget
-        // is always true, but it could be nullish sometimes
-        // eslint-disable-next-line
-        if (nextTarget)
-          focusAndPrevent(nextTarget, event);
-
-        else return false;
-      }
+      } else return false;
       return true;
     }
 
@@ -229,6 +243,15 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     }
     handleTopBar(el, event.key, event);
   }
+
+  const trapLink = gnav.querySelector<HTMLAnchorElement>('.trap-focus-gnav');
+  const onTrapFocus = (e: FocusEvent): void => {
+    if (!gnav.querySelector('.feds-menu-active')) return;
+    e.preventDefault();
+    gnav.querySelector<HTMLElement>('.feds-nav-toggle')?.focus();
+  };
+  trapLink?.addEventListener('focus', onTrapFocus);
+  cleanups.push(() => trapLink?.removeEventListener('focus', onTrapFocus));
 
   gnav.addEventListener('keydown', onKeydown);
   cleanups.push(() => gnav.removeEventListener('keydown', onKeydown));

@@ -9,7 +9,7 @@ import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence } from "./Utils/Utils";
 import './generated/gnav-styles.css';
-import { combineWithFederalPlaceholders, setPlaceholders } from "./Utils/Placeholders";
+import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholdersSync } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
  
@@ -97,7 +97,6 @@ export const main = async (
   }
   
   // TODO: Implement Aside
-  
   await renderGnav(gnavData)(mountpoint);
 
   return postRenderingTasks(input);
@@ -110,6 +109,7 @@ export const renderGnav = (
 mountpoint: HTMLElement
 ): Promise<HTMLElement> => {
   const navHTML = renderGnavString(data);
+  document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
   mountpoint.querySelector('nav')?.showPopover();
@@ -124,8 +124,7 @@ mountpoint: HTMLElement
   const _errors_ = await Promise.all(mmPromises.map(async (mmPromise, idx) => {
     try {
       const [content, errors] = await mmPromise;
-      const title = megaMenuComponents[idx].title;
-      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, title);
+      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id);
       return errors;
     } catch (error) {
       return [error];
@@ -139,8 +138,11 @@ export const renderGnavString = ({
   productCTA,
   unavEnabled,
 }: GlobalNavigationData
-): string => `
+): string => {
+  const placeholders = getPlaceholdersSync()!;
+  return `
 <nav popover="manual" data-lenis-prevent>
+  <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
   <ul>
     ${((): string => {
       const brandComponent = components.find((c) =>
@@ -187,8 +189,10 @@ export const renderGnavString = ({
   </ul>
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
+  <a href="#" class="trap-focus-gnav">.</a>
 </nav>
 `;
+};
 
 
 export const postRenderingTasks = async (
@@ -262,7 +266,6 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
       'daa-ll',
       isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
     );
-    menuWrapper.setAttribute('aria-hidden', String(!isOpen));
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
   });
 
@@ -361,4 +364,5 @@ const initHeaderAnalytics = (
   if (header === null) return;
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
 };
+
 

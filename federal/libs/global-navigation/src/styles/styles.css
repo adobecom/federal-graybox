@@ -4,6 +4,44 @@
  */
 
 /* =========================================
+   Skip to Main Content Link
+   ========================================= */
+
+.feds-skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.trap-focus-gnav {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  display: none;
+}
+
+nav:has(.feds-menu-active) .trap-focus-gnav {
+  display: block;
+}
+
+.feds-skip-link:focus {
+  outline: 2px solid var(--s2a-color-blue-800);
+  outline-offset: 1px;
+}
+
+/* =========================================
    Header Shell
    ========================================= */
 :root {

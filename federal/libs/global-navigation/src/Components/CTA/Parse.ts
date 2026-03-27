@@ -6,6 +6,7 @@ export type PrimaryCTA = {
   text: string;
   href: string;
   ariaLabel?: string;
+  ariaAttrs?: Record<string, string>;
   daaLl?: string | null;
 };
 
@@ -14,6 +15,7 @@ export type SecondaryCTA = {
   text: string;
   href: string;
   ariaLabel?: string;
+  ariaAttrs?: Record<string, string>;
   daaLl?: string | null;
 };
 

@@ -419,6 +419,40 @@ export const getAnalyticsAttrs = (
   return `${daaLhAttr}${daaLlAttr}`;
 };
 
+/**
+ * Renders aria attributes from an object
+ * @param ariaAttrs - Object containing aria attributes
+ * @param ariaLabel - Optional aria-label that takes precedence
+ * @returns Formatted string of aria attributes
+ */
+export const getAriaAttrs = (
+  ariaAttrs?: Record<string, string>,
+  ariaLabel?: string
+): string => {
+  if (!ariaAttrs && !ariaLabel) return '';
+  
+  const attrs: string[] = [];
+  
+  // ariaLabel takes precedence over ariaAttrs['aria-label']
+  if (ariaLabel !== null && ariaLabel !== undefined && ariaLabel !== '') {
+    attrs.push(`aria-label="${ariaLabel}"`);
+  } else if (ariaAttrs?.['aria-label']) {
+    attrs.push(`aria-label="${ariaAttrs['aria-label']}"`);
+  }
+  
+  // Add other aria attributes
+  if (ariaAttrs) {
+    Object.entries(ariaAttrs).forEach(([key, value]) => {
+      // Skip aria-label if we already handled it
+      if (key !== 'aria-label' && value) {
+        attrs.push(`${key}="${value}"`);
+      }
+    });
+  }
+  
+  return attrs.length > 0 ? ` ${attrs.join(' ')}` : '';
+};
+
 
 export const isDarkMode = (): boolean => {
   // TODO: Implement dark mode detection

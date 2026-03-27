@@ -77,6 +77,10 @@ const animations = (gnav: HTMLElement): void => {
     popup.addEventListener('toggle', (event: ToggleEvent) => {
       if (event.newState !== 'open' && !gnav.querySelector('.feds-popup:popover-open')) {
         (popoverBackgroundRule as CSSStyleRule).style.height = '100%';
+        if (isDesktop.matches) return;
+        // Bandaid for using escape for closing the popup in mobile
+        fedsGnavItems?.classList.remove('subscreen-opening');
+        fedsGnavItems?.classList.add('subscreen-closing');
       } else {
         // in case the resize observer fails
         (popoverBackgroundRule as CSSStyleRule).style.height = `${popup.clientHeight + 72}px`;

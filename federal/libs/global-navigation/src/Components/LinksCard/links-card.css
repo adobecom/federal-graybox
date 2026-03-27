@@ -61,8 +61,7 @@
   width: 100%;
   box-sizing: border-box;
   justify-content: center;
-  color: var(--s2a-color-gray-25);
-  background-color:var(--s2a-color-gray-1000);
+  background-color: transparent;
 }
 
 /* =========================================

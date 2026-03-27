@@ -102,11 +102,15 @@
   list-style: none;
 }
 
+.product-list .tab-content [role="tabpanel"] li {
+  display: flex;
+}
+
 .product-list .tab-content [role="tabpanel"] .feds-product-card {
   display: flex;
   flex-direction: column;
   min-height: 120px;
-  height: auto;
+  flex: 1;
   background-color: var(--s2a-color-gray-25);
   justify-content: space-between;
 }

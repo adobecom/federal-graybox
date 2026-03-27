@@ -5,6 +5,22 @@ type CleanupFunction = () => void
 export const initClickListeners = (
   gnav: HTMLElement
 ): CleanupFunction => {
+  const skipLink = gnav.querySelector<HTMLAnchorElement>('.feds-skip-link');
+  const onSkipLinkClick = (e: MouseEvent): void => {
+    const mainContent = document.querySelector('#main-content');
+    if (mainContent instanceof HTMLElement) {
+      e.preventDefault();
+      if (!mainContent.hasAttribute('tabindex')) {
+        mainContent.setAttribute('tabindex', '-1');
+      }
+      setTimeout(() => {
+        mainContent.focus();
+        mainContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  };
+  skipLink?.addEventListener('click', onSkipLinkClick);
+
   const tabButtons = [...gnav.querySelectorAll('.tabs button[role="tab"]')];
   const tabPanels = [...gnav.querySelectorAll('.tab-content ul')];
   const tabButtonClickCallbacks = tabButtons.map((button, i) => (): void => {
@@ -38,6 +54,7 @@ export const initClickListeners = (
   animations(gnav);
 
   return () => {
+    skipLink?.removeEventListener('click', onSkipLinkClick);
     tabButtons.forEach((button, i) => {
       button.removeEventListener('click', tabButtonClickCallbacks[i]);
     });

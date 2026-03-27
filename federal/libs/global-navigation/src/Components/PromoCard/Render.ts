@@ -1,6 +1,6 @@
 import { PromoCard, PromoCardData } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
-import { localizeHref } from "../../Utils/Utils";
+import { localizeHref, sanitize } from "../../Utils/Utils";
 
 export const promoCard = ({ card }: PromoCard): HTML => renderCard(card);
 
@@ -33,17 +33,17 @@ const renderCard = ({
           : ""
       }
       <div class="promo-card__text-content">
-        ${priceHref && isPriceMerchLink ? `<p class="promo-card__price">
+        ${priceHref && isPriceMerchLink ? `<p id="price-${sanitize(title)}" class="promo-card__price">
           <a href="${localizeHref(priceHref)}" class="merch">${priceText}</a>
         </p>` : ''}
-        <p class="promo-card__title" role="heading" aria-level="2">
+        <p id="title-${sanitize(title)}" class="promo-card__title" role="heading" aria-level="2">
           ${title}
         </p>
         ${
           cta === null
             ? ""
             : `<div class="promo-card__cta">
-                 ${secondaryCTA(cta)}
+                 ${secondaryCTA({...cta, ariaAttrs: { 'aria-describedby': `title-${sanitize(title)}${isPriceMerchLink ? ` price-${sanitize(title)}` : ''}` }})}
                </div>`
         }
       </div>

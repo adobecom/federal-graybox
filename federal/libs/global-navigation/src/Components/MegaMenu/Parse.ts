@@ -26,6 +26,7 @@ export type GnavColumn = {
 
 export type GnavCards = {
   type: "GnavCards";
+  megaMenuTitle: string;
   sections: List<GnavColumn>;
 };
 
@@ -54,8 +55,8 @@ export const parseMegaMenu = (
         throw new Error(megaMenuFragment.message);
       replaceDotMedia(fragmentURL.href, megaMenuFragment);
       if (element.classList.contains('product-list'))
-        return parseProductList(megaMenuFragment);
-      return parseGnavCards(megaMenuFragment);
+        return parseProductList(megaMenuFragment, title);
+      return parseGnavCards(megaMenuFragment, title);
     } catch (e) {
         // @ts-expect-error errors usually have a message
         throw new IrrecoverableError(e?.message);
@@ -83,7 +84,8 @@ const ERRORS = {
 };
 
 const parseGnavCards = (
-  fragment: Element | HTMLElement
+  fragment: Element | HTMLElement,
+  megaMenuTitle: string,
 ): Parsed<GnavCards, RecoverableError> => {
   // Get direct children divs - these represent columns
   const columnDivs = [...fragment.children];
@@ -103,6 +105,7 @@ const parseGnavCards = (
   return [
     {
       type: "GnavCards",
+      megaMenuTitle,
       sections,
     },
     errors

@@ -15,6 +15,7 @@
   --s2a-color-gray-1000: #000;
   --s2a-color-blue-100: #f5f9ff;
   --s2a-color-blue-200: #e5f0fe;
+  --s2a-color-blue-800: #4b75ff;
   --s2a-color-blue-900: #3b63fb;
   --s2a-color-red-900: #d73220;
   --s2a-color-transparent-black-64: rgb(0 0 0 / 64%);
@@ -139,6 +140,44 @@
  * Global Navigation Styles
  * Styles for the federal global navigation component
  */
+
+/* =========================================
+   Skip to Main Content Link
+   ========================================= */
+
+.feds-skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.trap-focus-gnav {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  display: none;
+}
+
+nav:has(.feds-menu-active) .trap-focus-gnav {
+  display: block;
+}
+
+.feds-skip-link:focus {
+  outline: 2px solid var(--s2a-color-blue-800);
+  outline-offset: 1px;
+}
 
 /* =========================================
    Header Shell
@@ -1830,6 +1869,7 @@ ul.tabs .product-links {
   flex: 1;
   background-color: var(--s2a-color-gray-25);
   justify-content: space-between;
+  outline-offset: -1px;
 }
 
 .feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover {
@@ -1911,6 +1951,10 @@ ul.tabs .product-links {
   .feds-popup .product-list .tabs {
     margin-right: var(--s2a-spacing-4xl);
   }
+}
+
+.product-hint {
+  display: none;
 }
 
 /* =========================================

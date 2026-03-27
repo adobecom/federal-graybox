@@ -1,11 +1,11 @@
 import { link } from "../Link/Render";
 import { Card, FeaturedCard } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
-import { icons, getAnalyticsAttrs } from "../../Utils/Utils";
+import { icons, getAnalyticsAttrs, sanitize } from "../../Utils/Utils";
 
 export const featuredcards = ({
   card
-}: FeaturedCard): HTML => renderCard(card);
+}: FeaturedCard, megaMenuTitle: string): HTML => renderCard(card, megaMenuTitle);
 
 
 const renderCard = ({
@@ -14,16 +14,20 @@ const renderCard = ({
   eyeBrow,
   footerCTA,
   bodyLink,
-}: Card): HTML => `
-  <article class="featured-card" ${getAnalyticsAttrs(eyeBrow, '')}>
+}: Card, megaMenuTitle: string): HTML => {
+  const eyeBrowId = `featured-eyebrow-${sanitize(eyeBrow)}`;
+  
+  return `
+  <div class="featured-card" tabindex="0" aria-label="${eyeBrow} ${megaMenuTitle}" ${getAnalyticsAttrs(eyeBrow, '')} role="group">
     <div>
-      <div class="featured-eyebrow">${eyeBrow}</div>
+      <div id="${eyeBrowId}" class="featured-eyebrow">${eyeBrow}</div>
       <h4>${title}</h4>
       <div class="featured-subtitle">${subtitle}</div>
-      <span>${link({ ...bodyLink, svgIcon: icons.chevronRight })}</span>
+      <span>${link({ ...bodyLink, ariaAttrs: { 'aria-describedby': eyeBrowId }, svgIcon: icons.chevronRight })}</span>
     </div>
     <div class="footer-container">
-      ${secondaryCTA(footerCTA)}
+      ${secondaryCTA({ ...footerCTA, ariaAttrs: { 'aria-describedby': eyeBrowId } })}
     </div>
-  </article>
+  </div>
 `.trim();
+};

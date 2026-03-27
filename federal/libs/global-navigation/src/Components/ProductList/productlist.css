@@ -113,6 +113,7 @@
   flex: 1;
   background-color: var(--s2a-color-gray-25);
   justify-content: space-between;
+  outline-offset: -1px;
 }
 
 .feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover {
@@ -194,4 +195,8 @@
   .feds-popup .product-list .tabs {
     margin-right: var(--s2a-spacing-4xl);
   }
+}
+
+.product-hint {
+  display: none;
 }

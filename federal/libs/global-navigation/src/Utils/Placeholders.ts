@@ -93,19 +93,25 @@ export function replacePlaceholders(
 
 type PlaceholdersStateFunctions = [
   (p: Promise<Map<string, string>>) => void,
-  () => Promise<Map<string, string>>
+  () => Promise<Map<string, string>>,
+  () => Map<string, string>
 ];
 
 export const [
   setPlaceholders,
-  getPlaceholders
+  getPlaceholders,
+  getPlaceholdersSync,
 ] = ((): PlaceholdersStateFunctions => {
   let placeholdersPromise: Promise<Map<string, string>> | undefined;
+  let resolvedPlaceholders: Map<string, string> | undefined;
 
   return [
     (p: Promise<Map<string, string>>): void => {
       if (placeholdersPromise) return;
-      placeholdersPromise = p;
+      placeholdersPromise = p.then(map => {
+        resolvedPlaceholders = map;
+        return map;
+      });
     },
     (): Promise<Map<string, string>> => {
       if (!placeholdersPromise) {
@@ -113,5 +119,11 @@ export const [
       }
       return placeholdersPromise;
     },
+    (): Map<string, string> => {
+      if (!resolvedPlaceholders) {
+        throw new Error('Placeholders not initialized. Call setPlaceholders() first.');
+      }
+      return resolvedPlaceholders;
+    }
   ];
 })();

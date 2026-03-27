@@ -1,18 +1,28 @@
 import { productCard } from "../ProductCard/Render";
 import { getAnalyticsAttrs, icons, localizeHref } from "../../Utils/Utils";
+import { getPlaceholdersSync } from "../../Utils/Placeholders";
 import { ProductCategory, ProductList } from "./Parse";
 
-export const productlist = ({ categories, links }: ProductList): HTML => {
+export const productlist = (
+  { categories, links }: ProductList
+): HTML => {
+  const placeholders = getPlaceholdersSync();
   const tabs = `
-    <ul class="tabs" role="tablist">
+    <ul class="tabs" role="tablist" aria-orientation="vertical">
       ${categories.map(renderTab).join('')}
       ${links.length ? `<li class="product-links"><a class="feds-link" href="${localizeHref(links[links.length - 1].href)}"${getAnalyticsAttrs(null, links[links.length - 1].daaLl ?? links[links.length - 1].text)}>${links[links.length - 1].text}${icons.chevronRight}</a></li>` : ''}
     </ul>
   `.trim();
   const tabcontent = `
     <ul class="tab-content">
-      ${categories.map(({ links }: ProductCategory, i: number) => `
+      ${categories.map(({ links }: ProductCategory, i: number) => {
+        const includesText = placeholders?.get('product-list-includes') ?? 'includes';
+        const productText = placeholders?.get('product-list-product') ?? 'product';
+        const productsText = placeholders?.get('product-list-products') ?? 'products';
+        const productWord = links.length === 1 ? productText : productsText;
+        return `
       <li>
+        <span id="product-hint-${i}" class="product-hint">${includesText} ${links.length} ${productWord}</span>
         <ul
           id="${i}"
           role="tabpanel"
@@ -21,7 +31,8 @@ export const productlist = ({ categories, links }: ProductList): HTML => {
           ${links.map(link => `<li>${productCard(link)}</li>`).join('')}
         </ul>
       </li>
-      `.trim()).join('')}
+      `.trim();
+      }).join('')}
     </ul>
   `.trim();
 
@@ -46,6 +57,7 @@ const renderTab = (
           class="tab"
           aria-selected="${(i === 0).toString()}"
           aria-controls="${i}"
+          aria-describedby="product-hint-${i}"
           ${getAnalyticsAttrs('', daaLl)}
           >
             ${name}

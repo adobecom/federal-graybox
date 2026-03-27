@@ -6,6 +6,7 @@ export type Link = {
   href: string;
   daaLl?: string | null;
   ariaLabel?: string;
+  ariaAttrs?: Record<string, string>;
   svgIcon?: string;
 };
 

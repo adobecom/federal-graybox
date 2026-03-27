@@ -1870,8 +1870,7 @@ ul.tabs .product-links {
   width: 100%;
   box-sizing: border-box;
   justify-content: center;
-  color: var(--s2a-color-gray-25);
-  background-color:var(--s2a-color-gray-1000);
+  background-color: transparent;
 }
 
 /* =========================================
@@ -2008,11 +2007,15 @@ ul.tabs .product-links {
   list-style: none;
 }
 
+.product-list .tab-content [role="tabpanel"] li {
+  display: flex;
+}
+
 .product-list .tab-content [role="tabpanel"] .feds-product-card {
   display: flex;
   flex-direction: column;
   min-height: 120px;
-  height: auto;
+  flex: 1;
   background-color: var(--s2a-color-gray-25);
   justify-content: space-between;
 }

@@ -33,7 +33,7 @@ const productCardHeader = ({
 
 const productCardLink = ({
   iconHref,
-  iconAlt,
+  iconAlt: _,
   title,
   href,
   subtitle,
@@ -41,7 +41,7 @@ const productCardLink = ({
   daaLl,
   daaLh
 }: ProductCardLink): HTML => {
-  const hasIcon = iconAlt !== null && iconHref !== null;
+  const hasIcon = iconHref !== null;
   const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? title);
   const icon = !hasIcon
     ? ""
@@ -50,7 +50,6 @@ const productCardLink = ({
         <img
           loading="lazy"
           src="${iconHref}"
-          alt="${iconAlt}"
           class="feds-product-card__icon-img"
         >
       </picture>

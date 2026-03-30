@@ -36,9 +36,9 @@ const renderCard = ({
         ${priceHref && isPriceMerchLink ? `<p id="price-${sanitize(title)}" class="promo-card__price">
           <a href="${localizeHref(priceHref)}" class="merch">${priceText}</a>
         </p>` : ''}
-        <p id="title-${sanitize(title)}" class="promo-card__title" role="heading" aria-level="2">
+        <h2 id="title-${sanitize(title)}" class="promo-card__title" role="heading" aria-level="2">
           ${title}
-        </p>
+        </h2>
         ${
           cta === null
             ? ""

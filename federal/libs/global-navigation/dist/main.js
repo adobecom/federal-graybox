@@ -79,7 +79,7 @@ version="1.0" encoding="UTF-8"?>
   <div class="featured-card" tabindex="0" aria-label="${a} ${i}" ${C(a,"")} role="group">
     <div>
       <div id="${o}" class="featured-eyebrow">${a}</div>
-      <h4>${n}</h4>
+      <h2>${n}</h2>
       <div class="featured-subtitle">${e}</div>
       <span>${O({...t,ariaAttrs:{"aria-describedby":o},svgIcon:H.chevronRight})}</span>
     </div>
@@ -90,7 +90,7 @@ version="1.0" encoding="UTF-8"?>
 `.trim()};var Vn=({card:n})=>Xe(n),Xe=({title:n,links:e,footerCTA:a})=>`
   <article class="links-card" ${C(n,"")}>
     <div>
-      <p id="links-card-${S(n)}" class="links-card-title" role="heading" aria-level="2">${n}</p>
+      <h2 id="links-card-${S(n)}" class="links-card-title" role="heading" aria-level="2">${n}</h2>
       <ul class="links-card-links" aria-labelledby="links-card-${S(n)}">
         ${e.map(r=>`<li>${O(r)}</li>`).join("")}
       </ul>
@@ -114,9 +114,9 @@ version="1.0" encoding="UTF-8"?>
         ${s&&l?`<p id="price-${S(t)}" class="promo-card__price">
           <a href="${T(s)}" class="merch">${o}</a>
         </p>`:""}
-        <p id="title-${S(t)}" class="promo-card__title" role="heading" aria-level="2">
+        <h2 id="title-${S(t)}" class="promo-card__title" role="heading" aria-level="2">
           ${t}
-        </p>
+        </h2>
         ${i===null?"":`<div class="promo-card__cta">
                  ${R({...i,ariaAttrs:{"aria-describedby":`title-${S(t)}${l?` price-${S(t)}`:""}`}})}
                </div>`}
@@ -379,9 +379,8 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
    ========================================= */
 :root {
   --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
-  --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
+  --feds-heading-font-family: var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
 }
-
 
 header.global-navigation {
   width: 100%;
@@ -1771,6 +1770,7 @@ ul.tabs .product-links {
   font-size: var(--s2a-typography-font-size-title-4);
   line-height: var(--s2a-typography-line-height-title-4);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
+  font-family: var(--feds-heading-font-family);
 }
 
 /* =========================================
@@ -2460,7 +2460,7 @@ ul.tabs .product-links {
   line-height: var(--s2a-typography-line-height-label);
 }
 
-.feds-popup .featured-card h4 {
+.feds-popup .featured-card h2 {
   margin: 0;
   font-family: var(--feds-heading-font-family);
   font-size: var(--s2a-typography-font-size-title-4);

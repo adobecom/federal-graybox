@@ -25,7 +25,7 @@
   line-height: var(--s2a-typography-line-height-label);
 }
 
-.feds-popup .featured-card h4 {
+.feds-popup .featured-card h2 {
   margin: 0;
   font-family: var(--feds-heading-font-family);
   font-size: var(--s2a-typography-font-size-title-4);

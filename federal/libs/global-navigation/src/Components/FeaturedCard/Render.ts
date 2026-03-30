@@ -21,7 +21,7 @@ const renderCard = ({
   <div class="featured-card" tabindex="0" aria-label="${eyeBrow} ${megaMenuTitle}" ${getAnalyticsAttrs(eyeBrow, '')} role="group">
     <div>
       <div id="${eyeBrowId}" class="featured-eyebrow">${eyeBrow}</div>
-      <h4>${title}</h4>
+      <h2>${title}</h2>
       <div class="featured-subtitle">${subtitle}</div>
       <span>${link({ ...bodyLink, ariaAttrs: { 'aria-describedby': eyeBrowId }, svgIcon: icons.chevronRight })}</span>
     </div>

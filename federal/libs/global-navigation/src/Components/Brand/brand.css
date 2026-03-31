@@ -100,6 +100,7 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
     animation: brand-fade 0.3s;
     opacity: 0;
     pointer-events: none;
+    visibility: hidden;
   }
   header.global-navigation .feds-nav-toggle {
     transform: translateX(0);

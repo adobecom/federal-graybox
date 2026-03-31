@@ -379,8 +379,9 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
    ========================================= */
 :root {
   --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
-  --feds-heading-font-family: var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
+  --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
 }
+
 
 header.global-navigation {
   width: 100%;

@@ -959,16 +959,9 @@ header.global-navigation:has(.unav-comp-app-switcher-open) nav {
   background: transparent;
 }
 
-/* Todo: Discuss with Raghav why he added this */
-/* header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-app-switcher-tray {
-  bottom: calc(var(--s2a-spacing-xs) + var(--s2a-spacing-64) - 100vh);
-} */
-
 header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-overlay {
   height: 100vh;
   width: 100vw;
-  top: calc(0px - var(--s2a-spacing-xs));
-  left: calc(0px - var(--s2a-spacing-xs));
 }
 
 /* =========================================
@@ -1306,10 +1299,12 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 @media (max-width: 1023px) {
   @keyframes brand-fade {
     from {
-      opacity: 1
+      opacity: 1;
+      visibility: visible;
     }
     to {
       opacity: 0;
+      visibility: hidden;
     }
   }
   header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-brand,

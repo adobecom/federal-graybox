@@ -89,10 +89,12 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 @media (max-width: 1023px) {
   @keyframes brand-fade {
     from {
-      opacity: 1
+      opacity: 1;
+      visibility: visible;
     }
     to {
       opacity: 0;
+      visibility: hidden;
     }
   }
   header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-brand,

@@ -207,6 +207,11 @@ header.feds-header-scrolled .feds-link {
   color: var(--s2a-color-gray-1000);
 }
 
+header.feds-header-scrolled nav {
+  color: var(--s2a-color-gray-1000);
+  box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
+}
+
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
   color: var(--s2a-color-gray-25);
   border: 1px solid;

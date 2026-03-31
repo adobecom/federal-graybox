@@ -1312,7 +1312,8 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
       opacity: 0;
     }
   }
-  header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-brand {
+  header.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .feds-brand,
+  header.global-navigation:has(.feds-menu-active) .feds-brand {
     animation: brand-fade 0.3s;
     opacity: 0;
     pointer-events: none;

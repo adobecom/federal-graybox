@@ -959,10 +959,6 @@ header.global-navigation:has(.unav-comp-app-switcher-open) nav {
   background: transparent;
 }
 
-header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) nav {
-  background: var(--s2a-color-gray-75);
-}
-
 /* Todo: Discuss with Raghav why he added this */
 /* header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-app-switcher-tray {
   bottom: calc(var(--s2a-spacing-xs) + var(--s2a-spacing-64) - 100vh);

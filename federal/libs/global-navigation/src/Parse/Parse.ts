@@ -11,11 +11,13 @@ export type GlobalNavigationData = {
   localnav: boolean;
   errors: List<RecoverableError>;
   unavEnabled: boolean;
+  placeholders: Map<string, string>;
 };
 
 export const parseNavigation = (
   mainNav: HTMLElement,
-  unavEnabled: boolean
+  unavEnabled: boolean,
+  placeholders: Map<string, string> = new Map(),
 ): GlobalNavigationData | IrrecoverableError => {
   const [breadcrumbs, breadcrumbErrors]
     = parseListAndAccumulateErrors(
@@ -55,5 +57,6 @@ export const parseNavigation = (
     localnav,
     errors,
     unavEnabled,
+    placeholders,
   }
 };

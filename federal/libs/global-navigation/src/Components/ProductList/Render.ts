@@ -1,12 +1,10 @@
 import { productCard } from "../ProductCard/Render";
 import { getAnalyticsAttrs, icons, localizeHref } from "../../Utils/Utils";
-import { getPlaceholdersSync } from "../../Utils/Placeholders";
 import { ProductCategory, ProductList } from "./Parse";
 
 export const productlist = (
-  { categories, links }: ProductList
+  { categories, links, placeholders }: ProductList
 ): HTML => {
-  const placeholders = getPlaceholdersSync();
   const tabs = `
     <ul class="tabs" role="tablist" aria-orientation="vertical">
       ${categories.map(renderTab).join('')}
@@ -16,9 +14,9 @@ export const productlist = (
   const tabcontent = `
     <ul class="tab-content">
       ${categories.map(({ links }: ProductCategory, i: number) => {
-        const includesText = placeholders?.get('product-list-includes') ?? 'includes';
-        const productText = placeholders?.get('product-list-product') ?? 'product';
-        const productsText = placeholders?.get('product-list-products') ?? 'products';
+        const includesText = placeholders.get('product-list-includes') ?? 'includes';
+        const productText = placeholders.get('product-list-product') ?? 'product';
+        const productsText = placeholders.get('product-list-products') ?? 'products';
         const productWord = links.length === 1 ? productText : productsText;
         return `
       <li>

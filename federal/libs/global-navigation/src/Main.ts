@@ -9,7 +9,7 @@ import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence } from "./Utils/Utils";
 import './generated/gnav-styles.css';
-import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholdersSync } from "./Utils/Placeholders";
+import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
  
@@ -90,7 +90,7 @@ export const main = async (
     throw mainNav;
   }
 
-  const gnavData = parseNavigation(mainNav, unavEnabled);
+  const gnavData = parseNavigation(mainNav, unavEnabled, await getPlaceholders());
   if (gnavData instanceof IrrecoverableError) {
     lanaLog(gnavData.message);
     throw gnavData;
@@ -137,9 +137,9 @@ export const renderGnavString = ({
   components,
   productCTA,
   unavEnabled,
+  placeholders,
 }: GlobalNavigationData
 ): string => {
-  const placeholders = getPlaceholdersSync()!;
   return `
 <nav popover="manual" data-lenis-prevent>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>

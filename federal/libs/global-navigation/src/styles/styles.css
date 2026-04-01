@@ -76,8 +76,9 @@ header.feds-header-scrolled nav {
 }
 
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
-  color: var(--s2a-color-gray-25);
-  border: 1px solid;
+  color: var(--s2a-color-gray-1000);
+  border: 1px solid var(--s2a-color-gray-25);
+  background-color: var(--s2a-color-gray-25);
 }
 
 .global-navigation.site-pivot:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .universal-nav-container .profile-signed-out button,
@@ -85,6 +86,7 @@ header.feds-header-scrolled nav {
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button:focus-visible {
   color: inherit;
   border-color: var(--s2a-color-gray-1000);
+  background-color: transparent;
 }
 
 .global-navigation.site-pivot .universal-nav-container #universal-nav {
@@ -297,6 +299,7 @@ header.global-navigation.feds-header-scrolled nav::after {
 .global-navigation.feds-header-scrolled .universal-nav-container .profile-signed-out button {
   color: var(--s2a-color-gray-1000);
   border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
+  background-color: transparent;
 }
 
 header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg,

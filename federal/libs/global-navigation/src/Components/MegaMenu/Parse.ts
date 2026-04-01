@@ -5,6 +5,7 @@ import {
   parseListAndAccumulateErrors,
   replaceDotMedia,
 } from "../../Utils/Utils";
+import { getPlaceholders } from "../../Utils/Placeholders";
 import { LinksCard, parseLinksCard } from "../LinksCard/Parse";
 import { parseProductList, ProductList } from "../ProductList/Parse";
 import { parseFeaturedCard, FeaturedCard } from "../FeaturedCard/Parse";
@@ -54,8 +55,10 @@ export const parseMegaMenu = (
       if (megaMenuFragment instanceof IrrecoverableError)
         throw new Error(megaMenuFragment.message);
       replaceDotMedia(fragmentURL.href, megaMenuFragment);
-      if (element.classList.contains('product-list'))
-        return parseProductList(megaMenuFragment, title);
+      if (element.classList.contains('product-list')) {
+        const placeholders = await getPlaceholders();
+        return parseProductList(megaMenuFragment, title, placeholders);
+      }
       return parseGnavCards(megaMenuFragment, title);
     } catch (e) {
         // @ts-expect-error errors usually have a message

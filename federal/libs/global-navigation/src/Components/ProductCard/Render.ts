@@ -1,5 +1,5 @@
 import { ProductCard, ProductCardBlue, ProductCardHeader, ProductCardLink } from "./Parse";
-import { getAnalyticsAttrs, localizeHref } from "../../Utils/Utils";
+import { getAnalyticsAttrs, localizeHref, federateUrl } from "../../Utils/Utils";
 
 export const productCard = (card: ProductCard): HTML => {
   switch (card.type) {
@@ -49,7 +49,7 @@ const productCardLink = ({
       <picture class="feds-product-card__icon">
         <img
           loading="lazy"
-          src="${iconHref}"
+          src="${federateUrl(iconHref)}"
           class="feds-product-card__icon-img"
         >
       </picture>

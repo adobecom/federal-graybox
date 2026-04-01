@@ -1,0 +1,132 @@
+/* =========================================
+   Buy Now Card
+   ========================================= */
+
+.feds-buy-now-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2a-spacing-md);
+  padding: var(--s2a-spacing-lg);
+  background: var(--s2a-color-gray-25);
+  border-radius: var(--s2a-border-radius-24);
+  border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-100);
+  text-decoration: none;
+  box-sizing: border-box;
+  color: inherit;
+}
+
+.feds-buy-now-card:hover {
+  text-decoration: none;
+}
+
+/* =========================================
+   Header
+   ========================================= */
+
+.feds-buy-now-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s2a-spacing-xs);
+}
+
+.feds-buy-now-card__icon {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.feds-buy-now-card__icon-img {
+  width: var(--s2a-spacing-2xl);
+  height: var(--s2a-spacing-2xl);
+  border-radius: var(--s2a-border-radius-sm);
+}
+
+/* =========================================
+   Badges
+   ========================================= */
+
+.feds-buy-now-card__badges {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s2a-spacing-xs);
+  flex-wrap: wrap;
+}
+
+.feds-buy-now-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s2a-spacing-2xs) var(--s2a-spacing-sm);
+  border-radius: var(--s2a-border-radius-999);
+  font-family: var(--feds-font-family);
+  font-size: var(--s2a-font-size-sm);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  white-space: nowrap;
+  border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
+  background: transparent;
+  color: var(--s2a-color-gray-1000);
+}
+
+.feds-buy-now-card__badge--filled {
+  background: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+}
+
+/* =========================================
+   Body
+   ========================================= */
+
+.feds-buy-now-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2a-spacing-xs);
+}
+
+.feds-buy-now-card__title {
+  font-family: var(--feds-heading-font-family);
+  font-size: var(--s2a-typography-font-size-title-4);
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
+  letter-spacing: var(--s2a-typography-letter-spacing-title-4);
+  color: var(--s2a-color-content-default);
+  margin: 0;
+}
+
+.feds-buy-now-card__subtitle {
+  font-size: var(--s2a-font-size-sm);
+  line-height: var(--s2a-font-line-height-md);
+  color: var(--s2a-color-content-subtle);
+}
+
+/* =========================================
+   Pricing
+   ========================================= */
+
+.feds-buy-now-card__pricing {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2a-spacing-xs);
+}
+
+.feds-buy-now-card__original-price {
+  font-size: var(--s2a-font-size-sm);
+  color: var(--s2a-color-content-subtle);
+  text-decoration: line-through;
+}
+
+.feds-buy-now-card__current-price {
+  font-size: var(--s2a-font-size-md);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  color: var(--s2a-color-content-default);
+}
+
+/* =========================================
+   Responsive: Desktop (min-width: 1024px)
+   ========================================= */
+
+@media (min-width: 1024px) {
+  .feds-buy-now-card {
+    border-radius: var(--s2a-border-radius-md);
+  }
+}

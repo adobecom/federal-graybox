@@ -380,6 +380,7 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
 :root {
   --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
   --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
+  --s2a-typography-line-height-title-4-temp: 1;
 }
 
 
@@ -746,7 +747,7 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
 .feds-popup .feds-product-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-family: var(--feds-heading-font-family);
 }
@@ -1767,7 +1768,7 @@ ul.tabs .product-links {
 .feds-gnav-cards .promo-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-family: var(--feds-heading-font-family);
 }
@@ -1869,7 +1870,7 @@ ul.tabs .product-links {
 .feds-popup .links-card .links-card-title {
   margin: 0 0 var(--s2a-spacing-sm);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   color: var(--s2a-color-gray-1000);
@@ -2463,7 +2464,7 @@ ul.tabs .product-links {
   margin: 0;
   font-family: var(--feds-heading-font-family);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   color: var(--s2a-color-content-default);
   padding: var(--s2a-spacing-md) 0 var(--s2a-spacing-xs) 0;
@@ -2526,7 +2527,6 @@ ul.tabs .product-links {
 
 @media (min-width: 1024px) {
   .feds-popup .featured-card {
-    /* No token: 12px radius on desktop */
     border-radius: 12px;
   }
 

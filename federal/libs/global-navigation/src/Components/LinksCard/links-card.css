@@ -15,7 +15,7 @@
 .feds-popup .links-card .links-card-title {
   margin: 0 0 var(--s2a-spacing-sm);
   font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4);
+  line-height: var(--s2a-typography-line-height-title-4-temp);
   letter-spacing: var(--s2a-typography-letter-spacing-title-4);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   color: var(--s2a-color-gray-1000);

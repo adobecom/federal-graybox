@@ -5,8 +5,8 @@ import { icons, getAnalyticsAttrs, sanitize } from "../../Utils/Utils";
 
 export const featuredcards = ({
   card
-}: FeaturedCard, megaMenuTitle: string): HTML => renderCard(card, megaMenuTitle);
-
+}: FeaturedCard, megaMenuTitle: string): HTML =>
+  renderCard(card, megaMenuTitle);
 
 const renderCard = ({
   title,

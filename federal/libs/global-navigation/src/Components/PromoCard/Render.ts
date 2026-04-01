@@ -1,6 +1,6 @@
 import { PromoCard, PromoCardData } from "./Parse";
 import { secondaryCTA } from "../CTA/Render";
-import { localizeHref, sanitize } from "../../Utils/Utils";
+import { localizeHref, sanitize, federateUrl } from "../../Utils/Utils";
 
 export const promoCard = ({ card }: PromoCard): HTML => renderCard(card);
 
@@ -19,7 +19,12 @@ const renderCard = ({
     ${
       bgImageSrc
         ? `<picture class="promo-card__bg">
-             <img src="${bgImageSrc}" alt="${bgImageAlt}" class="promo-card__bg-image">
+             <img 
+              loading="lazy"
+              src="${federateUrl(bgImageSrc)}"
+              alt="${bgImageAlt}"
+              class="promo-card__bg-image"
+            >
            </picture>`
         : ""
     }
@@ -28,7 +33,12 @@ const renderCard = ({
       ${
         iconSrc
           ? `<picture class="promo-card__icon">
-               <img src="${iconSrc}" alt="${iconAlt}" class="promo-card__icon-image">
+               <img
+                loading="lazy"
+                src="${federateUrl(iconSrc)}"
+                alt="${iconAlt}"
+                class="promo-card__icon-image"
+              >
              </picture>`
           : ""
       }

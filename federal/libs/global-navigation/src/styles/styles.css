@@ -276,23 +276,27 @@ header.global-navigation.feds-header-scrolled nav::after {
    ========================================= */
 
 .global-navigation .unav-comp-app-switcher.unav-comp-icon svg,
-.global-navigation .unav-comp-external-notifications svg path {
+.global-navigation .unav-comp-external-notifications svg path,
+.global-navigation .unav-comp-cart svg {
   fill: var(--s2a-color-gray-25);
 }
 
 .global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .unav-comp-app-switcher.unav-comp-icon svg,
-.global-navigation .unav-comp-app-switcher.unav-comp-icon.unav-comp-app-switcher-open svg {
+.global-navigation .unav-comp-app-switcher.unav-comp-icon.unav-comp-app-switcher-open svg,
+.global-navigation:has(.feds-popup:popover-open, .feds-menu-wrapper:popover-open) .unav-comp-cart svg {
   fill: var(--s2a-color-gray-1000);
 }
 
 .global-navigation.feds-header-scrolled .unav-comp-app-switcher.unav-comp-icon svg,
-.global-navigation.feds-header-scrolled .unav-comp-external-notifications svg path {
+.global-navigation.feds-header-scrolled .unav-comp-external-notifications svg path,
+.global-navigation.feds-header-scrolled .unav-comp-cart svg {
   fill: var(--s2a-color-gray-1000);
 }
 
 .global-navigation .unav-comp-app-switcher.unav-comp-icon:hover svg,
 .global-navigation .unav-comp-app-switcher.unav-comp-icon:focus-visible svg,
-.global-navigation .unav-comp-external-notifications:hover svg path {
+.global-navigation .unav-comp-external-notifications:hover svg path,
+.global-navigation .unav-comp-cart:hover svg {
   fill: var(--s2a-color-gray-1000);
 }
 
@@ -303,7 +307,8 @@ header.global-navigation.feds-header-scrolled nav::after {
 }
 
 header.global-navigation:has(.feds-popup:popover-open) .unav-comp-app-switcher.unav-comp-icon svg,
-header.global-navigation:has(.feds-popup:popover-open) .unav-comp-external-notifications svg path {
+header.global-navigation:has(.feds-popup:popover-open) .unav-comp-external-notifications svg path,
+header.global-navigation:has(.feds-popup:popover-open) .unav-comp-cart svg {
   fill: inherit;
 }
 

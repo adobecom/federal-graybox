@@ -284,7 +284,7 @@ export const getFederatedContentRoot = (): string => {
 // and make the check more strict.
 export const federateUrl = (url = ''): string => {
   // TEMPORARY REMOVE LATER
-  if (url.includes('c2-poc--milo--adobecom')) {
+  if (url.includes('stage.adobe.com')) {
     return url.replace('c2-poc--milo--adobecom', 'main--federal--adobecom');
   }
   if (url.includes('c2-poc-feds-gnav--milo--adobecom')) {

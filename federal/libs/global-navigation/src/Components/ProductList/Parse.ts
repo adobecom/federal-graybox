@@ -8,6 +8,7 @@ export type ProductList = {
   megaMenuTitle: string;
   categories: List<ProductCategory>;
   links: List<Link>;
+  placeholders: Map<string, string>;
 };
 
 export type ProductCategory = {
@@ -20,6 +21,7 @@ export type ProductCategory = {
 export const parseProductList = (
   element: HTMLElement | Element,
   megaMenuTitle = '',
+  placeholders: Map<string, string> = new Map(),
 ): Parsed<ProductList, RecoverableError> => {
   const unparsedCategories = [...element.querySelectorAll('li > div')];
   const unparsedLinks = [...element.querySelectorAll('li > a')];
@@ -37,6 +39,7 @@ export const parseProductList = (
       megaMenuTitle,
       categories,
       links,
+      placeholders,
     },
     [...categoryErrors, ...linkErrors]
   ]

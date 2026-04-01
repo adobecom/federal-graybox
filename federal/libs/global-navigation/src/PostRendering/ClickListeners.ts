@@ -51,6 +51,18 @@ export const initClickListeners = (
     button.addEventListener('click', tabButtonClickCallbacks[i]);
   });
 
+  const tabList = gnav.querySelector<HTMLElement>('.tabs[role="tablist"]');
+  const updateTablistOrientation = (): void => {
+    if (!tabList) return;
+    if (isDesktop.matches) {
+      tabList.setAttribute('aria-orientation', 'vertical');
+    } else {
+      tabList.removeAttribute('aria-orientation');
+    }
+  };
+  updateTablistOrientation();
+  isDesktop.addEventListener('change', updateTablistOrientation);
+
   animations(gnav);
 
   return () => {
@@ -58,6 +70,7 @@ export const initClickListeners = (
     tabButtons.forEach((button, i) => {
       button.removeEventListener('click', tabButtonClickCallbacks[i]);
     });
+    isDesktop.removeEventListener('change', updateTablistOrientation);
   };
 };
 

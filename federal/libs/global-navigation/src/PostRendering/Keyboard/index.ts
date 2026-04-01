@@ -147,10 +147,20 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     const index = items.indexOf(el);
     if (index < 0) return false;
 
-    if (ARROW_DELTA[key]) {
-      const next = items[wrapIndex(index, ARROW_DELTA[key], items.length)];
+    /** 1->Next, -1->Previous, 0->No movement */
+    const tabArrowDelta: Record<string, 1 | -1 | 0> = isDesktop.matches
+      ? { ArrowLeft: 0, ArrowRight: 0, ArrowUp: -1, ArrowDown: 1 }
+      : { ArrowLeft: -1, ArrowRight: 1, ArrowUp: 0, ArrowDown: 0 };
+
+    if (tabArrowDelta[key]) {
+      const next = items[wrapIndex(index, tabArrowDelta[key], items.length)];
       if (next.matches('[role="tab"]')) next.click();
       focusAndPrevent(next, event);
+      return true;
+    }
+
+    if (key in tabArrowDelta) {
+      event.preventDefault();
       return true;
     }
 

@@ -143,7 +143,7 @@ export const renderGnavString = ({
   return `
 <nav popover="manual" data-lenis-prevent>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
-  <ul>
+  <ul role="presentation">
     ${((): string => {
       const brandComponent = components.find((c) =>
         c.type === "Brand"
@@ -178,7 +178,6 @@ export const renderGnavString = ({
           id="feds-menu-wrapper"
           popover
           class="feds-menu-wrapper"
-          aria-hidden="true"
         >
           <ul class="feds-gnav-items">
             ${menuItemsHTML}

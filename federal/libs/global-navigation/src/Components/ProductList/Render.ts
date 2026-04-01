@@ -6,7 +6,7 @@ export const productlist = (
   { categories, links, placeholders }: ProductList
 ): HTML => {
   const tabs = `
-    <ul class="tabs" role="tablist" aria-orientation="vertical">
+    <ul class="tabs" role="tablist">
       ${categories.map(renderTab).join('')}
       ${links.length ? `<li class="product-links"><a class="feds-link" href="${localizeHref(links[links.length - 1].href)}"${getAnalyticsAttrs(null, links[links.length - 1].daaLl ?? links[links.length - 1].text)}>${links[links.length - 1].text}${icons.chevronRight}</a></li>` : ''}
     </ul>

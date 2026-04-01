@@ -2527,7 +2527,6 @@ ul.tabs .product-links {
 
 @media (min-width: 1024px) {
   .feds-popup .featured-card {
-    /* No token: 12px radius on desktop */
     border-radius: 12px;
   }
 

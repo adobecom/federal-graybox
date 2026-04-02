@@ -144,6 +144,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     el: HTMLElement, popup: HTMLElement, key: string, event: KeyboardEvent,
   ): boolean {
     const items = $$(popup, '.tabs :is([role="tab"], .product-links a)');
+    const firstTabOffsetLeft = items[0]?.offsetLeft ?? 0;
     const index = items.indexOf(el);
     if (index < 0) return false;
 
@@ -154,7 +155,17 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
 
     if (tabArrowDelta[key]) {
       const next = items[wrapIndex(index, tabArrowDelta[key], items.length)];
-      if (next.matches('[role="tab"]')) next.click();
+      if (next.matches('[role="tab"]')) {
+        next.click();
+        if (!isDesktop.matches) {
+          requestAnimationFrame(() => {
+            const container = next.closest<HTMLElement>('.tabs') as HTMLElement;
+            if (container) {
+              container.scrollLeft = next.offsetLeft - firstTabOffsetLeft;
+            }
+          });
+        }
+      }
       focusAndPrevent(next, event);
       return true;
     }

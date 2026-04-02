@@ -21,7 +21,7 @@ export const initClickListeners = (
   };
   skipLink?.addEventListener('click', onSkipLinkClick);
 
-  const tabButtons = [...gnav.querySelectorAll('.tabs button[role="tab"]')];
+  const tabButtons = [...gnav.querySelectorAll<HTMLButtonElement>('.tabs button[role="tab"]')];
   const tabPanels = [...gnav.querySelectorAll('.tab-content ul')];
   const tabButtonClickCallbacks = tabButtons.map((button, i) => (): void => {
 
@@ -47,8 +47,21 @@ export const initClickListeners = (
     }
   );
 
+  const tabButtonFocusCallbacks = tabButtons.map((button) => (): void => {
+    if (isDesktop.matches) return;
+    if (!button.matches(':focus-visible')) return;
+    const firstTabOffsetLeft = tabButtons[0]?.offsetLeft ?? 0;
+    requestAnimationFrame(() => {
+      const container = button.closest<HTMLElement>('.tabs');
+      if (container) {
+        container.scrollLeft = button.offsetLeft - firstTabOffsetLeft;
+      }
+    });
+  });
+
   tabButtons.forEach((button, i) => {
     button.addEventListener('click', tabButtonClickCallbacks[i]);
+    button.addEventListener('focus', tabButtonFocusCallbacks[i]);
   });
 
   const tabList = gnav.querySelector<HTMLElement>('.tabs[role="tablist"]');
@@ -69,6 +82,7 @@ export const initClickListeners = (
     skipLink?.removeEventListener('click', onSkipLinkClick);
     tabButtons.forEach((button, i) => {
       button.removeEventListener('click', tabButtonClickCallbacks[i]);
+      button.removeEventListener('focus', tabButtonFocusCallbacks[i]);
     });
     isDesktop.removeEventListener('change', updateTablistOrientation);
   };
@@ -114,6 +128,15 @@ const animations = (gnav: HTMLElement): void => {
       } else {
         // in case the resize observer fails
         (popoverBackgroundRule as CSSStyleRule).style.height = `${popup.clientHeight + 72}px`;
+        // On mobile (horizontal tabs), scroll active tab to the left edge
+        if (!isDesktop.matches) {
+          const tabsList = (popup as HTMLElement).querySelector<HTMLElement>('.tabs');
+          const activeTab = (popup as HTMLElement).querySelector<HTMLElement>('button[role="tab"][aria-selected="true"]');
+          const firstTab = tabsList?.querySelector<HTMLElement>('button[role="tab"]');
+          if (tabsList && activeTab && firstTab) {
+            tabsList.scrollLeft = activeTab.offsetLeft - tabsList.offsetLeft - firstTab.offsetLeft;
+          }
+        }
       }
     });
   });

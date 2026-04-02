@@ -1005,6 +1005,7 @@ export const tempFixJarvis = (gnav: HTMLElement): void => {
     if (adobeMsgClientWrapper.getAttribute('popover') !== 'manual') {
       adobeMsgClientWrapper.setAttribute('popover', 'manual');
       (adobeMsgClientWrapper as HTMLElement).style.padding = '0'; // override default popover styling
+      (adobeMsgClientWrapper as HTMLElement).style.border = 'none';
     }
     // show and then hide to make sure the chat window container
     // is the topmost popover.

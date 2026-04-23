@@ -51,14 +51,7 @@ var [
 })();
 
 // src/Utils/Utils.ts
-var isDesktop = window.matchMedia("(min-width: 900px)");
-var icons = {
-  brand: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" id="Layer_1" viewBox="0 0 64.57 35"><defs><style>.cls-1{fill: #eb1000;}</style></defs><path class="cls-1" d="M6.27,10.22h4.39l6.2,14.94h-4.64l-3.92-9.92-2.59,6.51h3.08l1.23,3.41H0l6.27-14.94ZM22.03,13.32c.45,0,.94.04,1.43.16v-3.7h3.88v14.72c-.89.4-2.81.89-4.73.89-3.48,0-6.47-1.98-6.47-5.93s2.88-6.13,5.89-6.13ZM22.52,22.19c.36,0,.65-.07.94-.16v-5.42c-.29-.11-.58-.16-.96-.16-1.27,0-2.45.94-2.45,2.92s1.2,2.81,2.47,2.81ZM34.25,13.32c3.23,0,5.98,2.18,5.98,6.02s-2.74,6.02-5.98,6.02-6-2.18-6-6.02,2.72-6.02,6-6.02ZM34.25,22.13c1.11,0,2.14-.89,2.14-2.79s-1.03-2.79-2.14-2.79-2.12.89-2.12,2.79.96,2.79,2.12,2.79ZM41.16,9.78h3.9v3.7c.47-.09.96-.16,1.45-.16,3.03,0,5.84,1.98,5.84,5.86,0,4.1-2.99,6.18-6.53,6.18-1.52,0-3.46-.31-4.66-.87v-14.72ZM45.91,22.17c1.34,0,2.56-.96,2.56-2.94,0-1.85-1.2-2.72-2.5-2.72-.36,0-.65.04-.91.16v5.35c.22.09.51.16.85.16ZM58.97,13.32c2.92,0,5.6,1.87,5.6,5.64,0,.51-.02,1-.09,1.49h-7.27c.4,1.32,1.56,1.94,3.01,1.94,1.18,0,2.27-.29,3.5-.82v2.97c-1.14.58-2.5.82-3.9.82-3.7,0-6.58-2.23-6.58-6.02s2.61-6.02,5.73-6.02ZM60.93,18.02c-.2-1.27-1.05-1.78-1.92-1.78s-1.58.54-1.87,1.78h3.79Z"/></svg>',
-  company: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="22" viewBox="0 0 24 22" fill="none"><path d="M14.2353 21.6209L12.4925 16.7699H8.11657L11.7945 7.51237L17.3741 21.6209H24L15.1548 0.379395H8.90929L0 21.6209H14.2353Z" fill="#EB1000"/></svg>',
-  search: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false"><path d="M14 2A8 8 0 0 0 7.4 14.5L2.4 19.4a1.5 1.5 0 0 0 2.1 2.1L9.5 16.6A8 8 0 1 0 14 2Zm0 14.1A6.1 6.1 0 1 1 20.1 10 6.1 6.1 0 0 1 14 16.1Z"></path></svg>',
-  home: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 0 18 18" width="25"><path fill="#6E6E6E" d="M17.666,10.125,9.375,1.834a.53151.53151,0,0,0-.75,0L.334,10.125a.53051.53051,0,0,0,0,.75l.979.9785A.5.5,0,0,0,1.6665,12H2v4.5a.5.5,0,0,0,.5.5h4a.5.5,0,0,0,.5-.5v-5a.5.5,0,0,1,.5-.5h3a.5.5,0,0,1,.5.5v5a.5.5,0,0,0,.5.5h4a.5.5,0,0,0,.5-.5V12h.3335a.5.5,0,0,0,.3535-.1465l.979-.9785A.53051.53051,0,0,0,17.666,10.125Z"/></svg>',
-  arrowBack: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>'
-};
+var isDesktop = window.matchMedia("(min-width: 1024px)");
 var alternative = (primaryFn) => {
   return {
     eval: primaryFn,
@@ -90,13 +83,71 @@ var [setPersonalizationConfig, getPersonalizationConfig] = /* @__PURE__ */ (() =
     }
   ];
 })();
+var [setLocalizeLink, getLocalizeLink] = /* @__PURE__ */ (() => {
+  let localizeLink = (link) => link;
+  return [
+    (nextLocalizeLink) => {
+      localizeLink = nextLocalizeLink;
+    },
+    () => localizeLink
+  ];
+})();
+var localizeHref = (href) => {
+  try {
+    return getLocalizeLink()(href);
+  } catch {
+    return href;
+  }
+};
+var federatedContentRoot;
+var getFederatedContentRoot = () => {
+  if (federatedContentRoot) return federatedContentRoot;
+  const cdnWhitelistedOrigins = [
+    "https://www.adobe.com",
+    "https://business.adobe.com",
+    "https://blog.adobe.com",
+    "https://milo.adobe.com",
+    "https://news.adobe.com",
+    "graybox.adobe.com"
+  ];
+  if (federatedContentRoot) return federatedContentRoot;
+  const origin = window.location.origin;
+  const isAllowedOrigin = cdnWhitelistedOrigins.some((o) => {
+    const originNoStage = origin.replace(".stage", "");
+    return o.startsWith("https://") ? originNoStage === o : originNoStage.endsWith(o);
+  });
+  federatedContentRoot = isAllowedOrigin ? origin : "https://www.adobe.com";
+  const SLD = window.location.hostname.includes(".aem.") ? "aem" : "hlx";
+  if (origin.includes("localhost") || origin.includes(`.${SLD}.`)) {
+    federatedContentRoot = `https://main--federal--adobecom.aem.${origin.endsWith(".live") ? "live" : "page"}`;
+  }
+  return federatedContentRoot;
+};
+var federateUrl = (url = "") => {
+  if (url.includes("stage.adobe.com")) {
+    return url.replace("c2-poc--milo--adobecom", "main--federal--adobecom");
+  }
+  if (url.includes("c2-poc-feds-gnav--milo--adobecom")) {
+    return url.replace("c2-poc-feds-gnav--milo--adobecom", "main--federal--adobecom");
+  }
+  if (url.includes("localhost:3000")) {
+    return url.replace("localhost:3000", "main--federal--adobecom.aem.page");
+  }
+  if (typeof url !== "string" || !url.includes("/federal/")) return url;
+  if (url.startsWith("/")) return `${getFederatedContentRoot()}${url}`;
+  try {
+    const { pathname, search, hash } = new URL(url);
+    return `${getFederatedContentRoot()}${pathname}${search}${hash}`;
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.warn(`getFederatedUrl errored parsing the URL: ${url}: ${message}`);
+  }
+  return url;
+};
 var getAnalyticsAttrs = (daaLh, daaLl) => {
   const daaLhAttr = daaLh !== null && daaLh !== "" ? ` daa-lh="${daaLh}"` : "";
   const daaLlAttr = daaLl !== null && daaLl !== "" ? ` daa-ll="${daaLl}"` : "";
   return `${daaLhAttr}${daaLlAttr}`;
-};
-var isDarkMode = () => {
-  return true;
 };
 function loadLink(href, {
   id,
@@ -373,7 +424,7 @@ var parseLink = (anchor) => {
     throw new IrrecoverableError(ERRORS.elementNull);
   if (anchor.tagName !== "A")
     throw new IrrecoverableError(ERRORS.notAnchor);
-  const text = anchor?.textContent ?? "";
+  const [text, ariaLabel] = anchor?.textContent?.split("|").map((s) => s.trim()) ?? ["", ""];
   if (text === "")
     throw new IrrecoverableError(ERRORS.textContentNotFound);
   const href = anchor?.getAttribute("href") ?? "";
@@ -385,14 +436,21 @@ var parseLink = (anchor) => {
       type: "Link",
       text,
       href,
-      daaLl
+      daaLl,
+      ariaLabel
     },
     []
   ];
 };
 
-// src/Components/LinkGroup/Parse.ts
-var parseLinkGroup = (element) => alternative(parseLinkGroupHeader).or(parseLinkGroupLink).or(parseLinkGroupBlue).eval(element);
+// src/Components/ProductCard/Parse.ts
+var parseProductCard = (element) => {
+  if (!element)
+    throw new IrrecoverableError(ERRORS2.elementNull);
+  if (!element.classList.contains("product-card"))
+    throw new IrrecoverableError(ERRORS2.notAProductCard);
+  return alternative(parseProductCardHeader).or(parseProductCardLink).or(parseProductCardBlue).eval(element);
+};
 var ERRORS2 = {
   elementNull: "Element not found",
   noTitleAnchor: "Title anchor not found",
@@ -400,9 +458,10 @@ var ERRORS2 = {
   noTitle: "Title text not found",
   noSubtitleP: "Subtitle <p> not found",
   noSubtitle: "Subtitle text not found",
-  notAHeader: "Expected a Header class"
+  notAHeader: "Expected a Header class",
+  notAProductCard: "Expected a product-card class"
 };
-var parseLinkGroupLink = (element) => {
+var parseProductCardLink = (element) => {
   const errors = /* @__PURE__ */ new Set();
   if (!element)
     throw new IrrecoverableError(ERRORS2.elementNull);
@@ -423,36 +482,31 @@ var parseLinkGroupLink = (element) => {
   const subtitle = subtitleElement?.textContent ?? "";
   if (subtitle === "")
     errors.add(new RecoverableError(ERRORS2.noSubtitle));
-  const badges = [];
-  let oldPrice = null;
-  let newPrice = null;
-  if (element.classList.contains("new")) {
-    badges.push("New");
-  }
-  if (element.classList.contains("show-offer")) {
-    badges.push("Save 20%");
-    oldPrice = "$29.99";
-    newPrice = "$19.99";
-  }
+  const badgePs = element.querySelectorAll(":scope > div:nth-child(2) > :first-child p") ?? [];
+  const badges = Array.from(badgePs).map((p) => {
+    const isFilled = p.querySelector("strong") !== null;
+    return {
+      text: p?.textContent?.trim() ?? "",
+      isFilled
+    };
+  });
   const [iconHref, iconAlt = null] = (element.firstElementChild?.firstElementChild?.textContent?.split("|") ?? []).map((x) => x.trim());
   return [
     {
-      type: "LinkGroupLink",
+      type: "ProductCardLink",
       iconHref,
       iconAlt,
       title,
       href,
       subtitle,
       badges,
-      oldPrice,
-      newPrice,
       daaLl,
       daaLh
     },
     [...errors]
   ];
 };
-var parseLinkGroupHeader = (element) => {
+var parseProductCardHeader = (element) => {
   if (!element)
     throw new IrrecoverableError(ERRORS2.elementNull);
   const classes = [...element.classList];
@@ -465,7 +519,7 @@ var parseLinkGroupHeader = (element) => {
     throw new IrrecoverableError(ERRORS2.noTitle);
   return [
     {
-      type: "LinkGroupHeader",
+      type: "ProductCardHeader",
       title,
       classes,
       daaLl,
@@ -474,18 +528,18 @@ var parseLinkGroupHeader = (element) => {
     []
   ];
 };
-var parseLinkGroupBlue = (element) => {
+var parseProductCardBlue = (element) => {
   if (!element)
     throw new IrrecoverableError(ERRORS2.elementNull);
   if (!element.classList.contains("blue"))
-    throw new Error("Not a Blue Link Group");
+    throw new Error("Not a Blue Product Card");
   const a = element.querySelector("a");
   const [link, es] = parseLink(a);
   const daaLl = a?.getAttribute("daa-ll") ?? null;
   const daaLh = a?.getAttribute("daa-lh") ?? null;
   return [
     {
-      type: "LinkGroupBlue",
+      type: "ProductCardBlue",
       link,
       daaLl,
       daaLh
@@ -494,103 +548,93 @@ var parseLinkGroupBlue = (element) => {
   ];
 };
 
-// src/Components/LinkGroup/Render.ts
-var linkGroup = (lg) => {
-  switch (lg.type) {
-    case "LinkGroupHeader":
-      return linkGroupHeader(lg);
-    case "LinkGroupLink":
-      return linkGroupLink(lg);
-    case "LinkGroupBlue":
-      return linkGroupBlue(lg);
+// src/Components/ProductCard/Render.ts
+var productCard = (card) => {
+  switch (card.type) {
+    case "ProductCardHeader":
+      return productCardHeader(card);
+    case "ProductCardLink":
+      return productCardLink(card);
+    case "ProductCardBlue":
+      return productCardBlue(card);
     default: {
-      const exhaustivenessCheck = lg;
+      const exhaustivenessCheck = card;
       console.error(exhaustivenessCheck);
       return "";
     }
   }
 };
-var linkGroupHeader = ({
+var productCardHeader = ({
   title,
   classes,
   daaLl,
   daaLh
 }) => {
-  const classNames = classes.slice(1).map((cls) => `feds-link-group--${cls}`).join(" ");
+  const classNames = classes.slice(1).map((cls) => `feds-product-card--${cls}`).join(" ");
   const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? title);
   return `
-    <div role="heading" class="feds-link-group ${classNames}"${analyticsAttrs}>
-      <div class="feds-link-group__content">
-        <div class="feds-link-group__title">${title}</div>
+    <div role="heading" class="feds-product-card ${classNames}"${analyticsAttrs}>
+      <div class="feds-product-card__content">
+        <div class="feds-product-card__title">${title}</div>
       </div>
     </div>
   `;
 };
-var linkGroupLink = ({
+var productCardLink = ({
   iconHref,
-  iconAlt,
+  iconAlt: _,
   title,
   href,
   subtitle,
   badges = [],
-  oldPrice = null,
-  newPrice = null,
   daaLl,
   daaLh
 }) => {
-  const hasIcon = iconAlt !== null && iconHref !== null;
+  const hasIcon = iconHref !== null;
   const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? title);
   const icon = !hasIcon ? "" : `
-      <picture class="feds-link-group__icon">
+      <picture class="feds-product-card__icon">
         <img
           loading="lazy"
-          src="${iconHref}"
-          alt="${iconAlt}"
-          class="feds-link-group__icon-img"
+          src="${federateUrl(iconHref)}"
+          class="feds-product-card__icon-img"
         >
       </picture>
     `;
   const badgesMarkup = badges.length === 0 ? "" : `
-      <div class="feds-link-group__badges">
-        ${badges.map((badge, index) => `
-          <span class="feds-link-group__badge${index > 0 ? " feds-link-group__badge--filled" : ""}">
-            ${badge}
+      <div class="feds-product-card__badges">
+        ${badges.map(({ text, isFilled }) => `
+          <span class="feds-product-card__badge${isFilled ? " feds-product-card__badge--filled" : ""}">
+            ${text}
           </span>
         `).join("")}
       </div>
     `;
-  const subtitleMarkup = subtitle === "" ? "" : `<div class="feds-link-group__subtitle">${subtitle}</div>`;
-  const priceMarkup = oldPrice === null && newPrice === null ? "" : `
-      <div class="feds-link-group__price">
-        ${oldPrice === null ? "" : `<span class="feds-link-group__old-price">${oldPrice}</span>`}
-        ${newPrice === null ? "" : `<span class="feds-link-group__new-price">${newPrice}</span>`}
-      </div>
-    `;
+  const subtitleMarkup = subtitle === "" ? "" : `<div class="feds-product-card__subtitle">${subtitle}</div>`;
   return `
-    <a class="feds-link-group" href="${href}"${analyticsAttrs}>
-      <div class="feds-link-header">
+    <a class="feds-product-card" href="${localizeHref(href)}"${analyticsAttrs}>
+      <div class="feds-product-card-header">
         ${icon}
         ${badgesMarkup}
       </div>
-      <div class="feds-link-group__content">
+      <div class="feds-product-card__content">
        
-        <div class="feds-link-group__title">${title}</div>
+        <div class="feds-product-card__title">${title}</div>
         ${subtitleMarkup}
-        ${priceMarkup}
       </div>
     </a>
   `;
 };
-var linkGroupBlue = ({
+var productCardBlue = ({
   link,
   daaLl,
   daaLh
 }) => {
   const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? link.text);
   return `
-  <a href="${link.href}" class="feds-link-group feds-link-group--blue"${analyticsAttrs}>
-    <div class="feds-link-group__content">
-        <div class="feds-link-group__title">${link.text}</div>
+  <a href="${localizeHref(link.href)}" class="feds-product-card feds-product-card--blue"${analyticsAttrs}>
+    <div class="feds-product-card__content">
+        <div class="feds-product-card__title">${link.text}</div>
       </div>
   </a>
 `;
@@ -599,144 +643,120 @@ var linkGroupBlue = ({
 // src/Components/Brand/Parse.ts
 var ERRORS3 = {
   elementNull: "Error when parsing Brand. Element is null",
-  noLinks: "Error when parsing Brand. No links found",
-  noPrimaryLink: "Error when parsing Brand. No primary link found"
-};
-var IMG_REGEX = /(\.png|\.jpg|\.jpeg|\.svg)/i;
-var extractImageSource = (element) => {
-  const imgSrc = element.querySelector("picture img")?.getAttribute("src") ?? null;
-  if (imgSrc !== null && imgSrc !== "") return imgSrc;
-  const text = element.textContent?.trim();
-  if (text !== void 0 && text !== "" && IMG_REGEX.test(text)) {
-    const source = text.split("|")[0]?.trim();
-    if (source !== void 0 && source !== "") return source;
-  }
-  const href = element.getAttribute("href");
-  return href !== null && href !== "" && IMG_REGEX.test(href) ? href : null;
-};
-var extractAltText = (element) => {
-  const text = element.textContent?.trim();
-  if (text?.includes("|") === true) {
-    const alt = text.split("|")[1]?.trim();
-    if (alt) return alt;
-  }
-  const altAttr = element.querySelector("img")?.getAttribute("alt");
-  return altAttr ?? "";
+  noLinkSection: "Error when parsing Brand. No link section found",
+  noLink: "Error when parsing Brand. No link found",
+  noImageSection: "Error when parsing Brand. No image section found",
+  missingImageSections: "Error when parsing Brand. Missing mobile or desktop image section",
+  missingThemeImages: "Error when parsing Brand. Missing mobile or desktop image section"
 };
 var parseBrand = (element) => {
+  const errors = /* @__PURE__ */ new Set();
   if (element === null) {
     throw new IrrecoverableError(ERRORS3.elementNull);
   }
-  const rawBlock = element.querySelector(".gnav-brand");
-  if (rawBlock === null) {
-    throw new IrrecoverableError(ERRORS3.elementNull);
+  const isDarkBg = !!element.classList.contains("dark-bg");
+  const [linkSection, imagesSection] = element.querySelectorAll(":scope > div");
+  if (linkSection === void 0) {
+    throw new IrrecoverableError(ERRORS3.noLinkSection);
   }
-  const blockLinks = [...rawBlock.querySelectorAll("a")];
-  if (blockLinks.length === 0) {
-    throw new IrrecoverableError(ERRORS3.noLinks);
+  const linkElement = linkSection.querySelector("a");
+  if (linkElement === null) {
+    throw new IrrecoverableError(ERRORS3.noLink);
   }
-  const primaryLink = blockLinks.find((link) => {
-    const textContent = link.textContent ?? "";
-    return !IMG_REGEX.test(link.href) && !IMG_REGEX.test(textContent);
-  });
-  if (!primaryLink) {
-    throw new IrrecoverableError(ERRORS3.noPrimaryLink);
+  const href = linkElement.getAttribute("href") ?? "";
+  const label = linkElement.textContent?.trim() ?? "";
+  if (imagesSection === void 0) {
+    errors.add(new RecoverableError(ERRORS3.noImageSection));
   }
-  const isBrandImageOnly = rawBlock.matches(".brand-image-only");
-  const noLogo = rawBlock.matches(".no-logo");
-  const imageOnly = rawBlock.matches(".image-only");
-  const renderImage2 = !noLogo;
-  const renderLabel = !isBrandImageOnly && !imageOnly;
-  const imageLinks = blockLinks.filter((link) => {
-    const textContent = link.textContent ?? "";
-    return IMG_REGEX.test(link.href) || IMG_REGEX.test(textContent);
-  });
-  const [imgSrc, imgSrcDark, altText] = (() => {
-    const defaultImgSrc = isBrandImageOnly ? icons.brand : icons.company;
-    const [svgImgSrc = null, svgDarkImgSrc = null] = [...rawBlock.querySelectorAll('picture img[src$=".svg"]')].map((img) => img?.src).filter((src) => src?.length > 0);
-    const [imgSrc2 = null, imgSrcDark2 = null] = imageLinks.map(extractImageSource);
-    const altText2 = imageLinks[0] instanceof Element ? extractAltText(imageLinks[0]) : primaryLink.textContent?.trim() ?? "";
-    return [
-      imgSrc2 ?? svgImgSrc ?? defaultImgSrc,
-      imgSrcDark2 ?? svgDarkImgSrc,
-      altText2
-    ];
-  })();
-  const label = primaryLink.textContent?.trim() ?? "";
-  const href = primaryLink.href;
-  if (!renderImage2 && !renderLabel) return [{ type: "Brand", data: { type: "NoRender" } }, []];
-  const selectSource = (light, dark) => {
-    const hasDark = dark !== null && dark !== void 0 && dark !== "";
-    return isDarkMode() && hasDark ? dark : light;
-  };
-  const imageData = imgSrc.startsWith("<svg") ? { type: "inline-svg", svgContent: selectSource(imgSrc, imgSrcDark), alt: altText } : { type: "image", src: selectSource(imgSrc, imgSrcDark), alt: altText };
-  if (renderImage2 && renderLabel) {
-    return [{ type: "Brand", data: { type: "LabelledBrand", href, label, image: imageData } }, []];
+  const [mobileImageSection, desktopImageSection] = imagesSection?.querySelectorAll(":scope > div") ?? [];
+  if (mobileImageSection === void 0 || desktopImageSection === void 0) {
+    errors.add(new RecoverableError(ERRORS3.missingImageSections));
   }
-  if (renderImage2 && isBrandImageOnly) {
-    return [{ type: "Brand", data: { type: "BrandImageOnly", href, image: imageData, alt: altText } }, []];
+  const lightThemeImages = mobileImageSection?.querySelectorAll('a[href$=".svg"]');
+  const darkThemeImages = desktopImageSection?.querySelectorAll('a[href$=".svg"]');
+  const lightThemeMobileImageSrc = lightThemeImages?.[0]?.getAttribute("href") ?? "";
+  const lightThemeMobileImageAlt = lightThemeImages?.[0]?.textContent?.split("|")[1]?.trim() ?? "";
+  const darkThemeMobileImageSrc = lightThemeImages?.[1]?.getAttribute("href") ?? "";
+  const darkThemeMobileImageAlt = lightThemeImages?.[1]?.textContent?.split("|")[1]?.trim() ?? "";
+  const lightThemeDesktopImageSrc = darkThemeImages?.[0]?.getAttribute("href") ?? "";
+  const lightThemeDesktopImageAlt = darkThemeImages?.[0]?.textContent?.split("|")[1]?.trim() ?? "";
+  const darkThemeDesktopImageSrc = darkThemeImages?.[1]?.getAttribute("href") ?? "";
+  const darkThemeDesktopImageAlt = darkThemeImages?.[1]?.textContent?.split("|")[1]?.trim() ?? "";
+  if (!lightThemeMobileImageSrc || !lightThemeDesktopImageSrc || !darkThemeMobileImageSrc || !darkThemeDesktopImageSrc) {
+    errors.add(new RecoverableError(ERRORS3.missingThemeImages));
   }
-  if (renderImage2 && imageOnly) {
-    return [{ type: "Brand", data: { type: "ImageOnlyBrand", href, image: imageData, alt: altText } }, []];
-  }
-  return [{ type: "Brand", data: { type: "BrandLabelOnly", href, label } }, []];
+  return [{
+    type: "Brand",
+    data: {
+      href,
+      label,
+      isDarkBg,
+      imageData: {
+        type: "svg",
+        lightThemeImageSrc: lightThemeDesktopImageSrc,
+        lightThemeImageAlt: lightThemeDesktopImageAlt,
+        darkThemeImageSrc: darkThemeDesktopImageSrc,
+        darkThemeImageAlt: darkThemeDesktopImageAlt,
+        mobileLightThemeImageSrc: lightThemeMobileImageSrc,
+        mobileLightThemeImageAlt: lightThemeMobileImageAlt,
+        mobileDarkThemeImageSrc: darkThemeMobileImageSrc,
+        mobileDarkThemeImageAlt: darkThemeMobileImageAlt
+      }
+    }
+  }, [...errors]];
 };
-
-// src/Components/Brand/brand.css
-var css = ".feds-brand-container {\n    display: flex;\n    flex-shrink: 0;\n}\n\n.feds-brand {\n    display: flex;\n}\n\n.feds-brand,\n.feds-logo {\n    align-items: center;\n    outline-offset: 2px;\n    padding: 0 var(--feds-gutter);\n    column-gap: 10px;\n}\n\n.feds-brand-image,\n.feds-logo-image {\n    width: 25px;\n    flex-shrink: 0;\n}\n\n.feds-brand-image.brand-image-only {\n    height: 36px;\n    width: auto;\n    min-width: 66px;\n}\n\n.feds-brand-image.brand-image-only picture,\n.feds-brand-image.brand-image-only img,\n.feds-brand-image.brand-image-only svg {\n    width: auto;\n    height: 100%;\n}\n\n.feds-brand-image picture,\n.feds-brand-image img,\n.feds-brand-image svg,\n.feds-logo-image picture,\n.feds-logo-image img,\n.feds-logo-image svg {\n    width: 100%;\n    display: block;\n}\n\n.feds-brand-label,\n.feds-logo-label {\n    flex-shrink: 0;\n    font-weight: 700;\n    font-size: 18px;\n    color: var(--feds-color-adobeBrand);\n}\n\n@media (min-width: 900px) {\n    .feds-brand-image+.feds-brand-label {\n        display: flex;\n    }\n}";
-var style = document.createElement("style");
-style.textContent = css;
-document.head.appendChild(style);
 
 // src/Components/Brand/Render.ts
-var renderImage = (image, imageOnly) => {
-  const cls = `feds-brand-image${imageOnly ? " brand-image-only" : ""}`;
-  if (image.type === "inline-svg") {
-    return `<span class="${cls}">${image.svgContent}</span>`;
-  }
-  const alt = image.alt ? ` alt="${image.alt}"` : "";
-  return `<span class="${cls}"><img src="${image.src}"${alt} /></span>`;
-};
-var renderBrand = (href, content, ariaLabel = "") => `<div class="feds-brand-container">
-    <a href="${href}" class="feds-brand" daa-ll="Brand"${ariaLabel}>
-      ${content}
+var DESKTOP_SVG = `
+<?xml
+version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64.57 35" fill="currentColor">
+    <path d="M6.27,10.22h4.39l6.2,14.94h-4.64l-3.92-9.92-2.59,6.51h3.08l1.23,3.41H0l6.27-14.94ZM22.03,13.32c.45,0,.94.04,1.43.16v-3.7h3.88v14.72c-.89.4-2.81.89-4.73.89-3.48,0-6.47-1.98-6.47-5.93s2.88-6.13,5.89-6.13ZM22.52,22.19c.36,0,.65-.07.94-.16v-5.42c-.29-.11-.58-.16-.96-.16-1.27,0-2.45.94-2.45,2.92s1.2,2.81,2.47,2.81ZM34.25,13.32c3.23,0,5.98,2.18,5.98,6.02s-2.74,6.02-5.98,6.02-6-2.18-6-6.02,2.72-6.02,6-6.02ZM34.25,22.13c1.11,0,2.14-.89,2.14-2.79s-1.03-2.79-2.14-2.79-2.12.89-2.12,2.79.96,2.79,2.12,2.79ZM41.16,9.78h3.9v3.7c.47-.09.96-.16,1.45-.16,3.03,0,5.84,1.98,5.84,5.86,0,4.1-2.99,6.18-6.53,6.18-1.52,0-3.46-.31-4.66-.87v-14.72ZM45.91,22.17c1.34,0,2.56-.96,2.56-2.94,0-1.85-1.2-2.72-2.5-2.72-.36,0-.65.04-.91.16v5.35c.22.09.51.16.85.16ZM58.97,13.32c2.92,0,5.6,1.87,5.6,5.64,0,.51-.02,1-.09,1.49h-7.27c.4,1.32,1.56,1.94,3.01,1.94,1.18,0,2.27-.29,3.5-.82v2.97c-1.14.58-2.5.82-3.9.82-3.7,0-6.58-2.23-6.58-6.02s2.61-6.02,5.73-6.02ZM60.93,18.02c-.2-1.27-1.05-1.78-1.92-1.78s-1.58.54-1.87,1.78h3.79Z"/>
+</svg>
+`.trim();
+var MOBILE_SVG = `
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 18 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+<path id="Logo" d="M17.5512 15.9999H13.8827C13.7233 16.0027 13.5666 15.9587 13.4326 15.8735C13.2987 15.7882 13.1934 15.6656 13.1303 15.5211L9.1476 6.3291C9.1372 6.29332 9.11539 6.26179 9.08542 6.23919C9.05545 6.2166 9.0189 6.20413 8.98118 6.20365C8.94347 6.20316 8.9066 6.21469 8.87605 6.2365C8.84549 6.25832 8.82286 6.28928 8.81152 6.32478L6.32954 12.161C6.31607 12.1925 6.31072 12.2269 6.31397 12.261C6.31721 12.2951 6.32896 12.3279 6.34815 12.3565C6.36735 12.385 6.39339 12.4084 6.42398 12.4246C6.45456 12.4408 6.48872 12.4493 6.52343 12.4493H9.25162C9.33426 12.4493 9.41508 12.4733 9.48398 12.5183C9.55288 12.5634 9.60681 12.6275 9.63905 12.7026L10.8335 15.3264C10.8652 15.4 10.8778 15.4802 10.8704 15.5599C10.863 15.6395 10.8357 15.7161 10.791 15.7828C10.7463 15.8495 10.6856 15.9042 10.6142 15.9421C10.5429 15.98 10.4631 15.9998 10.3821 15.9999H0.450101C0.375399 15.9994 0.301967 15.9808 0.236351 15.9455C0.170735 15.9103 0.114973 15.8595 0.0740362 15.7979C0.0330997 15.7362 0.00826021 15.6655 0.00173221 15.592C-0.00479579 15.5185 0.00719033 15.4446 0.0366223 15.3769L6.35412 0.526466C6.41869 0.369291 6.52976 0.234984 6.67284 0.141079C6.81593 0.0471732 6.98437 -0.00196688 7.15618 7.38373e-05H10.7999C10.9718 -0.00217252 11.1403 0.0468839 11.2835 0.140814C11.4266 0.234745 11.5377 0.369168 11.6021 0.526466L17.9633 15.3769C17.9927 15.4445 18.0048 15.5183 17.9983 15.5917C17.9919 15.665 17.9672 15.7357 17.9264 15.7973C17.8856 15.859 17.83 15.9097 17.7646 15.9451C17.6991 15.9804 17.6258 15.9992 17.5512 15.9999V15.9999Z" />
+</svg>
+`.trim();
+var renderBrand = (data) => {
+  const { href, label, isDarkBg, imageData } = data;
+  const desktopLightSrc = imageData.lightThemeImageSrc?.trim() || imageData.darkThemeImageSrc?.trim() || "";
+  const desktopDarkSrc = imageData.darkThemeImageSrc?.trim() || imageData.lightThemeImageSrc?.trim() || "";
+  const mobileLightSrc = imageData.mobileLightThemeImageSrc?.trim() || imageData.mobileDarkThemeImageSrc?.trim() || "";
+  const mobileDarkSrc = imageData.mobileDarkThemeImageSrc?.trim() || imageData.mobileLightThemeImageSrc?.trim() || "";
+  const desktopLightAlt = imageData.lightThemeImageAlt || imageData.darkThemeImageAlt || "";
+  const desktopDarkAlt = imageData.darkThemeImageAlt || imageData.lightThemeImageAlt || "";
+  const mobileLightAlt = imageData.mobileLightThemeImageAlt || imageData.mobileDarkThemeImageAlt || "";
+  const mobileDarkAlt = imageData.mobileDarkThemeImageAlt || imageData.mobileLightThemeImageAlt || "";
+  const hasDesktopLight = !!desktopLightSrc;
+  const hasDesktopDark = !!desktopDarkSrc;
+  const hasMobileLight = !!mobileLightSrc;
+  const hasMobileDark = !!mobileDarkSrc;
+  const desktopLightImg = hasDesktopLight ? `<img src="${federateUrl(desktopLightSrc)}" alt="${desktopLightAlt}" />` : "";
+  const desktopDarkImg = hasDesktopDark ? `<img src="${federateUrl(desktopDarkSrc)}" alt="${desktopDarkAlt}" />` : "";
+  const mobileLightImg = hasMobileLight ? `<img src="${federateUrl(mobileLightSrc)}" alt="${mobileLightAlt}" />` : "";
+  const mobileDarkImg = hasMobileDark ? `<img src="${federateUrl(mobileDarkSrc)}" alt="${mobileDarkAlt}" />` : "";
+  const desktopSvg = hasDesktopLight && hasDesktopDark ? "" : DESKTOP_SVG;
+  const mobileSvg = hasMobileLight && hasMobileDark ? "" : MOBILE_SVG;
+  return `<div class="feds-brand-container${isDarkBg ? " feds-dark-bg" : ""}">
+    <a href="${href}" class="feds-brand" daa-ll="Brand" aria-label="${label}">
+      <span class="feds-brand-image desktop-brand">
+        ${desktopLightImg}
+        ${desktopDarkImg}
+        ${desktopSvg}
+      </span>
+      <span class="feds-brand-image mobile-brand">
+        ${mobileLightImg}
+        ${mobileDarkImg}
+        ${mobileSvg}
+      </span>
     </a>
   </div>`.trim();
+};
 var brand = (brandData) => {
   const { data } = brandData;
-  switch (data.type) {
-    case "LabelledBrand":
-      return renderBrand(
-        data.href,
-        renderImage(data.image, false) + `<span class="feds-brand-label">${data.label}</span>`
-      );
-    case "BrandImageOnly": {
-      const aria = data.alt ? ` aria-label="${data.alt}"` : "";
-      return renderBrand(
-        data.href,
-        renderImage(data.image, true),
-        aria
-      );
-    }
-    case "ImageOnlyBrand": {
-      const aria = data.alt ? ` aria-label="${data.alt}"` : "";
-      return renderBrand(
-        data.href,
-        renderImage(data.image, false),
-        aria
-      );
-    }
-    case "BrandLabelOnly":
-      return renderBrand(
-        data.href,
-        `<span class="feds-brand-label">${data.label}</span>`
-      );
-    case "NoRender":
-      return "";
-    default:
-      data;
-      return "";
-  }
+  return renderBrand(data);
 };
 
 // src/PostRendering/Unav/Unav.utils.ts
@@ -770,7 +790,7 @@ var [setUserProfile, getUserProfile] = (() => {
   });
   return [
     (data) => {
-      if (data && !profileData) {
+      if (profileData === void 0) {
         profileData = data;
         clearTimeout(profileTimeout);
         profileResolve?.(profileData);
@@ -828,7 +848,10 @@ var getDevice = () => {
 };
 var getVisitorGuid = async () => {
   const windowWithAlloy = window;
-  return windowWithAlloy.alloy ? await windowWithAlloy.alloy("getIdentity").then((data) => data?.identity?.ECID).catch(() => void 0) : void 0;
+  if (typeof windowWithAlloy.alloy !== "function") {
+    return void 0;
+  }
+  return windowWithAlloy.alloy("getIdentity").then((data) => data?.identity?.ECID).catch(() => void 0);
 };
 
 // src/PostRendering/Unav/Unav.config.ts
@@ -851,7 +874,7 @@ var getMessageEventListener = () => {
   if (configListener) return configListener;
   return (event) => {
     const { name, payload, executeDefaultAction } = event.detail;
-    if (!name || name !== "System" || !payload || typeof executeDefaultAction !== "function") return;
+    if (name !== "System" || typeof executeDefaultAction !== "function") return;
     switch (payload.subType) {
       case "AppInitiated":
         window.adobeProfile?.getUserProfile().then((data) => {
@@ -865,7 +888,9 @@ var getMessageEventListener = () => {
         break;
       case "ProfileSwitch":
         Promise.resolve(executeDefaultAction()).then((profile) => {
-          if (profile) window.location.reload();
+          if (profile !== null && profile !== void 0) {
+            window.location.reload();
+          }
         });
         break;
       default:
@@ -882,6 +907,7 @@ function getHelpChildren() {
 }
 var getUnavComponents = () => {
   const config = getMiloConfig();
+  const uncAppId = config?.unav?.uncAppId;
   return {
     profile: {
       name: "profile",
@@ -899,8 +925,17 @@ var getUnavComponents = () => {
                 info: () => {
                 },
                 // TODO: Integrate with lanaLog for proper logging
-                // warn: (e) => lanaLog({ message: 'Profile Menu warning', e, tags: 'universalnav,warn' }),
-                // error: (e) => lanaLog({ message: 'Profile Menu error', e, tags: 'universalnav', errorType: 'e' }),
+                // warn: (e) => lanaLog({
+                //   message: 'Profile Menu warning',
+                //   e,
+                //   tags: 'universalnav,warn',
+                // }),
+                // error: (e) => lanaLog({
+                //   message: 'Profile Menu error',
+                //   e,
+                //   tags: 'universalnav',
+                //   errorType: 'e',
+                // }),
                 warn: () => {
                 },
                 error: () => {
@@ -912,8 +947,8 @@ var getUnavComponents = () => {
           },
           messageEventListener: getMessageEventListener()
         },
-        // UNav 1.5: Support for primary/secondary signIn CTA style
-        // Setting signInCtaStyle = 'primary' makes signIn CTA primary and signUp secondary
+        // UNav 1.5 supports primary/secondary signIn CTA styles.
+        // 'primary' means signIn is primary and signUp is secondary.
         signInCtaStyle: getSignInCtaStyle(),
         isSignUpRequired: false,
         callbacks: {
@@ -934,7 +969,7 @@ var getUnavComponents = () => {
       attributes: {
         notificationsConfig: {
           applicationContext: {
-            appID: config?.unav?.uncAppId || "adobecom",
+            appID: uncAppId !== void 0 && uncAppId !== "" ? uncAppId : "adobecom",
             ...config?.unav?.uncConfig
           }
         }
@@ -961,9 +996,21 @@ var getUnavComponents = () => {
 
 // src/PostRendering/Unav/Unav.loader.ts
 var setProfileSignUpRequired = (children, value) => {
-  if (children[0] && "attributes" in children[0] && children[0].attributes && typeof children[0].attributes === "object" && "isSignUpRequired" in children[0].attributes) {
-    children[0].attributes.isSignUpRequired = value;
+  const profileChild = children[0];
+  if (profileChild === void 0) {
+    return;
   }
+  if (!("attributes" in profileChild)) {
+    return;
+  }
+  const { attributes } = profileChild;
+  if (attributes === void 0 || attributes === null) {
+    return;
+  }
+  if (typeof attributes !== "object" || !("isSignUpRequired" in attributes)) {
+    return;
+  }
+  attributes.isSignUpRequired = value;
 };
 var loadUnav = async (nav, _config) => {
   try {
@@ -981,7 +1028,7 @@ var loadUnav = async (nav, _config) => {
     if (meta instanceof HTMLMetaElement && trimmedValue.length === 0) {
       errors.add(new RecoverableError('metadata "universal-nav" has no value'));
     }
-    const signedOut = !window.adobeIMS?.isSignedInUser();
+    const signedOut = window.adobeIMS?.isSignedInUser() !== true;
     const unavComponents = trimmedValue.split(",").map((option) => option.trim()).filter(
       (component) => Object.keys(getUnavComponents()).includes(component) || component === "signup"
     );
@@ -992,7 +1039,7 @@ var loadUnav = async (nav, _config) => {
     let config;
     try {
       config = getMiloConfig();
-    } catch (error) {
+    } catch (_error) {
       throw new Error("MiloConfig not available for UNAV initialization");
     }
     const locale = getUniversalNavLocale(config.locale);
@@ -1017,14 +1064,14 @@ var loadUnav = async (nav, _config) => {
       const unavComponentsConfig = getUnavComponents();
       const children = [unavComponentsConfig.profile];
       setProfileSignUpRequired(children, false);
-      unavComponents?.forEach((component) => {
+      unavComponents.forEach((component) => {
         if (component === "profile") return;
         if (component === "signup") {
           setProfileSignUpRequired(children, true);
           return;
         }
         const unavComponent = unavComponentsConfig[component];
-        if (unavComponent) {
+        if (unavComponent !== void 0) {
           children.push(unavComponent);
         }
       });
@@ -1049,7 +1096,7 @@ var loadUnav = async (nav, _config) => {
         event: { visitor_guid: visitorGuid }
       },
       children: getChildren(),
-      isSectionDividerRequired: !!config?.unav?.showSectionDivider,
+      isSectionDividerRequired: config?.unav?.showSectionDivider === true,
       showTrayExperience: !isDesktop.matches
     });
     await window?.UniversalNav?.(getConfiguration());
@@ -1073,6 +1120,238 @@ var loadUnav = async (nav, _config) => {
     return new RecoverableError(message);
   }
 };
+
+// src/PostRendering/Keyboard/index.ts
+function $$(root, selector) {
+  return [...root.querySelectorAll(selector)];
+}
+function setTabindex(root, selector, enabled) {
+  $$(root, selector).forEach(
+    (el) => enabled ? el.removeAttribute("tabindex") : el.setAttribute("tabindex", "-1")
+  );
+}
+var ARROW_DELTA = {
+  ArrowLeft: -1,
+  ArrowRight: 1,
+  ArrowUp: -1,
+  ArrowDown: 1
+};
+var HORIZONTAL = /* @__PURE__ */ new Set(["ArrowLeft", "ArrowRight"]);
+var VERTICAL = /* @__PURE__ */ new Set(["ArrowUp", "ArrowDown"]);
+var SELECTED_TAB = '.tabs [role="tab"][aria-selected="true"]';
+function wrapIndex(index, delta, length) {
+  return (index + delta + length) % length;
+}
+function gridNextIndex(items, index, key, grid) {
+  const delta = ARROW_DELTA[key];
+  if (HORIZONTAL.has(key)) {
+    const next = index + delta;
+    return next >= 0 && next < items.length ? next : null;
+  }
+  const cols = getComputedStyle(grid).gridTemplateColumns.split(" ").length;
+  const children = [...grid.children];
+  const cellOf = (i) => {
+    const parent = items[i].parentElement;
+    return parent ? children.indexOf(parent) : -1;
+  };
+  const currentCol = cellOf(index) % cols;
+  const targetRow = Math.floor(cellOf(index) / cols) + (key === "ArrowDown" ? 1 : -1);
+  const maxRow = Math.floor((children.length - 1) / cols);
+  if (targetRow < 0 || targetRow > maxRow) return null;
+  let best = null;
+  let bestDist = Infinity;
+  for (let j = 0; j < items.length; j++) {
+    const dist = Math.abs(cellOf(j) % cols - currentCol);
+    if (Math.floor(cellOf(j) / cols) === targetRow && dist < bestDist) {
+      bestDist = dist;
+      best = j;
+    }
+  }
+  return best;
+}
+function initKeyboardNav(gnav) {
+  setTabindex(gnav, '.tab-content [role="tabpanel"] a', false);
+  const cleanups = [];
+  $$(gnav, ".feds-popup[popover]").forEach((popup) => {
+    const onToggle = () => {
+      if (!popup.matches(":popover-open")) setTabindex(popup, '[role="tabpanel"] a', false);
+    };
+    popup.addEventListener("toggle", onToggle);
+    cleanups.push(() => popup.removeEventListener("toggle", onToggle));
+    let tabPressed = false;
+    const onKeyDown = (event) => {
+      if (event.key === "Tab" && !event.shiftKey) {
+        tabPressed = true;
+      }
+    };
+    popup.addEventListener("keydown", onKeyDown);
+    cleanups.push(() => popup.removeEventListener("keydown", onKeyDown));
+    const onFocusOut = (event) => {
+      if (tabPressed && !popup.contains(event.relatedTarget)) {
+        popup.hidePopover?.();
+        if (!isDesktop.matches) {
+          const gnavItems = popup.closest(".feds-gnav-items");
+          gnavItems?.classList.remove("subscreen-opening");
+          gnavItems?.classList.add("subscreen-closing");
+        }
+        tabPressed = false;
+      }
+    };
+    popup.addEventListener("focusout", onFocusOut);
+    cleanups.push(() => popup.removeEventListener("focusout", onFocusOut));
+  });
+  const focusAndPrevent = (target, event) => {
+    target.focus();
+    event.preventDefault();
+  };
+  const openPopup = () => gnav.querySelector(".feds-popup:popover-open");
+  const selectedTab = (scope) => scope.querySelector(SELECTED_TAB);
+  const visiblePanel = (scope) => scope.querySelector('[role="tabpanel"]:not([hidden])');
+  function handleEscape(event) {
+    const popup = openPopup();
+    const menuWrapper = gnav.querySelector("#feds-menu-wrapper");
+    if (!menuWrapper) return false;
+    const gnavItems = menuWrapper.querySelector(".feds-gnav-items");
+    const backButton = popup ? popup.querySelector(".feds-popup-back-button") : null;
+    const isSubscreenOpening = gnavItems?.classList.contains("subscreen-opening") === true;
+    if (popup !== null && isSubscreenOpening && backButton !== null) {
+      backButton.click();
+      event.preventDefault();
+      return true;
+    }
+    const popover = popup ?? (menuWrapper?.matches(":popover-open") ? menuWrapper : null);
+    if (!popover) return false;
+    popover.hidePopover?.();
+    const trigger = popup ? `[popovertarget="${popover.id}"]` : ".feds-nav-toggle";
+    gnav.querySelector(trigger)?.focus();
+    event.preventDefault();
+    return true;
+  }
+  function handleTopBar(el, key, event) {
+    if (!HORIZONTAL.has(key)) return false;
+    const items = $$(gnav, ".feds-gnav-items > li > .feds-link");
+    const index = items.indexOf(el);
+    if (index < 0) return false;
+    focusAndPrevent(
+      items[wrapIndex(index, ARROW_DELTA[key], items.length)],
+      event
+    );
+    return true;
+  }
+  function handleTabs(el, popup, key, event) {
+    const items = $$(popup, '.tabs :is([role="tab"], .product-links a)');
+    const firstTabOffsetLeft = items[0]?.offsetLeft ?? 0;
+    const index = items.indexOf(el);
+    if (index < 0) return false;
+    const tabArrowDelta = isDesktop.matches ? { ArrowLeft: 0, ArrowRight: 0, ArrowUp: -1, ArrowDown: 1 } : { ArrowLeft: -1, ArrowRight: 1, ArrowUp: 0, ArrowDown: 0 };
+    if (tabArrowDelta[key]) {
+      const next = items[wrapIndex(index, tabArrowDelta[key], items.length)];
+      if (next.matches('[role="tab"]')) {
+        next.click();
+        if (!isDesktop.matches) {
+          requestAnimationFrame(() => {
+            const container = next.closest(".tabs");
+            if (container !== null) {
+              container.scrollLeft = next.offsetLeft - firstTabOffsetLeft;
+            }
+          });
+        }
+      }
+      focusAndPrevent(next, event);
+      return true;
+    }
+    if (key in tabArrowDelta) {
+      event.preventDefault();
+      return true;
+    }
+    if (key === "Tab" && !event.shiftKey && el.matches('[aria-selected="true"]')) {
+      const panel = visiblePanel(popup);
+      if (!panel) return false;
+      setTabindex(panel, "a", true);
+      const firstLink = panel.querySelector("a");
+      if (firstLink) focusAndPrevent(firstLink, event);
+      return true;
+    }
+    return false;
+  }
+  function handlePanel(el, popup, key, event) {
+    const panel = visiblePanel(popup);
+    if (!panel) return false;
+    const items = $$(panel, "a");
+    const index = items.indexOf(el);
+    if (index < 0) return false;
+    if (ARROW_DELTA[key]) {
+      const nextIndex = gridNextIndex(items, index, key, panel);
+      if (nextIndex !== null) {
+        focusAndPrevent(items[nextIndex], event);
+        return true;
+      }
+      if (key === "ArrowUp") {
+        setTabindex(panel, "a", false);
+        focusAndPrevent(selectedTab(popup) ?? items[0], event);
+        return true;
+      }
+      return false;
+    }
+    if (key === "Tab" && !event.shiftKey) {
+      if (index + 1 < items.length) {
+        focusAndPrevent(items[index + 1], event);
+      } else return false;
+      return true;
+    }
+    if (key === "Tab" && event.shiftKey) {
+      if (index > 0) {
+        focusAndPrevent(items[index - 1], event);
+      } else {
+        setTabindex(panel, "a", false);
+        const target = selectedTab(popup) ?? $$(popup, '.tabs :is([role="tab"], .product-links a)')[0];
+        if (target) focusAndPrevent(target, event);
+      }
+      return true;
+    }
+    return false;
+  }
+  function handleCards(el, popup, key, event) {
+    if (!VERTICAL.has(key)) return false;
+    const items = $$(popup, ".feds-gnav-cards a");
+    const index = items.indexOf(el);
+    if (index < 0) return false;
+    focusAndPrevent(
+      items[wrapIndex(index, ARROW_DELTA[key], items.length)],
+      event
+    );
+    return true;
+  }
+  function onKeydown(event) {
+    const el = document.activeElement ?? event.target;
+    if (event.key === "Escape") {
+      handleEscape(event);
+      return;
+    }
+    const popup = openPopup();
+    if (popup) {
+      if (popup.matches(":has(.product-list)")) {
+        if (handleTabs(el, popup, event.key, event)) return;
+        if (handlePanel(el, popup, event.key, event)) return;
+      }
+      if (popup.matches(":has(.feds-gnav-cards)")) {
+        if (handleCards(el, popup, event.key, event)) return;
+      }
+    }
+    handleTopBar(el, event.key, event);
+  }
+  const trapLink = gnav.querySelector(".trap-focus-gnav");
+  const onTrapFocus = (e) => {
+    if (!gnav.querySelector(".feds-menu-active")) return;
+    e.preventDefault();
+    gnav.querySelector(".feds-nav-toggle")?.focus();
+  };
+  trapLink?.addEventListener("focus", onTrapFocus);
+  cleanups.push(() => trapLink?.removeEventListener("focus", onTrapFocus));
+  gnav.addEventListener("keydown", onKeydown);
+  cleanups.push(() => gnav.removeEventListener("keydown", onKeydown));
+  return () => cleanups.forEach((fn) => fn());
+}
 export {
   IrrecoverableError,
   LANGMAP,
@@ -1087,13 +1366,14 @@ export {
   getUniversalNavLocale,
   getUserProfile,
   getVisitorGuid,
-  linkGroup,
+  initKeyboardNav,
   loadScript,
   loadStyles,
   loadUnav,
   parseBrand,
   parseLink,
-  parseLinkGroup,
+  parseProductCard,
+  productCard,
   setMiloConfig,
   setUserProfile
 };

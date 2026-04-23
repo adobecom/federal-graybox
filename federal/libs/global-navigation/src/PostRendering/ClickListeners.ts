@@ -42,7 +42,7 @@ export const initClickListeners = (
       if (!popoverBackgroundRule) return;
 
       const newHeight = popover?.clientHeight ?? 0;
-      (popoverBackgroundRule as CSSStyleRule).style.height = `${newHeight + 72}px`;
+      popoverBackgroundRule.style.height = `${newHeight + 72}px`;
 
     }
   );
@@ -88,7 +88,7 @@ export const initClickListeners = (
   };
 };
 
-const getPopoverBackgroundRule = () =>
+const getPopoverBackgroundRule = (): CSSStyleRule | undefined =>
   [...document.adoptedStyleSheets.flatMap(sheet => [...sheet.cssRules])]
     .find(rule => 
           (rule as CSSStyleRule)?.selectorText === 'header.global-navigation nav::after');
@@ -101,15 +101,16 @@ const animations = (gnav: HTMLElement): void => {
   // popover height animations
   const popoverBackgroundRule = getPopoverBackgroundRule();
   const resizeObserver = new ResizeObserver(entries => {
+    if (!popoverBackgroundRule) return;
     if (entries.length < 1) return;
     const openPopover = gnav.querySelector('.feds-popup:popover-open');
     if (!openPopover) {
-      (popoverBackgroundRule as CSSStyleRule).style.height = '100%';
+      popoverBackgroundRule.style.height = '100%';
       return;
     }
     const resetPopoverHeight = openPopover.clientHeight < 1;
     const height = resetPopoverHeight ? '100%' : `${openPopover.clientHeight + 72}px`;
-    (popoverBackgroundRule as CSSStyleRule).style.height = height;
+    popoverBackgroundRule.style.height = height;
   });
 
   mainMenuButtons.forEach(button => {
@@ -120,21 +121,23 @@ const animations = (gnav: HTMLElement): void => {
     // @ts-expect-error popup is a popover with a toggle event
     popup.addEventListener('toggle', (event: ToggleEvent) => {
       if (event.newState !== 'open' && !gnav.querySelector('.feds-popup:popover-open')) {
-        (popoverBackgroundRule as CSSStyleRule).style.height = '100%';
+        popoverBackgroundRule.style.height = '100%';
         if (isDesktop.matches) return;
         // Bandaid for using escape for closing the popup in mobile
         fedsGnavItems?.classList.remove('subscreen-opening');
         fedsGnavItems?.classList.add('subscreen-closing');
       } else {
         // in case the resize observer fails
-        (popoverBackgroundRule as CSSStyleRule).style.height = `${popup.clientHeight + 72}px`;
+        popoverBackgroundRule.style.height = `${popup.clientHeight + 72}px`;
         // On mobile (horizontal tabs), scroll active tab to the left edge
         if (!isDesktop.matches) {
           const tabsList = (popup as HTMLElement).querySelector<HTMLElement>('.tabs');
           const activeTab = (popup as HTMLElement).querySelector<HTMLElement>('button[role="tab"][aria-selected="true"]');
           const firstTab = tabsList?.querySelector<HTMLElement>('button[role="tab"]');
           if (tabsList && activeTab && firstTab) {
-            tabsList.scrollLeft = activeTab.offsetLeft - tabsList.offsetLeft - firstTab.offsetLeft;
+            tabsList.scrollLeft = activeTab.offsetLeft
+              - tabsList.offsetLeft
+              - firstTab.offsetLeft;
           }
         }
       }

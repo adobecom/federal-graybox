@@ -4,17 +4,20 @@ import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
+  {
+    ignores: [
+      "node_modules/**",
+      "dist/**",
+      "coverage/**",
+      "consonant/**",
+      "eslint.config.mjs",
+      "**/*.js",
+    ]
+  },
   eslint.configs.recommended,
   tseslint.configs.recommended,
   tseslint.configs.strict,
   {
-    ignores: [
-      "node_modules/",
-      "dist/",
-      "coverage/",
-      "*.js",
-      "*.d.ts "
-    ],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

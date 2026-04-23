@@ -6,118 +6,86 @@ describe('Brand Parse', () => {
     expect(() => parseBrand(null)).to.throw(IrrecoverableError, 'Error when parsing Brand. Element is null');
   });
 
-  it('should throw irrecoverable error when .gnav-brand is missing', () => {
+  it('should throw irrecoverable error when link section is missing', () => {
     const container = document.createElement('div');
-    container.innerHTML = `<div class="not-gnav-brand"></div>`;
-    expect(() => parseBrand(container)).to.throw(IrrecoverableError, 'Error when parsing Brand. Element is null');
+    container.innerHTML = `<div class="brand-root"></div>`;
+    expect(() => parseBrand(container)).to.throw(IrrecoverableError, 'Error when parsing Brand. No link found');
   });
 
-  it('should throw irrecoverable error when no links are found', () => {
-    const container = document.createElement('div');
-    container.innerHTML = `<div class="gnav-brand"></div>`;
-    expect(() => parseBrand(container)).to.throw(IrrecoverableError, 'Error when parsing Brand. No links found');
-  });
-
-  it('should throw irrecoverable error when no primary (non-image) link is found', () => {
+  it('should throw irrecoverable error when no link is found in link section', () => {
     const container = document.createElement('div');
     container.innerHTML = `
       <div class="gnav-brand">
-        <a href="https://example.com/logo.svg">https://example.com/logo.svg | Logo</a>
+        <div></div>
       </div>
     `;
-    expect(() => parseBrand(container)).to.throw(IrrecoverableError, 'Error when parsing Brand. No primary link found');
+    expect(() => parseBrand(container)).to.throw(IrrecoverableError, 'Error when parsing Brand. No link found');
   });
 
-  it('should parse a labelled brand with default company icon when no image links exist', () => {
+  it('should parse full brand data with all image variants', () => {
     const container = document.createElement('div');
     container.innerHTML = `
       <div class="gnav-brand">
-        <a href="https://example.com/">Adobe</a>
+        <div><a href="https://example.com/">Adobe</a></div>
+        <div>
+          <div>
+            <a href="https://example.com/mobile-light.svg">mobile-light.svg | Mobile Light</a>
+            <a href="https://example.com/mobile-dark.svg">mobile-dark.svg | Mobile Dark</a>
+          </div>
+          <div>
+            <a href="https://example.com/desktop-light.svg">desktop-light.svg | Desktop Light</a>
+            <a href="https://example.com/desktop-dark.svg">desktop-dark.svg | Desktop Dark</a>
+          </div>
+        </div>
       </div>
     `;
 
-    const [result, errors] = parseBrand(container);
+    const [result, errors] = parseBrand(container.querySelector('.gnav-brand'));
     expect(errors).to.have.lengthOf(0);
 
     expect(result.type).to.equal('Brand');
-    expect(result.data.type).to.equal('LabelledBrand');
     expect(result.data.href).to.equal('https://example.com/');
     expect(result.data.label).to.equal('Adobe');
-    expect(result.data.image.type).to.equal('inline-svg');
-    expect(result.data.image.svgContent).to.include('<svg');
-    expect(result.data.image.alt).to.equal('Adobe');
+    expect(result.data.imageData.lightThemeImageSrc).to.equal('https://example.com/desktop-light.svg');
+    expect(result.data.imageData.darkThemeImageSrc).to.equal('https://example.com/desktop-dark.svg');
+    expect(result.data.imageData.mobileLightThemeImageSrc).to.equal('https://example.com/mobile-light.svg');
+    expect(result.data.imageData.mobileDarkThemeImageSrc).to.equal('https://example.com/mobile-dark.svg');
   });
 
-  it('should parse brand-image-only and use brand icon by default', () => {
+  it('should set isDarkBg when dark-bg class is present', () => {
     const container = document.createElement('div');
     container.innerHTML = `
-      <div class="gnav-brand brand-image-only">
-        <a href="https://example.com/">Adobe</a>
+      <div class="gnav-brand dark-bg">
+        <div><a href="https://example.com/">Adobe</a></div>
+        <div>
+          <div>
+            <a href="https://example.com/mobile-light.svg">mobile-light.svg | Mobile Light</a>
+            <a href="https://example.com/mobile-dark.svg">mobile-dark.svg | Mobile Dark</a>
+          </div>
+          <div>
+            <a href="https://example.com/desktop-light.svg">desktop-light.svg | Desktop Light</a>
+            <a href="https://example.com/desktop-dark.svg">desktop-dark.svg | Desktop Dark</a>
+          </div>
+        </div>
       </div>
     `;
 
-    const [result, errors] = parseBrand(container);
-    expect(errors).to.have.lengthOf(0);
-
-    expect(result.type).to.equal('Brand');
-    expect(result.data.type).to.equal('BrandImageOnly');
-    expect(result.data.href).to.equal('https://example.com/');
-    expect(result.data.image.type).to.equal('inline-svg');
-    expect(result.data.image.svgContent).to.include('<svg');
+    const [result] = parseBrand(container.querySelector('.gnav-brand'));
+    expect(result.data.isDarkBg).to.equal(true);
   });
 
-  it('should return NoRender when both image + label are disabled (no-logo + brand-image-only)', () => {
+  it('should return recoverable errors when image sections are missing', () => {
     const container = document.createElement('div');
     container.innerHTML = `
-      <div class="gnav-brand brand-image-only no-logo">
-        <a href="https://example.com/">Adobe</a>
+      <div class="gnav-brand">
+        <div><a href="https://example.com/">Adobe</a></div>
       </div>
     `;
 
-    const [result, errors] = parseBrand(container);
-    expect(errors).to.have.lengthOf(0);
-
+    const [result, errors] = parseBrand(container.querySelector('.gnav-brand'));
     expect(result.type).to.equal('Brand');
-    expect(result.data.type).to.equal('NoRender');
-  });
-
-  it('should parse BrandLabelOnly when logo is disabled but label is enabled (no-logo only)', () => {
-    const container = document.createElement('div');
-    container.innerHTML = `
-      <div class="gnav-brand no-logo">
-        <a href="https://example.com/">Adobe</a>
-      </div>
-    `;
-
-    const [result, errors] = parseBrand(container);
-    expect(errors).to.have.lengthOf(0);
-
-    expect(result.type).to.equal('Brand');
-    expect(result.data.type).to.equal('BrandLabelOnly');
-    expect(result.data.href).to.equal('https://example.com/');
-    expect(result.data.label).to.equal('Adobe');
-  });
-
-  it('should parse ImageOnlyBrand when image-only is set, and select dark source when provided', () => {
-    const container = document.createElement('div');
-    container.innerHTML = `
-      <div class="gnav-brand image-only">
-        <a href="https://example.com/">Adobe</a>
-        <a href="https://example.com/logo-light.png">https://example.com/logo-light.png | Light Logo</a>
-        <a href="https://example.com/logo-dark.png">https://example.com/logo-dark.png | Dark Logo</a>
-      </div>
-    `;
-
-    const [result, errors] = parseBrand(container);
-    expect(errors).to.have.lengthOf(0);
-
-    expect(result.type).to.equal('Brand');
-    expect(result.data.type).to.equal('ImageOnlyBrand');
-    expect(result.data.href).to.equal('https://example.com/');
-    expect(result.data.image.type).to.equal('image');
-    // isDarkMode() currently always returns true in Utils.ts, so dark is selected when present
-    expect(result.data.image.src).to.equal('https://example.com/logo-dark.png');
-    expect(result.data.image.alt).to.equal('Light Logo');
+    expect(errors.length).to.be.greaterThan(0);
+    expect(errors.some((e) => e.message === 'Error when parsing Brand. No image section found')).to.equal(true);
   });
 });
 

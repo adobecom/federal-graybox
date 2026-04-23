@@ -90,7 +90,11 @@ export const main = async (
     throw mainNav;
   }
 
-  const gnavData = parseNavigation(mainNav, unavEnabled, await getPlaceholders());
+  const gnavData = parseNavigation(
+    mainNav,
+    unavEnabled,
+    await getPlaceholders()
+  );
   if (gnavData instanceof IrrecoverableError) {
     lanaLog(gnavData.message);
     throw gnavData;

@@ -14,7 +14,9 @@ export type ImageData = {
 
 export type Brand = {
     type: 'Brand';
-    data: { href: string; label: string; isDarkBg: boolean; imageData: ImageData }
+    data: {
+      href: string; label: string; isDarkBg: boolean; imageData: ImageData
+    }
 };
 
 const ERRORS = {
@@ -70,7 +72,12 @@ export const parseBrand = (
     const darkThemeDesktopImageSrc = darkThemeImages?.[1]?.getAttribute('href') ?? '';
     const darkThemeDesktopImageAlt = darkThemeImages?.[1]?.textContent?.split('|')[1]?.trim() ?? '';
 
-    if (!lightThemeMobileImageSrc || !lightThemeDesktopImageSrc || !darkThemeMobileImageSrc || !darkThemeDesktopImageSrc) {
+    if (
+      !lightThemeMobileImageSrc
+      || !lightThemeDesktopImageSrc
+      || !darkThemeMobileImageSrc
+      || !darkThemeDesktopImageSrc
+    ) {
         errors.add(new RecoverableError(ERRORS.missingThemeImages));
     }
 

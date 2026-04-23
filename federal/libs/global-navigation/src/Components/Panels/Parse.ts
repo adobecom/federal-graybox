@@ -72,8 +72,6 @@ export const parsePanels = (
     (el) => parsePanel(el, layout)
   );
 
-  console.log(panels);
-
   return [
     {
       type: "Panels",

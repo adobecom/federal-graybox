@@ -1,10 +1,17 @@
 /**
  * UNAV Loader - Initialization and lifecycle management
- * Orchestrates the loading, configuration, and initialization of Universal Navigation
+ * Orchestrates UNAV initialization lifecycle.
  */
 
 import { RecoverableError } from '../../Error/Error';
-import { loadScript, loadStyles, isDesktop, getMiloConfig, getMiloLocaleSettings, MiloConfig } from '../../Utils/Utils';
+import {
+  loadScript,
+  loadStyles,
+  isDesktop,
+  getMiloConfig,
+  getMiloLocaleSettings,
+  MiloConfig
+} from '../../Utils/Utils';
 import type {
   UnavConfig,
   UnavChildren,
@@ -39,16 +46,25 @@ export type Unav = {
  * @param children - Array of UNAV components with profile as first element
  * @param value - Boolean value to set for isSignUpRequired
  */
-const setProfileSignUpRequired = (children: UnavChildren, value: boolean): void => {
-  if (
-    children[0] &&
-    'attributes' in children[0] &&
-    children[0].attributes &&
-    typeof children[0].attributes === 'object' &&
-    'isSignUpRequired' in children[0].attributes
-  ) {
-    (children[0].attributes as { isSignUpRequired: boolean }).isSignUpRequired = value;
+const setProfileSignUpRequired = (
+  children: UnavChildren,
+  value: boolean
+): void => {
+  const profileChild = children[0];
+  if (profileChild === undefined) {
+    return;
   }
+  if (!('attributes' in profileChild)) {
+    return;
+  }
+  const { attributes } = profileChild;
+  if (attributes === undefined || attributes === null) {
+    return;
+  }
+  if (typeof attributes !== 'object' || !('isSignUpRequired' in attributes)) {
+    return;
+  }
+  (attributes as { isSignUpRequired: boolean }).isSignUpRequired = value;
 };
 
 // ============================================================================
@@ -103,7 +119,7 @@ export const loadUnav = async (
     // ========================================================================
     // Step 3: Check user authentication state
     // ========================================================================
-    const signedOut = !window.adobeIMS?.isSignedInUser();
+    const signedOut = window.adobeIMS?.isSignedInUser() !== true;
 
     // Parse component list from meta tag
     const unavComponents = trimmedValue
@@ -129,7 +145,7 @@ export const loadUnav = async (
     let config: MiloConfig;
     try {
       config = getMiloConfig();
-    } catch (error) {
+    } catch (_error) {
       throw new Error('MiloConfig not available for UNAV initialization');
     }
 
@@ -170,7 +186,8 @@ export const loadUnav = async (
     
     /**
      * Dynamically assembles child components based on meta tag configuration
-     * Special handling for 'profile' (always first) and 'signup' (modifies profile)
+     * Special handling for profile (always first) and signup
+     * (which modifies profile).
      */
     const getChildren = (): UnavChildren => {
       const unavComponentsConfig = getUnavComponents();
@@ -180,7 +197,7 @@ export const loadUnav = async (
       setProfileSignUpRequired(children, false);
 
       // Process each component from meta tag
-      unavComponents?.forEach((component: string) => {
+      unavComponents.forEach((component: string) => {
         if (component === 'profile') return; // Already added
 
         if (component === 'signup') {
@@ -191,7 +208,7 @@ export const loadUnav = async (
 
         // Add component if it exists in configuration
         const unavComponent = unavComponentsConfig[component];
-        if (unavComponent) {
+        if (unavComponent !== undefined) {
           children.push(unavComponent);
         }
       });
@@ -221,7 +238,7 @@ export const loadUnav = async (
         event: { visitor_guid: visitorGuid },
       },
       children: getChildren(),
-      isSectionDividerRequired: !!config?.unav?.showSectionDivider,
+      isSectionDividerRequired: config?.unav?.showSectionDivider === true,
       showTrayExperience: !isDesktop.matches,
     });
 

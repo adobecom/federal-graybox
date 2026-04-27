@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { setMiloConfig, getMiloConfig } from '../../dist/test-exports.js';
+import { setMiloConfig, getMiloConfig } from '../../src/Utils/Utils';
 
 /**
  * MiloConfig Unit Tests

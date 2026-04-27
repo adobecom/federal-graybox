@@ -1,7 +1,32 @@
 /**
  * Global Navigation Styles
  * Styles for the federal global navigation component
+ *
+ * This file is the CSS entry point for the global navigation library.
+ * It @imports all design tokens and every component CSS file so that:
+ *  - esbuild's watcher and Lightning CSS's bundler both see the complete
+ *    CSS graph and rebuild on any authored CSS edit;
+ *  - the build pipeline (see build-plugins/inline-lightning-css.js) can
+ *    bundle, prune unused tokens, and minify in a single pass.
+ *
+ * Order matters: design tokens must come before any rule that references
+ * them via var(), and semantic tokens must come after primitives.
  */
+
+/* Design tokens (consonant) */
+@import "../../consonant/dist/packages/tokens/css/dev/tokens.primitives.css";
+@import "../../consonant/dist/packages/tokens/css/dev/tokens.semantic.css";
+@import "../../consonant/dist/packages/tokens/css/dev/tokens.semantic.light.css";
+
+/* Component styles */
+@import "../Components/Brand/brand.css";
+@import "../Components/MegaMenu/mega-menu.css";
+@import "../Components/GnavCards/gnav-cards.css";
+@import "../Components/PromoCard/promo-card.css";
+@import "../Components/LinksCard/links-card.css";
+@import "../Components/ProductList/productlist.css";
+@import "../Components/Panels/panels.css";
+@import "../Components/FeaturedCard/featured-card.css";
 
 /* =========================================
    Skip to Main Content Link

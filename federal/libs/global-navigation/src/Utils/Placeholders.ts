@@ -1,5 +1,5 @@
 import { Input } from "../Main";
-import { RecoverableError } from "../test-exports";
+import { RecoverableError } from "../Error/Error";
 import { lanaLog } from "./Log";
 import { getFederatedContentRoot, getMiloConfig } from "./Utils";
 // TODO: avoid circular dependencies between Main and

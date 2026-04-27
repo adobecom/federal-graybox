@@ -1,5 +1,7 @@
 import { expect } from '@esm-bundle/chai';
-import { loadUnav, RecoverableError, setMiloConfig } from '../../dist/test-exports.js';
+import { loadUnav } from '../../src/PostRendering/Unav/Unav.loader';
+import { RecoverableError } from '../../src/Error/Error';
+import { setMiloConfig } from '../../src/Utils/Utils';
 
 /**
  * UNAV Loader Integration Tests

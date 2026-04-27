@@ -11,6 +11,7 @@ export default tseslint.config(
       "coverage/**",
       "consonant/**",
       "eslint.config.mjs",
+      "web-test-runner.config.mjs",
       "**/*.js",
     ]
   },

@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { productCard } from '../../../dist/test-exports.js';
+import { productCard } from '../../../src/Components/ProductCard/Render';
 
 describe('ProductCard Render', () => {
   describe('productCardHeader', () => {

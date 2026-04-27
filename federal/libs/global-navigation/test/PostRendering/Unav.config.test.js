@@ -1,5 +1,6 @@
 import { expect } from '@esm-bundle/chai';
-import { getUnavComponents, setMiloConfig, getMetadata } from '../../dist/test-exports.js';
+import { getUnavComponents } from '../../src/PostRendering/Unav/Unav.config';
+import { setMiloConfig, getMetadata } from '../../src/Utils/Utils';
 
 describe('UNAV Config', () => {
   let originalAdobeIMS;

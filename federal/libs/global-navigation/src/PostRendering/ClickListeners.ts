@@ -89,9 +89,10 @@ export const initClickListeners = (
 };
 
 const getPopoverBackgroundRule = (): CSSStyleRule | undefined =>
-  [...document.adoptedStyleSheets.flatMap(sheet => [...sheet.cssRules])]
+  [...document.adoptedStyleSheets
+    .flatMap(sheet => [...sheet.cssRules] as (CSSStyleRule | undefined)[])]
     .find(rule => 
-          (rule as CSSStyleRule)?.selectorText === 'header.global-navigation nav::after');
+          (rule)?.selectorText === 'header.global-navigation nav::after');
 
 
 const animations = (gnav: HTMLElement): void => {

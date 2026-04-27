@@ -1,5 +1,6 @@
 import { expect } from '@esm-bundle/chai';
-import { parseBrand, IrrecoverableError } from '../../../dist/test-exports.js';
+import { parseBrand } from '../../../src/Components/Brand/Parse';
+import { IrrecoverableError } from '../../../src/Error/Error';
 
 describe('Brand Parse', () => {
   it('should throw irrecoverable error when element is null', () => {

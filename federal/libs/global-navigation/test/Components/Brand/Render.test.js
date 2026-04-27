@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { brand } from '../../../dist/test-exports.js';
+import { brand } from '../../../src/Components/Brand/Render';
 
 describe('Brand Render', () => {
   it('should render brand with desktop and mobile image containers', () => {

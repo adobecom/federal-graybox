@@ -1,5 +1,6 @@
 import { expect } from '@esm-bundle/chai';
-import { parseProductCard, IrrecoverableError, RecoverableError } from '../../../dist/test-exports.js';
+import { parseProductCard } from '../../../src/Components/ProductCard/Parse';
+import { IrrecoverableError, RecoverableError } from '../../../src/Error/Error';
 
 describe('ProductCard Parse', () => {
   describe('parseProductCardLink', () => {

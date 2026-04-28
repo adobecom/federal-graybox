@@ -339,25 +339,36 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const menuWrapper = mountpoint.querySelector("#feds-menu-wrapper");
   const isMenuOpen = (): boolean =>
     menuWrapper?.matches(":popover-open") ?? false;
-  const hasScrolledPastThreshold = (): boolean => window.scrollY > 20;
 
-  const updateHeaderState = (): void => {
-    if (isMenuOpen()) {
+  const updateHeaderState = (scrolledPast: boolean): void => {
+    if (isMenuOpen() || !scrolledPast) {
       header.classList.remove("feds-header-scrolled");
       return;
     }
-
-    if (hasScrolledPastThreshold()) {
-      header.classList.add("feds-header-scrolled");
-      return;
-    }
-
-    header.classList.remove("feds-header-scrolled");
+    header.classList.add("feds-header-scrolled");
   };
 
-  updateHeaderState();
-  window.addEventListener("scroll", updateHeaderState, { passive: true });
-  menuWrapper?.addEventListener("toggle", updateHeaderState);
+  // A 20px sentinel placed at the top of the document body. When it scrolls
+  // out of the viewport the page has passed the threshold.
+  const sentinel = document.createElement("div");
+  sentinel.style.cssText = "position:absolute;top:20px;height:1px;width:1px;pointer-events:none;visibility:hidden;";
+  sentinel.setAttribute("aria-hidden", "true");
+  sentinel.setAttribute("tabindex", "-1");
+  document.body.prepend(sentinel);
+
+  let scrolledPast = false;
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      scrolledPast = !entry.isIntersecting;
+      updateHeaderState(scrolledPast);
+    },
+    { threshold: 0 }
+  );
+  observer.observe(sentinel);
+
+  menuWrapper?.addEventListener("toggle", () =>
+    updateHeaderState(scrolledPast)
+  );
 };
 
 const initHeaderAnalytics = (

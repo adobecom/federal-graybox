@@ -85,10 +85,10 @@
 
 .feds-buy-now-card__title {
   font-family: var(--feds-heading-font-family);
-  font-size: var(--s2a-typography-font-size-title-4);
+  font-size: var(--s2a-typography-font-size-title-5);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
-  line-height: var(--s2a-typography-line-height-title-4-temp);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-4);
+  line-height: var(--s2a-typography-line-height-title-5-temp);
+  letter-spacing: var(--s2a-typography-letter-spacing-title-5);
   color: var(--s2a-color-content-default);
   margin: 0;
 }

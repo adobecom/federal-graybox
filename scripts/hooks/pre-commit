@@ -1,0 +1,39 @@
+#!/bin/sh
+# Pre-commit hook: builds global-navigation and stages dist/ when source files change.
+# Installed automatically via the `prepare` npm script in the repo root.
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+GNAV_DIR="federal/libs/global-navigation"
+GNAV_PATH="$REPO_ROOT/$GNAV_DIR"
+
+# Only run when global-navigation source files are staged.
+STAGED=$(git diff --cached --name-only | grep -E "^$GNAV_DIR/(src/|build\.js|build-plugins/|tsconfig\.json|package\.json)" || true)
+
+if [ -z "$STAGED" ]; then
+  exit 0
+fi
+
+# Guard: node_modules must be installed before we can build.
+if [ ! -d "$GNAV_PATH/node_modules" ]; then
+  echo "error: global-navigation dependencies not installed."
+  echo "Run: npm install"
+  echo "  in: $GNAV_PATH"
+  exit 1
+fi
+
+echo "global-navigation source changed — running build..."
+
+# Run the build. Aborts the commit on failure.
+if ! npm run build --prefix "$GNAV_PATH"; then
+  echo ""
+  echo "error: global-navigation build failed. Commit aborted."
+  echo "Fix the errors above and try again."
+  exit 1
+fi
+
+# Stage the freshly built artifacts.
+git add "$GNAV_PATH/dist/"
+
+echo "dist/ updated and staged."

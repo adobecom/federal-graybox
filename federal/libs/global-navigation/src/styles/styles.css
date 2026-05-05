@@ -72,7 +72,7 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
 :root {
   --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
   --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
-  --s2a-typography-line-height-title-4-temp: 1;
+  --s2a-typography-line-height-title-5-temp: 1;
 }
 
 
@@ -451,9 +451,9 @@ header.global-navigation:has(.feds-popup:popover-open) .unav-comp-tooltip {
 
 .feds-popup .feds-product-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
-  font-size: var(--s2a-typography-font-size-title-4);
-  line-height: var(--s2a-typography-line-height-title-4-temp);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-4);
+  font-size: var(--s2a-typography-font-size-title-5);
+  line-height: var(--s2a-typography-line-height-title-5-temp);
+  letter-spacing: var(--s2a-typography-letter-spacing-title-5);
   font-family: var(--feds-heading-font-family);
 }
 

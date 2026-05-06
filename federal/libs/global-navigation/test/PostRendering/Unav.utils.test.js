@@ -9,7 +9,7 @@ import {
   getUserProfile,
   SIGNED_OUT_ICONS,
   LANGMAP,
-} from '../../dist/test-exports.js';
+} from '../../src/PostRendering/Unav/Unav.utils';
 
 /**
  * UNAV Utils Unit Tests

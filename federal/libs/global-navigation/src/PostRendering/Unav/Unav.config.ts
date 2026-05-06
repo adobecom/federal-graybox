@@ -34,7 +34,7 @@ const getSignInContext = (): object => {
  * Checks metadata tag first, then falls back to config
  * @returns 'primary' or 'secondary' button style
  */
-const getSignInCtaStyle = () => {
+const getSignInCtaStyle = (): 'primary' | 'secondary' => {
   const config = getMiloConfig();
   const isPrimary = (
     getMetadata('signin-cta-style') === 'primary'
@@ -45,7 +45,8 @@ const getSignInCtaStyle = () => {
 
 /**
  * Returns message event listener for profile component
- * Uses custom listener from config if provided, otherwise returns default listener
+ * Uses custom listener from config if provided,
+ * otherwise returns default listener.
  * 
  * Default listener handles:
  * - AppInitiated: Fetches and sets user profile data
@@ -54,14 +55,16 @@ const getSignInCtaStyle = () => {
  * 
  * @returns Event listener function for CustomEvent<AccountMenuEventDetail>
  */
-const getMessageEventListener = () => {
+const getMessageEventListener = (): ((
+  event: CustomEvent<AccountMenuEventDetail>
+) => void) => {
   const config = getMiloConfig();
   const configListener = config?.unav?.profile?.messageEventListener;
   if (configListener) return configListener;
 
   return (event: CustomEvent<AccountMenuEventDetail>) => {
     const { name, payload, executeDefaultAction } = event.detail;
-    if (!name || name !== 'System' || !payload || typeof executeDefaultAction !== 'function') return;
+    if (name !== 'System' || typeof executeDefaultAction !== 'function') return;
     switch (payload.subType) {
       case 'AppInitiated':
         window.adobeProfile?.getUserProfile()
@@ -73,7 +76,9 @@ const getMessageEventListener = () => {
         break;
       case 'ProfileSwitch':
         Promise.resolve(executeDefaultAction()).then((profile) => {
-          if (profile) window.location.reload();
+          if (profile !== null && profile !== undefined) {
+            window.location.reload();
+          }
         });
         break;
       default:
@@ -106,6 +111,7 @@ function getHelpChildren(): HelpItem[] {
  */
 export const getUnavComponents = (): UnavComponents => {
   const config = getMiloConfig();
+  const uncAppId = config?.unav?.uncAppId;
   return {
     profile: {
       name: 'profile',
@@ -116,14 +122,23 @@ export const getUnavComponents = (): UnavComponents => {
             enableProfileSwitcher: true,
             miniAppContext: {
               logger: {
-                trace: () => {},
-                debug: () => {},
-                info: () => {},
+                trace: (): void => {},
+                debug: (): void => {},
+                info: (): void => {},
                 // TODO: Integrate with lanaLog for proper logging
-                // warn: (e) => lanaLog({ message: 'Profile Menu warning', e, tags: 'universalnav,warn' }),
-                // error: (e) => lanaLog({ message: 'Profile Menu error', e, tags: 'universalnav', errorType: 'e' }),
-                warn: () => {},
-                error: () => {},
+                // warn: (e) => lanaLog({
+                //   message: 'Profile Menu warning',
+                //   e,
+                //   tags: 'universalnav,warn',
+                // }),
+                // error: (e) => lanaLog({
+                //   message: 'Profile Menu error',
+                //   e,
+                //   tags: 'universalnav',
+                //   errorType: 'e',
+                // }),
+                warn: (): void => {},
+                error: (): void => {},
               },
             },
             complexConfig: config?.unav?.profile?.complexConfig || null,
@@ -131,15 +146,15 @@ export const getUnavComponents = (): UnavComponents => {
           },
           messageEventListener: getMessageEventListener(),
         },
-        // UNav 1.5: Support for primary/secondary signIn CTA style
-        // Setting signInCtaStyle = 'primary' makes signIn CTA primary and signUp secondary
+        // UNav 1.5 supports primary/secondary signIn CTA styles.
+        // 'primary' means signIn is primary and signUp is secondary.
         signInCtaStyle: getSignInCtaStyle(),
         isSignUpRequired: false,
         callbacks: {
-          onSignIn: () => {
+          onSignIn: (): void => {
             window.adobeIMS?.signIn(getSignInContext());
           },
-          onSignUp: () => {
+          onSignUp: (): void => {
             window.adobeIMS?.signIn(getSignInContext());
           },
         },
@@ -155,7 +170,9 @@ export const getUnavComponents = (): UnavComponents => {
       attributes: {
         notificationsConfig: {
           applicationContext: {
-            appID: config?.unav?.uncAppId || 'adobecom',
+            appID: uncAppId !== undefined && uncAppId !== ''
+              ? uncAppId
+              : 'adobecom',
             ...config?.unav?.uncConfig,
           },
         },

@@ -1,115 +1,91 @@
 import { expect } from '@esm-bundle/chai';
-import { brand } from '../../../dist/test-exports.js';
+import { brand } from '../../../src/Components/Brand/Render';
 
 describe('Brand Render', () => {
-  it('should render LabelledBrand with image + label', () => {
+  it('should render brand with desktop and mobile image containers', () => {
     const html = brand({
       type: 'Brand',
       data: {
-        type: 'LabelledBrand',
         href: 'https://example.com/',
         label: 'Adobe',
-        image: { type: 'inline-svg', svgContent: '<svg>logo</svg>', alt: 'Adobe' }
-      }
+        isDarkBg: false,
+        imageData: {
+          type: 'svg',
+          lightThemeImageSrc: 'https://example.com/desktop-light.svg',
+          lightThemeImageAlt: 'Desktop Light',
+          darkThemeImageSrc: 'https://example.com/desktop-dark.svg',
+          darkThemeImageAlt: 'Desktop Dark',
+          mobileLightThemeImageSrc: 'https://example.com/mobile-light.svg',
+          mobileLightThemeImageAlt: 'Mobile Light',
+          mobileDarkThemeImageSrc: 'https://example.com/mobile-dark.svg',
+          mobileDarkThemeImageAlt: 'Mobile Dark',
+        },
+      },
     });
 
     expect(html).to.include('class="feds-brand-container"');
     expect(html).to.include('class="feds-brand"');
     expect(html).to.include('href="https://example.com/"');
     expect(html).to.include('daa-ll="Brand"');
-    expect(html).to.include('class="feds-brand-image"');
-    expect(html).to.include('<svg>logo</svg>');
-    expect(html).to.include('class="feds-brand-label"');
-    expect(html).to.include('Adobe');
+    expect(html).to.include('class="feds-brand-image desktop-brand"');
+    expect(html).to.include('class="feds-brand-image mobile-brand"');
+    expect(html).to.include('src="https://example.com/desktop-light.svg"');
+    expect(html).to.include('src="https://example.com/mobile-dark.svg"');
 
     const container = document.createElement('div');
     container.innerHTML = html;
     const a = container.querySelector('a.feds-brand');
     expect(a).to.exist;
-    expect(a.getAttribute('aria-label')).to.equal(null);
+    expect(a.getAttribute('aria-label')).to.equal('Adobe');
   });
 
-  it('should render BrandImageOnly with aria-label when alt is provided', () => {
+  it('should apply dark background modifier class', () => {
     const html = brand({
       type: 'Brand',
       data: {
-        type: 'BrandImageOnly',
         href: 'https://example.com/',
-        alt: 'Adobe Home',
-        image: { type: 'inline-svg', svgContent: '<svg>brand</svg>', alt: 'Adobe Home' }
-      }
+        label: 'Adobe',
+        isDarkBg: true,
+        imageData: {
+          type: 'svg',
+          lightThemeImageSrc: 'https://example.com/desktop-light.svg',
+          lightThemeImageAlt: 'Desktop Light',
+          darkThemeImageSrc: 'https://example.com/desktop-dark.svg',
+          darkThemeImageAlt: 'Desktop Dark',
+          mobileLightThemeImageSrc: 'https://example.com/mobile-light.svg',
+          mobileLightThemeImageAlt: 'Mobile Light',
+          mobileDarkThemeImageSrc: 'https://example.com/mobile-dark.svg',
+          mobileDarkThemeImageAlt: 'Mobile Dark',
+        },
+      },
     });
-
-    expect(html).to.include('brand-image-only');
-    expect(html).to.include('aria-label="Adobe Home"');
-
-    const container = document.createElement('div');
-    container.innerHTML = html;
-    const a = container.querySelector('a.feds-brand');
-    expect(a.getAttribute('aria-label')).to.equal('Adobe Home');
+    expect(html).to.include('class="feds-brand-container feds-dark-bg"');
   });
 
-  it('should render ImageOnlyBrand with <img> and alt attribute', () => {
+  it('should fallback missing dark assets to light assets', () => {
     const html = brand({
       type: 'Brand',
       data: {
-        type: 'ImageOnlyBrand',
         href: 'https://example.com/',
-        alt: 'Company Logo',
-        image: { type: 'image', src: 'https://example.com/logo.png', alt: 'Company Logo' }
-      }
+        label: 'Adobe',
+        isDarkBg: false,
+        imageData: {
+          type: 'svg',
+          lightThemeImageSrc: 'https://example.com/desktop-light.svg',
+          lightThemeImageAlt: 'Desktop Light',
+          darkThemeImageSrc: '',
+          darkThemeImageAlt: '',
+          mobileLightThemeImageSrc: 'https://example.com/mobile-light.svg',
+          mobileLightThemeImageAlt: 'Mobile Light',
+          mobileDarkThemeImageSrc: '',
+          mobileDarkThemeImageAlt: '',
+        },
+      },
     });
 
-    expect(html).to.include('src="https://example.com/logo.png"');
-    expect(html).to.include('alt="Company Logo"');
-    expect(html).to.include('aria-label="Company Logo"');
-
-    const container = document.createElement('div');
-    container.innerHTML = html;
-    const img = container.querySelector('.feds-brand-image img');
-    expect(img).to.exist;
-    expect(img.getAttribute('src')).to.equal('https://example.com/logo.png');
-    expect(img.getAttribute('alt')).to.equal('Company Logo');
-  });
-
-  it('should render BrandLabelOnly with just label content', () => {
-    const html = brand({
-      type: 'Brand',
-      data: {
-        type: 'BrandLabelOnly',
-        href: 'https://example.com/',
-        label: 'Adobe'
-      }
-    });
-
-    expect(html).to.include('class="feds-brand-label"');
-    expect(html).to.include('Adobe');
-    expect(html).to.not.include('feds-brand-image');
-
-    const container = document.createElement('div');
-    container.innerHTML = html;
-    expect(container.querySelector('.feds-brand-label')).to.exist;
-    expect(container.querySelector('.feds-brand-image')).to.equal(null);
-  });
-
-  it('should return empty string for NoRender', () => {
-    const html = brand({ type: 'Brand', data: { type: 'NoRender' } });
-    expect(html).to.equal('');
-  });
-
-  it('should omit img alt attribute when alt is empty', () => {
-    const html = brand({
-      type: 'Brand',
-      data: {
-        type: 'ImageOnlyBrand',
-        href: 'https://example.com/',
-        alt: '',
-        image: { type: 'image', src: 'https://example.com/logo.png', alt: '' }
-      }
-    });
-
-    expect(html).to.include('src="https://example.com/logo.png"');
-    expect(html).to.not.include('alt="');
+    expect(html).to.not.include('<svg id="Layer_1"');
+    expect(html).to.include('src="https://example.com/desktop-light.svg"');
+    expect(html).to.include('src="https://example.com/mobile-light.svg"');
   });
 });
 

@@ -1,5 +1,6 @@
 import { expect } from '@esm-bundle/chai';
-import { loadUnav, setMiloConfig } from '../../dist/test-exports.js';
+import { loadUnav } from '../../src/PostRendering/Unav/Unav.loader';
+import { setMiloConfig } from '../../src/Utils/Utils';
 
 /**
  * UNAV Loader Unit Tests

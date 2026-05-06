@@ -2,6 +2,10 @@
 
 This project exists as a home for centralised content for milo projects. https://github.com/orgs/adobecom/discussions/1388
 
+## Git Hooks
+
+run `npm install` in the root of the project so the `prepare` script can put the git pre-commit hook into the .git folder
+
 ## Submodules
 
 This project uses submodules. You may want to do

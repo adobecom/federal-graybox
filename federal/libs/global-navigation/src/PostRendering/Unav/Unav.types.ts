@@ -99,7 +99,7 @@ export type Profile = {
             error: (_: string) => void;
           };
         };
-        complexConfig: Record<string, any> | null;
+        complexConfig: Record<string, unknown> | null;
       };
       messageEventListener: (_: CustomEvent<AccountMenuEventDetail>) => void;
     };

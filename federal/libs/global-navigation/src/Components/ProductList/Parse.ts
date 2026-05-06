@@ -1,4 +1,4 @@
-import { IrrecoverableError, RecoverableError } from "../../test-exports";
+import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { getNextSiblings, parseListAndAccumulateErrors } from "../../Utils/Utils";
 import { ProductCard, parseProductCard } from "../ProductCard/Parse";
 import { Link, parseLink } from "../Link/Parse";

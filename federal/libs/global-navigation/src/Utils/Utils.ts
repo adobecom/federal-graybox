@@ -429,15 +429,21 @@ export const getAriaAttrs = (
   ariaAttrs?: Record<string, string>,
   ariaLabel?: string
 ): string => {
-  if (!ariaAttrs && !ariaLabel) return '';
+  const hasAriaLabel =
+    ariaLabel !== null && ariaLabel !== undefined && ariaLabel !== '';
+  const hasAriaAttrs = ariaAttrs !== undefined;
+  if (!hasAriaAttrs && !hasAriaLabel) return '';
   
   const attrs: string[] = [];
   
   // ariaLabel takes precedence over ariaAttrs['aria-label']
-  if (ariaLabel !== null && ariaLabel !== undefined && ariaLabel !== '') {
+  if (hasAriaLabel) {
     attrs.push(`aria-label="${ariaLabel}"`);
-  } else if (ariaAttrs?.['aria-label']) {
-    attrs.push(`aria-label="${ariaAttrs['aria-label']}"`);
+  } else {
+    const fallbackAriaLabel = ariaAttrs?.['aria-label'] ?? '';
+    if (fallbackAriaLabel !== '') {
+      attrs.push(`aria-label="${fallbackAriaLabel}"`);
+    }
   }
   
   // Add other aria attributes

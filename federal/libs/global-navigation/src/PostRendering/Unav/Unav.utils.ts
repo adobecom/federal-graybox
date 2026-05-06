@@ -48,7 +48,10 @@ export const LANGMAP = {
  * Provides async access to user profile with 5-second timeout fallback
  * @returns Tuple of [setter, getter] functions
  */
-export const [setUserProfile, getUserProfile] = (() => {
+export const [setUserProfile, getUserProfile] = ((): [
+  (data: UserProfile) => void,
+  () => Promise<UserProfile>
+] => {
   let profileData: UserProfile | undefined;
   let profileResolve: ((value: UserProfile) => void) | undefined;
   let profileTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -64,7 +67,7 @@ export const [setUserProfile, getUserProfile] = (() => {
 
   return [
     (data: UserProfile): void => {
-      if (data && !profileData) {
+      if (profileData === undefined) {
         profileData = data;
         clearTimeout(profileTimeout);
         profileResolve?.(profileData);
@@ -104,7 +107,9 @@ export function getUnavWidthCSS(
 
   if (signedOut) {
     // Calculate width for signed-out state (fewer icons + sign-in button)
-    const l = components.filter((c: string) => SIGNED_OUT_ICONS.includes(c)).length;
+    const l = components
+      .filter((c: string) => SIGNED_OUT_ICONS.includes(c))
+      .length;
     const signInButton = 92; // px
     return `calc(${signInButton}px + ${l * iconWidth}px + ${l * flexGap}rem${
       sectionDivider ? ` + 2px + ${2 * sectionDividerMargin}px + ${flexGap}rem` : ''
@@ -195,9 +200,10 @@ export const getDevice = (): UnavConfig['analyticsContext']['consumer']['device'
  */
 export const getVisitorGuid = async (): Promise<string | undefined> => {
   const windowWithAlloy = window as WindowWithAlloy;
-  return windowWithAlloy.alloy
-    ? await windowWithAlloy.alloy('getIdentity')
-        .then((data: AlloyIdentityData) => data?.identity?.ECID)
-        .catch(() => undefined)
-    : undefined;
+  if (typeof windowWithAlloy.alloy !== 'function') {
+    return undefined;
+  }
+  return windowWithAlloy.alloy('getIdentity')
+    .then((data: AlloyIdentityData) => data?.identity?.ECID)
+    .catch(() => undefined);
 };

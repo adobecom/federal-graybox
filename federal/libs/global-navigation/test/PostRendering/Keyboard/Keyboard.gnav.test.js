@@ -2,7 +2,7 @@
  * Integration test for gnav keyboard navigation.
  */
 import { expect } from '@esm-bundle/chai';
-import { initKeyboardNav } from '../../../dist/test-exports.js';
+import { initKeyboardNav } from '../../../src/PostRendering/Keyboard';
 
 describe('Gnav keyboard init', () => {
   let gnav;

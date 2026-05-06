@@ -1,4 +1,4 @@
-import { getMetadata, getMiloConfig } from "../test-exports";
+import { getMetadata, getMiloConfig } from "./Utils";
 
 export type LanaSeverity = 'd' | 'debug' | 'i' | 'info' | 'w' | 'warn' | 'e' | 'error' | 'c' | 'critical';
 

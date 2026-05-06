@@ -1,4 +1,5 @@
-import { IrrecoverableError, Link, parseLink, RecoverableError } from "../../test-exports";
+import { IrrecoverableError, RecoverableError } from "../../Error/Error";
+import { Link, parseLink } from "../Link/Parse";
 import { parseListAndAccumulateErrors } from "../../Utils/Utils";
 
 export type Panels = {
@@ -71,8 +72,6 @@ export const parsePanels = (
     panelElements,
     (el) => parsePanel(el, layout)
   );
-
-  console.log(panels);
 
   return [
     {

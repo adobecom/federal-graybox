@@ -159,8 +159,8 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
         next.click();
         if (!isDesktop.matches) {
           requestAnimationFrame(() => {
-            const container = next.closest<HTMLElement>('.tabs') as HTMLElement;
-            if (container) {
+            const container = next.closest<HTMLElement>('.tabs');
+            if (container !== null) {
               container.scrollLeft = next.offsetLeft - firstTabOffsetLeft;
             }
           });

@@ -1,7 +1,11 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 
+// NOTE: keep this glob in sync with the "test" script in package.json.
+// Both must agree on which files are treated as tests.
+const TEST_GLOB = 'test/**/*.test.{js,ts}';
+
 export default {
-  files: 'test/**/*.test.{js,ts}',
+  files: TEST_GLOB,
   nodeResolve: true,
   plugins: [
     // Transpile imported .ts files on the fly so tests can import directly

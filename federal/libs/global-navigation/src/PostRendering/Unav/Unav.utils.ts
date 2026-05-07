@@ -19,6 +19,13 @@ import type {
  */
 export const SIGNED_OUT_ICONS = ['appswitcher', 'help'];
 
+/** Timeout in ms before profile resolution falls back to an empty profile */
+const PROFILE_RESOLUTION_TIMEOUT_MS = 5000;
+
+/** Width in px of the sign-in button used for UNAV
+ *  container min-width calculation */
+const SIGN_IN_BUTTON_WIDTH_PX = 92;
+
 /**
  * Language to country code mapping for locale normalization
  */
@@ -62,7 +69,7 @@ export const [setUserProfile, getUserProfile] = ((): [
     profileTimeout = setTimeout(() => {
       profileData = {};
       resolve(profileData);
-    }, 5000);
+    }, PROFILE_RESOLUTION_TIMEOUT_MS);
   });
 
   return [
@@ -110,8 +117,7 @@ export function getUnavWidthCSS(
     const l = components
       .filter((c: string) => SIGNED_OUT_ICONS.includes(c))
       .length;
-    const signInButton = 92; // px
-    return `calc(${signInButton}px + ${l * iconWidth}px + ${l * flexGap}rem${
+    return `calc(${SIGN_IN_BUTTON_WIDTH_PX}px + ${l * iconWidth}px + ${l * flexGap}rem${
       sectionDivider ? ` + 2px + ${2 * sectionDividerMargin}px + ${flexGap}rem` : ''
     })`;
   }

@@ -49,11 +49,11 @@ export const split = <T>(
 export const zip = <T, R>(
   xs: T[],
   ys: R[]
-): List<[T, R]> => {
+): Array<[T, R]> => {
   const len = xs.length < ys.length
             ? xs.length
             : ys.length;
-  const result = new Array(len) as List<[T, R]>;
+  const result = new Array(len) as Array<[T, R]>;
   for (let i = 0; i < len; i = i + 1) {
     result[i] = [xs[i], ys[i]];
   }
@@ -119,9 +119,9 @@ export const parseListAndAccumulateErrors = <
   ParsedObj,
   ErrorType
   >(
-  elements: List<UnParsedObj>,
+  elements: Array<UnParsedObj>,
   parse: (element: UnParsedObj) => Parsed<ParsedObj, ErrorType>
-): Parsed<List<ParsedObj>, ErrorType> => elements.reduce(
+): Parsed<Array<ParsedObj>, ErrorType> => elements.reduce(
   ([accElems, accErrors], element) => {
     try {
       const [parsedElement, parseErrors] = parse(element);
@@ -139,7 +139,7 @@ export const parseListAndAccumulateErrors = <
       return [accElems, accErrors];
     }
   },
-  [[],[]] as Parsed<List<ParsedObj>, ErrorType>
+  [[],[]] as Parsed<Array<ParsedObj>, ErrorType>
   );
 
 export type PersonalizationConfig = {
@@ -257,7 +257,6 @@ export const getFederatedContentRoot = (): string => {
     'https://news.adobe.com',
     'graybox.adobe.com',
   ];
-  if (federatedContentRoot) return federatedContentRoot;
   // Non milo consumers will have its origin from config
   // TODO: allow the passing of a configured origin
   const origin = window.location.origin;
@@ -373,7 +372,7 @@ export const inlineNestedFragments = async (
           } catch {
             return;
           }
-        }, [] as List<[HTMLAnchorElement, URL]>)
+        }, [] as Array<[HTMLAnchorElement, URL]>)
       await Promise.all(inlineLinks);
       return currentElem
     } catch (error) {
@@ -601,7 +600,7 @@ export const loadScript = (
       script.setAttribute('type', type);
     }
     // Set loading mode (async or defer) if specified
-    if (mode && ['async', 'defer'].includes(mode)) script.setAttribute(mode, '');
+    if (mode !== undefined) script.setAttribute(mode, '');
     head.append(script);
   }
 
@@ -659,8 +658,8 @@ export function getMetadata(
   // Use 'property' for namespaced metadata (e.g., Open Graph), 'name' 
   // for standard metadata
   const attr = name && name.includes(':') ? 'property' : 'name';
-  const meta = doc.head.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement;
-  return meta?.content ?? null;
+  const meta = doc.head.querySelector(`meta[${attr}="${name}"]`);
+  return meta instanceof HTMLMetaElement ? meta.content : null;
 }
 
 type MiloConfigEnv = {
@@ -1027,7 +1026,14 @@ export const tempFixJarvis = (gnav: HTMLElement): void => {
   const popovers = gnav.querySelectorAll('[popover]');
   document.addEventListener('click', bringJarvisToTop);
   popovers.forEach(popover => popover.addEventListener('toggle', bringJarvisToTop));
+  let attempts = 0;
+  const maxAttempts = 200;
   const intervalId = setInterval(() => {
-    if (bringToTop()) clearInterval(intervalId);
+    attempts += 1;
+    if (bringToTop()) { clearInterval(intervalId); return; }
+    if (attempts >= maxAttempts) {
+      clearInterval(intervalId);
+      lanaLog('tempFixJarvis: gave up waiting for adbMsgClientWrapper');
+    }
   }, 150);
 }

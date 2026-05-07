@@ -2,6 +2,10 @@ import { isDesktop } from "../Utils/Utils";
 
 type CleanupFunction = () => void
 
+/** Height in px added to the popover background pseudo-element
+ *  to cover the nav bar */
+const POPOVER_BG_HEIGHT_OFFSET_PX = 72;
+
 export const initClickListeners = (
   gnav: HTMLElement
 ): CleanupFunction => {
@@ -42,7 +46,7 @@ export const initClickListeners = (
       if (!popoverBackgroundRule) return;
 
       const newHeight = popover?.clientHeight ?? 0;
-      popoverBackgroundRule.style.height = `${newHeight + 72}px`;
+      popoverBackgroundRule.style.height = `${newHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
 
     }
   );
@@ -110,7 +114,7 @@ const animations = (gnav: HTMLElement): void => {
       return;
     }
     const resetPopoverHeight = openPopover.clientHeight < 1;
-    const height = resetPopoverHeight ? '100%' : `${openPopover.clientHeight + 72}px`;
+    const height = resetPopoverHeight ? '100%' : `${openPopover.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
     popoverBackgroundRule.style.height = height;
   });
 
@@ -129,7 +133,7 @@ const animations = (gnav: HTMLElement): void => {
         fedsGnavItems?.classList.add('subscreen-closing');
       } else {
         // in case the resize observer fails
-        popoverBackgroundRule.style.height = `${popup.clientHeight + 72}px`;
+        popoverBackgroundRule.style.height = `${popup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
         // On mobile (horizontal tabs), scroll active tab to the left edge
         if (!isDesktop.matches) {
           const tabsList = (popup as HTMLElement).querySelector<HTMLElement>('.tabs');

@@ -57,6 +57,10 @@ if (isWatch) {
 } else {
   execSync('tsc --noEmit', { stdio: 'inherit' });
 
-  await esbuild.build(buildOptions);
+  const result = await esbuild.build({ ...buildOptions, metafile: false });
+  if (result.errors.length) {
+    console.error('Build failed with errors — aborting.');
+    process.exit(1);
+  }
   console.log('Build complete - CSS inlined into main.js');
 }

@@ -22,13 +22,13 @@ export type MegaMenuContent = ProductList
 
 export type GnavColumn = {
   type: "GnavColumn";
-  cards: List<FeaturedCard | LinksCard | PromoCard>;
+  cards: Array<FeaturedCard | LinksCard | PromoCard>;
 };
 
 export type GnavCards = {
   type: "GnavCards";
   megaMenuTitle: string;
-  sections: List<GnavColumn>;
+  sections: Array<GnavColumn>;
 };
 
 export const parseMegaMenu = (
@@ -65,9 +65,6 @@ export const parseMegaMenu = (
         throw new IrrecoverableError(e?.message);
     }
   })();
-
-  if (content instanceof IrrecoverableError)
-    throw content;
 
   return [
     {

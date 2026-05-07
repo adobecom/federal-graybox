@@ -7,7 +7,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence, tempFixJarvis } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, tempFixJarvis } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -311,21 +311,6 @@ const initPopoverCloseOnUnavInteraction = (mountpoint: HTMLElement): void => {
   });
 };
 
-const _initStaggeredAnimations = (mountpoint: HTMLElement): void => {
-  const tabs = [...mountpoint.querySelectorAll('.product-list ul.tabs > li')] as HTMLElement[];
-  animateInSequence(tabs, 0.025);
-  const popovers = [...mountpoint.querySelectorAll('.feds-popup[popover]')];
-  popovers.forEach(pop => {
-    if (pop.querySelector('.product-list')) {
-      [...pop.querySelectorAll('ul[role="tabpanel"]')].forEach(tabpanel => {
-        animateInSequence([...tabpanel.querySelectorAll('li')] as HTMLElement[], 0.025);
-      });
-    } else {
-      animateInSequence([...pop.querySelectorAll('.feds-gnav-cards > li')] as HTMLElement[], 0.025);
-    }
-  });
-
-}
 
 const closeEverything = (): void => {
 };

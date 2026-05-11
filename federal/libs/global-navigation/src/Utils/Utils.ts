@@ -1,6 +1,7 @@
 import { IrrecoverableError } from "../Error/Error";
 import { lanaLog } from "./Log";
 import { getPlaceholders, replacePlaceholders } from "./Placeholders";
+import { IS_OPEN_CLASS, closePopup } from "../PostRendering/PopupWiring";
 
 export const isDesktop = window.matchMedia('(min-width: 1024px)');
 
@@ -159,7 +160,7 @@ type PersonalizationStateFunctions = [
 
 // TODO: Consolidate all global state handlers into
 // a single file (but still probably keep them separate)
-export const [setPersonalizationConfig, getPersonalizationConfig] = 
+export const [setPersonalizationConfig, getPersonalizationConfig] =
   ((): PersonalizationStateFunctions => {
     let personalizationConfig: PersonalizationConfig | undefined;
     let isInitialized = false;
@@ -225,7 +226,7 @@ export const fetchAndProcessPlainHTML = async (
     const resolvedPlaceholders = await getPlaceholders();
     const processedHtml = replacePlaceholders(htmlText, resolvedPlaceholders);
     const { body } = new DOMParser().parseFromString(processedHtml, "text/html");
-    
+
     // Apply personalization to the fetched HTML
     try {
       const { handleCommands, commands } = getPersonalizationConfig();
@@ -236,7 +237,7 @@ export const fetchAndProcessPlainHTML = async (
       // @ts-expect-error errors usually have a message
       lanaLog(`Personalization not applied: ${error?.message}`);
     }
-    
+
     return body;
   } catch (error) {
     // @ts-expect-error errors usually have a message
@@ -316,18 +317,18 @@ export const replaceDotMedia = (path: string, ele: Element): void => {
     attr: 'src' | 'srcset'
   ): void => {
     const selector = `${tag}[${attr}^="./media_"]`;
-    const elements = tag === 'img' 
+    const elements = tag === 'img'
       ? ele.querySelectorAll<HTMLImageElement>(selector)
       : ele.querySelectorAll<HTMLSourceElement>(selector);
-    
+
     elements.forEach((el) => {
       const attrValue = el.getAttribute(attr);
       if (attrValue === null || attrValue === "") return;
-      
+
       try {
         // Construct absolute URL by resolving
         // relative path against source location
-        // Then federate the URL to ensure it 
+        // Then federate the URL to ensure it
         // points to the correct content source
         const absoluteUrl = federateUrl(
           new URL(attrValue, new URL(path, window.location.href)).href
@@ -432,9 +433,9 @@ export const getAriaAttrs = (
     ariaLabel !== null && ariaLabel !== undefined && ariaLabel !== '';
   const hasAriaAttrs = ariaAttrs !== undefined;
   if (!hasAriaAttrs && !hasAriaLabel) return '';
-  
+
   const attrs: string[] = [];
-  
+
   // ariaLabel takes precedence over ariaAttrs['aria-label']
   if (hasAriaLabel) {
     attrs.push(`aria-label="${ariaLabel}"`);
@@ -444,7 +445,7 @@ export const getAriaAttrs = (
       attrs.push(`aria-label="${fallbackAriaLabel}"`);
     }
   }
-  
+
   // Add other aria attributes
   if (ariaAttrs) {
     Object.entries(ariaAttrs).forEach(([key, value]) => {
@@ -454,7 +455,7 @@ export const getAriaAttrs = (
       }
     });
   }
-  
+
   return attrs.length > 0 ? ` ${attrs.join(' ')}` : '';
 };
 
@@ -478,17 +479,17 @@ type LoadLinkOptions<T> = {
 
 /**
  * Dynamically loads a link element into the document head.
- * Prevents duplicate loading by checking if a link 
+ * Prevents duplicate loading by checking if a link
  * with the same href already exists.
- * 
+ *
  * @param href - URL of the resource to load
  * @param options - Configuration options for the link element
  * @returns The created or existing HTMLLinkElement
- * 
+ *
  * @example
  * // Load a stylesheet with high priority
- * loadLink('/styles/main.css', { 
- *   rel: 'stylesheet', 
+ * loadLink('/styles/main.css', {
+ *   rel: 'stylesheet',
  *   fetchpriority: 'high',
  *   callback: (type) => console.log(`Stylesheet ${type}`)
  * });
@@ -507,7 +508,7 @@ export function loadLink<T>(
   // Check if link already exists to prevent duplicates
   const existingLink = document.head.querySelector(`link[href="${href}"]`);
   if (existingLink) {
-    // Link already exists, invoke callback with 
+    // Link already exists, invoke callback with
     // 'noop' to indicate no action taken
     callback?.('noop');
     return existingLink as HTMLLinkElement;
@@ -520,7 +521,7 @@ export function loadLink<T>(
   if (crossorigin !== undefined) link.setAttribute('crossorigin', crossorigin);
   if (fetchpriority !== undefined) link.setAttribute('fetchpriority', fetchpriority);
   link.setAttribute('href', href);
-  
+
   // Attach load/error event handlers if callback provided
   if (callback) {
     link.onload = (e: Event): T => callback(e.type);
@@ -532,7 +533,7 @@ export function loadLink<T>(
 
 /**
  * Convenience function to load a CSS stylesheet.
- * 
+ *
  * @param href - URL of the stylesheet to load
  * @param callback - Optional callback invoked on load/error events
  * @returns The created or existing HTMLLinkElement
@@ -546,7 +547,7 @@ export function loadStyle(
 
 /**
  * Conditionally loads a stylesheet based on the override flag.
- * 
+ *
  * @param url - URL of the stylesheet to load
  * @param override - Whether to load the stylesheet (defaults to false)
  */
@@ -559,7 +560,7 @@ export function loadStyles(url: string, override = false): void {
  * Configuration options for dynamically loading script elements
  */
 type LoadScriptOptions = {
-  /** Loading strategy: 'async' for parallel execution, 
+  /** Loading strategy: 'async' for parallel execution,
     * 'defer' for sequential after DOM parsing */
   mode?: 'async' | 'defer';
   /** Unique identifier for the script element */
@@ -568,15 +569,15 @@ type LoadScriptOptions = {
 
 /**
  * Dynamically loads a JavaScript file into the document head.
- * Returns a Promise that resolves when the script loads successfully 
+ * Returns a Promise that resolves when the script loads successfully
  * or rejects on error.
  * Prevents duplicate loading and tracks loaded state via data-loaded attribute.
- * 
+ *
  * @param url - URL of the script to load
  * @param type - Script MIME type (e.g., 'module', 'text/javascript')
  * @param options - Configuration options for loading behavior
  * @returns Promise that resolves with the HTMLScriptElement on success
- * 
+ *
  * @example
  * // Load a module script asynchronously
  * loadScript('/js/app.js', 'module', { mode: 'async' })
@@ -631,22 +632,22 @@ export const loadScript = (
 
 /**
  * Retrieves metadata content from the document's head section.
- * Automatically determines whether to use 'name' or 'property' 
+ * Automatically determines whether to use 'name' or 'property'
  * attribute based on the metadata name.
- * 
+ *
  * Uses 'property' attribute for Open Graph and other namespaced
  *  metadata (containing ':'),
  * and 'name' attribute for standard HTML metadata.
- * 
+ *
  * @param name - The metadata name or property to search for
  * (e.g., 'description', 'og:title')
  * @param doc - The document to search in (defaults to current document)
  * @returns The metadata content value, or null if not found
- * 
+ *
  * @example
  * // Get standard meta tag
  * const description = getMetadata('description');
- * 
+ *
  * @example
  * // Get Open Graph meta tag
  * const ogTitle = getMetadata('og:title');
@@ -655,7 +656,7 @@ export function getMetadata(
   name: string,
   doc: Document = document
 ): string | null {
-  // Use 'property' for namespaced metadata (e.g., Open Graph), 'name' 
+  // Use 'property' for namespaced metadata (e.g., Open Graph), 'name'
   // for standard metadata
   const attr = name && name.includes(':') ? 'property' : 'name';
   const meta = doc.head.querySelector(`meta[${attr}="${name}"]`);
@@ -687,7 +688,7 @@ type MiloConfigLocale = {
   contentRoot?: string;            // Full content path with origin
   language?: string;               // Langcode (new routing)e.g., 'en','fr','de'
   dir?: string;                    // Text direction: 'ltr' or 'rtl'
-  
+
   // Allow additional locale-specific properties
   [key: string]: unknown;          // Additional locale configuration
 };
@@ -737,53 +738,53 @@ const isValidMiloConfig = (config: unknown): config is MiloConfig => {
   if (invalid(cfg.locale)) return false;
   const locale = cfg.locale as Record<string, unknown>;
   if (typeof locale.prefix !== 'string') return false;
-  
+
   // Validate env structure
   if (invalid(cfg.env)) return false;
   const env = cfg.env as Record<string, unknown>;
   if (typeof env.name !== 'string') return false;
-  
+
   // Validate optional unav structure
   if (cfg.unav !== undefined) {
     if (typeof cfg.unav !== 'object' || cfg.unav === null) return false;
     const unav = cfg.unav as Record<string, unknown>;
-    
+
     // Validate unav.profile if present
     if (unav.profile !== undefined) {
       if (typeof unav.profile !== 'object' || unav.profile === null) return false;
       const profile = unav.profile as Record<string, unknown>;
-      
+
       // Validate signInCtaStyle if present
       if (profile.signInCtaStyle !== undefined) {
         if (profile.signInCtaStyle !== 'primary' && profile.signInCtaStyle !== 'secondary') {
           return false;
         }
       }
-      
+
       // Validate messageEventListener if present
       if (profile.messageEventListener !== undefined && typeof profile.messageEventListener !== 'function') {
         return false;
       }
     }
   }
-  
+
   // Validate optional jarvis structure
   if (cfg.jarvis !== undefined) {
     if (typeof cfg.jarvis !== 'object' || cfg.jarvis === null) return false;
     const jarvis = cfg.jarvis as Record<string, unknown>;
-    
+
     // id is required if jarvis object exists
     if (typeof jarvis.id !== 'string') return false;
   }
-  
+
   return true;
 };
 
 /**
  * MiloConfig Configuration State Management
- * Implements closure-based singleton pattern 
+ * Implements closure-based singleton pattern
  * for global configuration with validation
- * 
+ *
  * @throws Error if config validation fails or if accessed before initialization
  */
 
@@ -973,14 +974,12 @@ export function getMiloLocaleSettings(
 }
 
 export const closePopovers = (mountpoint: HTMLElement): void => {
-  const menuPopover = mountpoint.querySelector<
-    HTMLElement & { hidePopover?: () => void }
-  >('#feds-menu-wrapper');
+  const menuPopover = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
   menuPopover?.classList.remove('feds-menu-active');
-  menuPopover?.hidePopover?.();
-  mountpoint.querySelector<
-    HTMLElement & { hidePopover?: () => void }
-  >('.feds-popup:popover-open')?.hidePopover?.();
+  closePopup(menuPopover);
+  mountpoint
+    .querySelectorAll<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`)
+    .forEach(closePopup);
 };
 
 export const animateInSequence = (xs: HTMLElement[], gap: number): void => {
@@ -1001,39 +1000,4 @@ export function getExperienceName(): string {
     adobeid?: { client_id?: string };
   }).adobeid?.client_id;
   return typeof imsClientId === 'string' && imsClientId !== '' ? imsClientId : '';
-}
-
-export const tempFixJarvis = (gnav: HTMLElement): void => {
-  const bringToTop = (): boolean => {
-    const adobeMsgClientWrapper = document.querySelector('.adbMsgClientWrapper');
-    if (!adobeMsgClientWrapper) return false;
-    if (adobeMsgClientWrapper.getAttribute('popover') !== 'manual') {
-      adobeMsgClientWrapper.setAttribute('popover', 'manual');
-      (adobeMsgClientWrapper as HTMLElement).style.padding = '0'; // override default popover styling
-      (adobeMsgClientWrapper as HTMLElement).style.border = 'none';
-    }
-    // show and then hide to make sure the chat window container
-    // is the topmost popover.
-    (adobeMsgClientWrapper as HTMLElement)?.hidePopover();
-    (adobeMsgClientWrapper as HTMLElement)?.showPopover();
-    return true;
-  }
-  const bringJarvisToTop = (event: Event | ToggleEvent): void => {
-    const jarvisLink = (event.target as HTMLElement).closest('[href*="#open-jarvis-chat"]');
-    if (!jarvisLink && (event as ToggleEvent).newState !== 'open') return;
-    bringToTop();
-  }
-  const popovers = gnav.querySelectorAll('[popover]');
-  document.addEventListener('click', bringJarvisToTop);
-  popovers.forEach(popover => popover.addEventListener('toggle', bringJarvisToTop));
-  let attempts = 0;
-  const maxAttempts = 200;
-  const intervalId = setInterval(() => {
-    attempts += 1;
-    if (bringToTop()) { clearInterval(intervalId); return; }
-    if (attempts >= maxAttempts) {
-      clearInterval(intervalId);
-      lanaLog('tempFixJarvis: gave up waiting for adbMsgClientWrapper');
-    }
-  }, 150);
 }

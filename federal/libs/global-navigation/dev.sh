@@ -60,7 +60,7 @@ if [ -n "$REPO_ROOT" ]; then
     done
 fi
 
-echo -e "You can find the built file at ${GREEN}http://localhost:3000/libs/global-navigation/dist/main.js${NC}"
+echo -e "You can find the built file at ${GREEN}http://localhost:3000/federal/libs/global-navigation/dist/main.js${NC}"
 echo -e "${GREEN}Ready - Press Ctrl+C to stop${NC}"
 echo -e "Build: $BUILD_PID | AEM: $AEM_PID"
 

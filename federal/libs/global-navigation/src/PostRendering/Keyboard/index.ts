@@ -1,4 +1,5 @@
 import { isDesktop } from "../../Utils/Utils";
+import { IS_OPEN_CLASS, triggerForPopupId, closePopup, isPopupOpen } from "../PopupWiring";
 
 function $$(root: Element, selector: string): HTMLElement[] {
   return [...root.querySelectorAll<HTMLElement>(selector)];
@@ -54,9 +55,9 @@ function gridNextIndex(
 export function initKeyboardNav(gnav: HTMLElement): () => void {
   setTabindex(gnav, '.tab-content [role="tabpanel"] a', false);
   const cleanups: (() => void)[] = [];
-  $$(gnav, '.feds-popup[popover]').forEach((popup) => {
+  $$(gnav, '.feds-popup').forEach((popup) => {
     const onToggle = (): void => {
-      if (!popup.matches(':popover-open')) setTabindex(popup, '[role="tabpanel"] a', false);
+      if (!isPopupOpen(popup)) setTabindex(popup, '[role="tabpanel"] a', false);
     };
     popup.addEventListener('toggle', onToggle);
     cleanups.push(() => popup.removeEventListener('toggle', onToggle));
@@ -74,7 +75,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     // Auto-close popup when focus leaves it via Tab key (not Shift+Tab)
     const onFocusOut = (event: FocusEvent): void => {
       if (tabPressed && !popup.contains(event.relatedTarget as Node)) {
-        (popup as HTMLElement & { hidePopover?: () => void }).hidePopover?.();
+        closePopup(popup);
         if (!isDesktop.matches) {
           const gnavItems = popup.closest('.feds-gnav-items');
           gnavItems?.classList.remove('subscreen-opening');
@@ -90,7 +91,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
   const focusAndPrevent = (target: HTMLElement, event: KeyboardEvent): void => {
     target.focus(); event.preventDefault();
   };
-  const openPopup = (): HTMLElement | null => gnav.querySelector<HTMLElement>('.feds-popup:popover-open');
+  const openPopup = (): HTMLElement | null => gnav.querySelector<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`);
   const selectedTab = (
     scope: Element
   ): HTMLElement | null => scope.querySelector<HTMLElement>(SELECTED_TAB);
@@ -114,13 +115,13 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
       return true;
     }
 
-    const popover = popup ?? (menuWrapper?.matches(':popover-open') ? menuWrapper : null);
-    if (!popover) return false;
-    (popover as HTMLElement & { hidePopover?: () => void }).hidePopover?.();
+    const target = popup ?? (isPopupOpen(menuWrapper) ? menuWrapper : null);
+    if (!target) return false;
+    closePopup(target);
     const trigger = popup
-      ? `[popovertarget="${popover.id}"]`
-      : '.feds-nav-toggle';
-    gnav.querySelector<HTMLElement>(trigger)?.focus();
+      ? triggerForPopupId(gnav, target.id)
+      : gnav.querySelector<HTMLElement>('.feds-nav-toggle');
+    trigger?.focus();
     event.preventDefault();
     return true;
   }

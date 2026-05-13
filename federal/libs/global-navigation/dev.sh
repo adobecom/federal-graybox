@@ -7,6 +7,17 @@ NC='\033[0m'
 BUILD_PID=""
 AEM_PID=""
 
+find_repo_root() {
+    local dir="$PWD"
+    while [ "$dir" != "/" ]; do
+        if [ -f "$dir/helix-config.yaml" ] || [ -f "$dir/.helix" ] || [ -f "$dir/fstab.yaml" ]; then
+            echo "$dir"; return 0
+        fi
+        dir="$(dirname "$dir")"
+    done
+    return 1
+}
+
 kill_process() {
     local pid=$1
     local name=$2
@@ -32,12 +43,24 @@ trap cleanup SIGINT SIGTERM
 echo -e "${GREEN}Starting development environment...${NC}"
 node build.js --watch &
 BUILD_PID=$!
-sleep 1
 
-(cd ../../.. && aem up &> /dev/null) &
-AEM_PID=$!
+REPO_ROOT="$(find_repo_root)" || { echo -e "${YELLOW}Warning: could not locate repo root (helix-config.yaml/.helix not found)${NC}"; REPO_ROOT=""; }
 
-echo -e "You can find the built file at ${GREEN}http://localhost:3000/libs/global-navigation/dist/main.js${NC}"
+if [ -n "$REPO_ROOT" ]; then
+    LOGDIR="$(mktemp -d -t gnav-dev-XXXXXX)"
+    AEM_LOG="$LOGDIR/aem.log"
+    (cd "$REPO_ROOT" && aem up) >"$AEM_LOG" 2>&1 &
+    AEM_PID=$!
+    echo -e "AEM logs: ${GREEN}$AEM_LOG${NC}"
+
+    # Wait up to ~15 s for AEM to become reachable
+    for _ in {1..30}; do
+        if curl -sSf -o /dev/null http://localhost:3000/; then break; fi
+        sleep 0.5
+    done
+fi
+
+echo -e "You can find the built file at ${GREEN}http://localhost:3000/federal/libs/global-navigation/dist/main.js${NC}"
 echo -e "${GREEN}Ready - Press Ctrl+C to stop${NC}"
 echo -e "Build: $BUILD_PID | AEM: $AEM_PID"
 

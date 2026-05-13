@@ -9,13 +9,13 @@ export const megaMenu = ({
   <button type="button"
           aria-controls="${sanitize(title)}"
           aria-haspopup="true"
+          aria-expanded="false"
           class="mega-menu feds-link"
-          popovertarget="${sanitize(title)}"
           ${getAnalyticsAttrs(`${title}-${index + 1}`, 'header|Open')}
   >
     ${title}${icons.chevronDown}
   </button>
-  <div id="${sanitize(title)}" popover class="feds-popup">
+  <div id="${sanitize(title)}" class="feds-popup">
   </div>
 `;
 

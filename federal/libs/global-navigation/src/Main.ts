@@ -3,16 +3,18 @@ import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
+import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName, animateInSequence, tempFixJarvis } from "./Utils/Utils";
+import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
- 
+
 type GlobalNavigation = {
   closeEverything: () => void;
   reloadUnav: () => void;
@@ -72,10 +74,10 @@ export const main = async (
     lanaLog(`Failed to initialize MiloConfig: ${error}`);
     throw new IrrecoverableError(`Failed to initialize MiloConfig: ${error}`);
   }
-  
+
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
-  
+
   // We kick off the request for the federal placeholders in parallel
   setPlaceholders(combineWithFederalPlaceholders(input));
 
@@ -99,7 +101,7 @@ export const main = async (
     lanaLog(gnavData.message);
     throw gnavData;
   }
-  
+
   // TODO: Implement Aside
   await renderGnav(gnavData)(mountpoint);
 
@@ -116,7 +118,6 @@ mountpoint: HTMLElement
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
-  mountpoint.querySelector('nav')?.showPopover();
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
   ]
@@ -134,6 +135,7 @@ mountpoint: HTMLElement
       return [error];
     }
   }).flat());
+
   return mountpoint;
 };
 
@@ -145,7 +147,8 @@ export const renderGnavString = ({
 }: GlobalNavigationData
 ): string => {
   return `
-<nav popover="manual" data-lenis-prevent>
+<nav data-lenis-prevent>
+  <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
   <ul role="presentation">
     ${((): string => {
@@ -161,7 +164,6 @@ export const renderGnavString = ({
           daa-ll="hamburgermenu|open"
           aria-expanded="false"
           aria-controls="feds-menu-wrapper"
-          popovertarget="feds-menu-wrapper"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 7" fill="currentColor" aria-hidden="true">
             <path d="M13.25 5.5H0.75C0.33594 5.5 0 5.83594 0 6.25C0 6.66406 0.33594 7 0.75 7H13.25C13.6641 7 14 6.66406 14 6.25C14 5.83594 13.6641 5.5 13.25 5.5Z"/>
@@ -180,7 +182,6 @@ export const renderGnavString = ({
         </li>
         <li
           id="feds-menu-wrapper"
-          popover
           class="feds-menu-wrapper"
         >
           <ul class="feds-gnav-items">
@@ -207,51 +208,31 @@ export const postRenderingTasks = async (
     errors.add(unav);
     lanaLog(unav.message);
   }
-  else 
+  else
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
+
   initClickListeners(input.mountpoint);
+  wirePopups(input.mountpoint);
+  initLightDismiss(input.mountpoint);
   initKeyboardNav(input.mountpoint);
   initAriaToggleListeners(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
-  // initStaggeredAnimations(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
-  const handleModalLoaded = (): void => {
-    document.querySelector('nav[popover]')?.removeAttribute('popover');
-    closePopovers(input.mountpoint);
-  };
-  if (document.querySelector('.dialog-modal')) {
-    handleModalLoaded();
-  }
-
-  document.addEventListener('click', (event) => {
-    if (event.target instanceof Element && event.target.closest('a[href*="#openPrivacy"]')) {
-      handleModalLoaded();
-    }
-  });
-  tempFixJarvis(input.mountpoint);
-  //Todo: Fix this after the modal has changed to dialog
-  window.addEventListener('milo:modal:loaded', handleModalLoaded);
-  window.addEventListener('milo:modal:closed', () => {
-    const nav = document.querySelector<HTMLElement & { showPopover?: () => void }>('nav');
-    nav?.setAttribute('popover', 'manual');
-    nav?.showPopover?.();
-  });
-  // Initialize merch links after DOM is rendered
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
     lanaLog(error.message);
   });
-  
+
   const reloadUnav
     = unav instanceof RecoverableError
     ? (): void => {}
     : unav.reloadUnav;
 
   return {
-    closeEverything,
+    closeEverything: () => closePopovers(input.mountpoint),
     reloadUnav,
     errors,
     setGnavTopPosition: (_): void => {},
@@ -264,7 +245,7 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
   const navToggle = mountpoint.querySelector<HTMLElement>('.feds-nav-toggle');
 
   menuWrapper?.addEventListener('toggle', () => {
-    const isOpen = menuWrapper.matches(':popover-open');
+    const isOpen = menuWrapper.classList.contains(IS_OPEN_CLASS);
     navToggle?.setAttribute('aria-expanded', String(isOpen));
     navToggle?.setAttribute(
       'daa-ll',
@@ -274,22 +255,19 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
   });
 
   menuWrapper?.addEventListener('transitionend', () => {
-    if (!menuWrapper.matches(':popover-open')) {
+    if (!menuWrapper.classList.contains(IS_OPEN_CLASS)) {
       menuWrapper.classList.remove('feds-menu-active');
     }
   });
 
-  const megaMenuPopovers = mountpoint.querySelectorAll<HTMLElement>('.feds-popup[popover]');
+  const megaMenuPopovers = mountpoint.querySelectorAll<HTMLElement>('.feds-popup');
   megaMenuPopovers.forEach(popup => {
     popup.addEventListener('toggle', () => {
       const trigger = mountpoint.querySelector<HTMLElement>(
-        `[popovertarget="${popup.id}"]`
+        `[aria-controls="${popup.id}"]`
       );
-      const isOpen = popup.matches(':popover-open');
-      trigger?.setAttribute(
-        'aria-expanded',
-        String(isOpen)
-      );
+      const isOpen = popup.classList.contains(IS_OPEN_CLASS);
+      trigger?.setAttribute('aria-expanded', String(isOpen));
       trigger?.setAttribute('daa-ll', isOpen ? 'header|Close' : 'header|Open');
     });
   });
@@ -311,34 +289,14 @@ const initPopoverCloseOnUnavInteraction = (mountpoint: HTMLElement): void => {
   });
 };
 
-const _initStaggeredAnimations = (mountpoint: HTMLElement): void => {
-  const tabs = [...mountpoint.querySelectorAll('.product-list ul.tabs > li')] as HTMLElement[];
-  animateInSequence(tabs, 0.025);
-  const popovers = [...mountpoint.querySelectorAll('.feds-popup[popover]')];
-  popovers.forEach(pop => {
-    if (pop.querySelector('.product-list')) {
-      [...pop.querySelectorAll('ul[role="tabpanel"]')].forEach(tabpanel => {
-        animateInSequence([...tabpanel.querySelectorAll('li')] as HTMLElement[], 0.025);
-      });
-    } else {
-      animateInSequence([...pop.querySelectorAll('.feds-gnav-cards > li')] as HTMLElement[], 0.025);
-    }
-  });
-
-}
-
-const closeEverything = (): void => {
-};
-
 const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const header = mountpoint.closest("header");
   if (!header) {
     return;
   }
 
-  const menuWrapper = mountpoint.querySelector("#feds-menu-wrapper");
-  const isMenuOpen = (): boolean =>
-    menuWrapper?.matches(":popover-open") ?? false;
+  const menuWrapper = mountpoint.querySelector<HTMLElement>("#feds-menu-wrapper");
+  const isMenuOpen = (): boolean => isPopupOpen(menuWrapper);
 
   const updateHeaderState = (scrolledPast: boolean): void => {
     if (isMenuOpen() || !scrolledPast) {

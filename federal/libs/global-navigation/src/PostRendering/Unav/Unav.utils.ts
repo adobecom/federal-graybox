@@ -19,6 +19,13 @@ import type {
  */
 export const SIGNED_OUT_ICONS = ['appswitcher', 'help'];
 
+/** Timeout in ms before profile resolution falls back to an empty profile */
+const PROFILE_RESOLUTION_TIMEOUT_MS = 5000;
+
+/** Width in px of the sign-in button used for UNAV
+ *  container min-width calculation */
+const SIGN_IN_BUTTON_WIDTH_PX = 92;
+
 /**
  * Language to country code mapping for locale normalization
  */
@@ -62,7 +69,7 @@ export const [setUserProfile, getUserProfile] = ((): [
     profileTimeout = setTimeout(() => {
       profileData = {};
       resolve(profileData);
-    }, 5000);
+    }, PROFILE_RESOLUTION_TIMEOUT_MS);
   });
 
   return [
@@ -84,7 +91,7 @@ export const [setUserProfile, getUserProfile] = ((): [
 /**
  * Calculates minimum width CSS value for UNAV container
  * Prevents layout shift during initialization by pre-calculating required space
- * 
+ *
  * @param unavComponents - Array of component names to display
  * @param signedOut - Whether user is signed out (affects button display)
  * @returns CSS calc() string for min-width property
@@ -98,10 +105,10 @@ export function getUnavWidthCSS(
   const sectionDivider = false; // hardcoded for now
   const sectionDividerMargin = 4; // px (left and right margins)
   const cartEnabled = /uc_carts=/.test(document.cookie);
-  
+
   // Filter out cart if not enabled via cookie
-  const components = (!cartEnabled 
-    ? unavComponents?.filter((x) => x !== 'cart') 
+  const components = (!cartEnabled
+    ? unavComponents?.filter((x) => x !== 'cart')
     : unavComponents) ?? [];
   const n = components.length ?? 3;
 
@@ -129,15 +136,15 @@ export function getUnavWidthCSS(
 /**
  * Normalizes locale prefix to Universal Nav format (lang_COUNTRY)
  * Handles special cases and country-to-language mappings
- * 
+ *
  * @param locale - Locale object with prefix property
  * @returns Normalized locale string (e.g., 'en_US', 'fr_FR')
  */
 export const getUniversalNavLocale = (locale: { prefix: string }): string => {
   if (!locale.prefix || locale.prefix === '/') return 'en_US';
-  
+
   const prefix = locale.prefix.replace('/', '');
-  
+
   // Handle already formatted locales (e.g., 'en_us' or 'en_US')
   if (prefix.includes('_')) {
     const [lang, country] = prefix.split('_').reverse();
@@ -195,7 +202,7 @@ export const getDevice = (): UnavConfig['analyticsContext']['consumer']['device'
 /**
  * Retrieves visitor GUID from Adobe Alloy SDK
  * Used for analytics tracking and user identification
- * 
+ *
  * @returns Promise resolving to ECID or undefined if unavailable
  */
 export const getVisitorGuid = async (): Promise<string | undefined> => {

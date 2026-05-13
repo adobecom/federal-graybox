@@ -6,8 +6,8 @@ import { Link, parseLink } from "../Link/Parse";
 export type ProductList = {
   type: "ProductList";
   megaMenuTitle: string;
-  categories: List<ProductCategory>;
-  links: List<Link>;
+  categories: Array<ProductCategory>;
+  links: Array<Link>;
   placeholders: Map<string, string>;
 };
 
@@ -15,7 +15,7 @@ export type ProductCategory = {
   type: "ProductCategory";
   name: string;
   daaLl: string | null;
-  links: List<ProductCard>;
+  links: Array<ProductCard>;
 }
 
 export const parseProductList = (

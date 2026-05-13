@@ -5,11 +5,11 @@ import { IrrecoverableError, RecoverableError } from "../Error/Error";
 import { parseListAndAccumulateErrors } from "../Utils/Utils";
 
 export type GlobalNavigationData = {
-  breadcrumbs: List<Link>;
-  components: List<Component>;
+  breadcrumbs: Array<Link>;
+  components: Array<Component>;
   productCTA: ProductEntryCTA | null;
   localnav: boolean;
-  errors: List<RecoverableError>;
+  errors: Array<RecoverableError>;
   unavEnabled: boolean;
   placeholders: Map<string, string>;
 };

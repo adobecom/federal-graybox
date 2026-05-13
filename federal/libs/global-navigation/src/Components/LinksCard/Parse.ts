@@ -11,7 +11,7 @@ export type LinksCard = {
 export type LinksCardItem = {
   type: "LinksCardItem";
   title: string;
-  links: List<Link>;
+  links: Array<Link>;
   footerCTA: SecondaryCTA | null;
 };
 

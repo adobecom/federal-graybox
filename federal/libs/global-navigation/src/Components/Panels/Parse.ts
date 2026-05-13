@@ -5,13 +5,13 @@ import { parseListAndAccumulateErrors } from "../../Utils/Utils";
 export type Panels = {
   type: "Panels";
   layout: PanelsLayout;
-  panels: List<Panel>;
+  panels: Array<Panel>;
 };
 
 export type PanelsLayout = {
   type: "PanelsLayout";
-  gridColumns: List<string>;
-  gridRows: List<string>;
+  gridColumns: Array<string>;
+  gridRows: Array<string>;
 };
 
 export type PanelPosition = {
@@ -34,7 +34,7 @@ export type LinkPanel = {
   type: "LinkPanel";
   position: PanelPosition;
   title: string;
-  links: List<Link>;
+  links: Array<Link>;
   footer: FooterLink | null;
 };
 
@@ -42,7 +42,7 @@ export type ListWithImagePanel = {
   type: "ListWithImagePanel";
   position: PanelPosition;
   title: string;
-  links: List<Link>;
+  links: Array<Link>;
   imageHref: string;
   footer: FooterLink | null;
 };
@@ -155,7 +155,7 @@ const VALID_TRACK = /^\d+(\.\d+)?fr$/;
 const parseGridTracks = (
   raw: string,
   _label: string
-): Parsed<List<string>, RecoverableError> => {
+): Parsed<Array<string>, RecoverableError> => {
   const errors: RecoverableError[] = [];
   const tracks = raw.split(",").map(s => s.trim()).filter(Boolean);
   for (const track of tracks) {

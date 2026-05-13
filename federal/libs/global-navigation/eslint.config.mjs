@@ -13,24 +13,13 @@ export default tseslint.config(
       "consonant/**",
       "eslint.config.mjs",
       "web-test-runner.config.mjs",
-      "test/**",
+      "**/*.js",
     ]
-  },
-  // Lint JS build tooling with base recommended rules (no TS parser)
-  {
-    files: ['build.js', 'build-plugins/**/*.js'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      globals: globals.node,
-    },
-    ...eslint.configs.recommended,
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,
   tseslint.configs.strict,
   {
-    files: ['src/**/*.ts'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

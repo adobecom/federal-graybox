@@ -10,7 +10,7 @@ AEM_PID=""
 find_repo_root() {
     local dir="$PWD"
     while [ "$dir" != "/" ]; do
-        if [ -f "$dir/helix-config.yaml" ] || [ -f "$dir/.helix" ]; then
+        if [ -f "$dir/helix-config.yaml" ] || [ -f "$dir/.helix" ] || [ -f "$dir/fstab.yaml" ]; then
             echo "$dir"; return 0
         fi
         dir="$(dirname "$dir")"

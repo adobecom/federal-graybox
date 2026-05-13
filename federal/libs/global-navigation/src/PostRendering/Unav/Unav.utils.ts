@@ -117,7 +117,8 @@ export function getUnavWidthCSS(
     const l = components
       .filter((c: string) => SIGNED_OUT_ICONS.includes(c))
       .length;
-    return `calc(${SIGN_IN_BUTTON_WIDTH_PX}px + ${l * iconWidth}px + ${l * flexGap}rem${
+    const signInButton = 92; // px
+    return `calc(${signInButton}px + ${l * iconWidth}px + ${l * flexGap}rem${
       sectionDivider ? ` + 2px + ${2 * sectionDividerMargin}px + ${flexGap}rem` : ''
     })`;
   }

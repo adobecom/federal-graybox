@@ -47,7 +47,7 @@ export const initClickListeners = (
       if (!popoverBackgroundRule) return;
 
       const newHeight = popup?.clientHeight ?? 0;
-      popoverBackgroundRule.style.height = `${newHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
+      popoverBackgroundRule.style.height = `${newHeight + 72}px`;
 
     }
   );
@@ -133,7 +133,7 @@ const animations = (gnav: HTMLElement): void => {
         fedsGnavItems?.classList.add('subscreen-closing');
       } else {
         // in case the resize observer fails
-        popoverBackgroundRule.style.height = `${popup.clientHeight + POPOVER_BG_HEIGHT_OFFSET_PX}px`;
+        popoverBackgroundRule.style.height = `${popup.clientHeight + 72}px`;
         // On mobile (horizontal tabs), scroll active tab to the left edge
         if (!isDesktop.matches) {
           const tabsList = popup.querySelector<HTMLElement>('.tabs');

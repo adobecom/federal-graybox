@@ -13,8 +13,8 @@ li.feds-brand-wrapper {
   justify-content: flex-start;
 }
 
-header.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) nav .feds-brand-image svg,
-header.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) nav .feds-nav-toggle svg,
+header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav .feds-brand-image svg,
+header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav .feds-nav-toggle svg,
 header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   color: var(--s2a-color-gray-1000);
 }
@@ -26,8 +26,20 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 .feds-brand {
   align-items: center;
   outline-offset: var(--s2a-spacing-2xs);
-  padding: 0 var(--s2a-spacing-sm) 0 var(--s2a-spacing-md);
+  padding: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
   column-gap: 10px;
+}
+
+[dir="rtl"] .feds-brand {
+  padding: 0 var(--s2a-spacing-md) 0 var(--s2a-spacing-lg);
+}
+
+.is-compact .feds-brand {
+  padding: 0 var(--s2a-spacing-sm) 0 var(--s2a-spacing-md);
+}
+
+.is-compact [dir="rtl"] .feds-brand {
+  padding: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
 }
 
 .feds-brand-image svg {
@@ -41,6 +53,10 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 
 .feds-brand-image svg {
   color: var(--s2a-color-gray-25);
+}
+
+.global-navigation.dark-font .feds-brand-image svg {
+  color: var(--s2a-color-gray-1000);
 }
 
 .feds-brand-image.desktop-brand {
@@ -60,6 +76,12 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   width: 67px;
 }
 
+/* For transparent with dark-font */
+.global-navigation.dark-font .feds-brand-image {
+  & img:nth-child(1) { display: inherit; }
+  & img:nth-child(2) { display: none; }
+}
+
 /* For light background */
 .feds-brand-image {
   & img:nth-child(1) { display: inherit; }
@@ -74,8 +96,10 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
   }
 }
 
+
+
 /* same behavior for both "scrolled" and "popup open" states (considering for transparent-white/light background only)*/
-:is(.feds-header-scrolled, .global-navigation:has(.feds-popup.is-open)) {
+:is(.feds-header-scrolled, .global-navigation:has(.feds-popup.is-open:not(.small-menu))) {
   & .feds-brand-wrapper .feds-brand-image {
     & img:nth-child(1) { display: inherit; }
     & img:nth-child(2) { display: none; }
@@ -97,20 +121,58 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
       visibility: hidden;
     }
   }
-  header.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-brand,
+  header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-brand,
   header.global-navigation:has(.feds-menu-active) .feds-brand {
     animation: brand-fade 0.3s;
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
   }
+
+  .feds-brand {
+    padding: 0 var(--s2a-spacing-sm) 0 var(--s2a-spacing-md);
+  }
+
+  [dir="rtl"] .feds-brand {
+    padding: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
+  }
+
   header.global-navigation .feds-nav-toggle {
     transform: translateX(0);
     transition: transform 0.3s ease;
   }
-  header.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-nav-toggle {
-    transform: translateX(-30px);
+  header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
+    transform: translateX(-34px);
   }
+
+  [dir="rtl"] header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
+    transform: translateX(34px);
+  }
+}
+
+/* =========================================
+   is-compact: mirrors @media (max-width: 1023px) mobile behaviour
+   ========================================= */
+
+header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-brand,
+header.global-navigation.is-compact:has(.feds-menu-active) .feds-brand {
+  animation: brand-fade 0.3s;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+header.global-navigation.is-compact .feds-nav-toggle {
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+}
+
+header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
+  transform: translateX(-30px);
+}
+
+[dir="rtl"] header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-nav-toggle {
+  transform: translateX(30px);
 }
 
 /* =========================================
@@ -118,22 +180,22 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
    ========================================= */
 
 @media (min-width: 1024px) {
-  li.feds-brand-wrapper {
+  header.global-navigation:not(.is-compact) li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     padding-left: 0;
   }
 
-  .feds-brand-image.desktop-brand {
+  header.global-navigation:not(.is-compact) .feds-brand-image.desktop-brand {
     display: inherit;
   }
 
-  header:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-brand-image svg {
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-brand-image svg {
     color: var(--s2a-color-gray-1000);
   }
 
-  .feds-brand-image.mobile-brand {
+  header.global-navigation:not(.is-compact) .feds-brand-image.mobile-brand {
     display: none;
   }
 }

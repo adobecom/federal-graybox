@@ -32,10 +32,8 @@ export const secondaryCTA = ({
 `;
 
 export const productEntryCTA = (
-  cta: ProductEntryCTA
-): HTML => {
-  if (cta.type === "PrimaryCTA")
-    return primaryCTA(cta);
-  return secondaryCTA(cta);
-}
+  { cta }: ProductEntryCTA
+): HTML => `<div class="feds-product-entry-cta">${
+  cta.type === "PrimaryCTA" ? primaryCTA(cta) : secondaryCTA(cta)
+}</div>`;
 

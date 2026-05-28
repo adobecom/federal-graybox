@@ -1,0 +1,71 @@
+/* =========================================
+   Single Dropdown — Anchor the li so top:100% works
+   ========================================= */
+
+.feds-gnav-items > li:has(.single-dropdown-popup) {
+  position: relative;
+}
+
+/* =========================================
+   Single Dropdown — Popup overrides
+   Overrides the full-width fixed .feds-popup base styles
+   ========================================= */
+
+.feds-popup.single-dropdown-popup {
+  position: absolute;
+  inset: auto;
+  top: 100%;
+  left: 0;
+  width: auto;
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  background-color: var(--s2a-color-background-default, white);
+  border: 1px solid var(--s2a-color-transparent-black-12, rgba(0, 0, 0, 0.12));
+  border-radius: var(--s2a-spacing-xs, 8px);
+  padding: var(--s2a-spacing-md, 16px) var(--s2a-spacing-lg, 24px);
+  box-sizing: border-box;
+}
+
+.feds-popup.single-dropdown-popup.is-open {
+  border-radius: var(--s2a-spacing-xs, 8px);
+}
+
+/* =========================================
+   Single Dropdown — List
+   ========================================= */
+
+.feds-popup .single-dropdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2a-spacing-xs, 8px);
+}
+
+/* =========================================
+   Single Dropdown — List Item
+   ========================================= */
+
+.feds-popup .single-dropdown-item {
+  display: flex;
+  align-items: center;
+  height: 34px;
+}
+
+.feds-popup .single-dropdown-item .feds-link {
+  font-family: var(--s2a-font-family-body, 'Adobe Clean', sans-serif);
+  font-size: var(--s2a-typography-font-size-body-sm, 14px);
+  font-weight: var(--s2a-font-weight-adobe-clean-regular, 400);
+  line-height: var(--s2a-typography-line-height-body-sm, 18px);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm, 0.14px);
+  color: var(--s2a-color-content-body-strong, #131313);
+  padding: 0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.feds-popup .single-dropdown-item .feds-link:hover {
+  text-decoration: underline;
+}

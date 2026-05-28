@@ -198,6 +198,20 @@ describe('UNAV Utils', () => {
         // Only 'help' is in SIGNED_OUT_ICONS
         expect(result).to.equal('calc(92px + 32px + 0.25rem)');
       });
+
+      it('should include cart when uc_carts cookie is present (signed out)', () => {
+        document.cookie = 'uc_carts=true';
+        // appswitcher + help + cart -> 3 icons reserved alongside sign-in CTA
+        const result = getUnavWidthCSS(['appswitcher', 'help', 'cart'], true);
+        expect(result).to.equal('calc(92px + 96px + 0.75rem)');
+      });
+
+      it('should filter cart when uc_carts cookie is absent (signed out)', () => {
+        document.cookie = '';
+        const result = getUnavWidthCSS(['appswitcher', 'help', 'cart'], true);
+        // cart filtered out -> only appswitcher + help count
+        expect(result).to.equal('calc(92px + 64px + 0.5rem)');
+      });
     });
 
     describe('signed in state', () => {

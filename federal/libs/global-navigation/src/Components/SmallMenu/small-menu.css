@@ -1,0 +1,137 @@
+/* =========================================
+   Small Menu — Desktop only (min-width: 1024px)
+   ========================================= */
+
+@media (min-width: 1024px) {
+  /* Anchor the li so top:100% works */
+  header.global-navigation:not(.is-compact) .feds-gnav-items > li:has(.feds-popup.small-menu) {
+    position: relative;
+  }
+
+  /* Popup overrides — position as a dropdown below the trigger */
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu {
+    position: absolute;
+    inset: auto;
+    top: 100%;
+    left: 0;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    overflow: auto;
+    border: 1px solid var(--s2a-color-transparent-black-12, rgba(0, 0, 0, 0.12));
+    border-radius: var(--s2a-spacing-xs);
+    box-sizing: border-box;
+
+    .links-card {
+      padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
+    }
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open {
+    border-radius: var(--s2a-spacing-xs);
+    overflow-y: hidden;
+    left: -24px;
+  }
+
+  /* Gnav cards layout */
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .feds-gnav-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2a-spacing-xs);
+    background-color: var(--s2a-color-background-default, white);
+    border-radius: var(--s2a-spacing-xs);
+    padding: 0;
+    border-color: var(--s2a-color-transparent-black-12);
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .feds-gnav-cards > li {
+    width: auto;
+    flex: none;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .feds-gnav-cards > li:has(> :nth-child(2)) {
+    flex-direction: column;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-title {
+    display: none;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-links li {
+    display: flex;
+    height: 34px;
+    align-items: center;
+    padding: var(--s2a-spacing-xs, 8px) 0;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-links .feds-link:hover {
+    text-decoration: underline;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-footer {
+    margin-top: 0;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-footer .feds-secondary-cta {
+    font-family: var(--s2a-font-family-label, 'Adobe_Clean', sans-serif);
+    font-size: var(--s2a-typography-font-size-body-sm, 14px);
+    font-weight: var(--s2a-font-weight-adobe-clean-black, 700);
+    line-height: var(--s2a-typography-line-height-body-sm, 18px);
+    letter-spacing: 0;
+    color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
+    white-space: nowrap;
+    background: none;
+    border: none;
+    padding: var(--s2a-spacing-xs, 8px) 0;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    width: auto;
+    justify-content: flex-start;
+    text-decoration: none;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu .links-card-footer .feds-secondary-cta:hover {
+    text-decoration: underline;
+    background: none;
+    color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
+  }
+
+  /* When only a small menu is open: suppress backdrop, nav::after expansion */
+  header.global-navigation:not(.is-compact) nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu))) .feds-backdrop {
+    display: none;
+  }
+
+  header.global-navigation:not(.is-compact) nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
+    height: 64px;
+    border-radius: 0 0 0 0;
+    top: 0;
+  }
+
+  header.global-navigation:not(.is-compact) nav:has(.small-menu.is-open):has(.feds-breadcrumbs):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
+    height: var(--feds-popup-bg-height);
+  }
+
+  header.global-navigation:not(.is-compact).feds-header-scrolled nav:has(.small-menu.is-open):not(:has(.feds-popup.is-open:not(.small-menu)))::after {
+    width: 100%;
+    left: 0;
+    top: 0;
+    background-color: rgba(255, 255, 255, 0.51);
+    backdrop-filter: blur(var(--s2a-blur-sm));
+    border-radius: var(--s2a-border-radius-16);
+  }
+}
+
+.feds-popup.small-menu .links-card {
+  padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
+
+  .links-card-title {
+    display: none;
+  }
+}

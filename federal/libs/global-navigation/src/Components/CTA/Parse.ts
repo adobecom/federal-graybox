@@ -19,7 +19,10 @@ export type SecondaryCTA = {
   daaLl?: string | null;
 };
 
-export type ProductEntryCTA = PrimaryCTA | SecondaryCTA;
+export type ProductEntryCTA = {
+  type: "ProductEntryCTA";
+  cta: PrimaryCTA | SecondaryCTA;
+};
 
 const parseCTA = (
   type: Pick<CTA, 'type'>
@@ -67,9 +70,12 @@ export const parseSecondaryCTA = parseCTA({ type: "SecondaryCTA" });
 
 export const parseProductEntryCTA = (
   element: Element | null
-): Parsed<ProductEntryCTA, RecoverableError> => alternative(parsePrimaryCTA)
-  .or(parseSecondaryCTA)
-  .eval(element);
+): Parsed<ProductEntryCTA, RecoverableError> => {
+  const [cta, errors] = alternative(parsePrimaryCTA)
+    .or(parseSecondaryCTA)
+    .eval(element);
+  return [{ type: "ProductEntryCTA", cta }, errors];
+};
 
 type CTA
   = PrimaryCTA

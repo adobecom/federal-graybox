@@ -1,3 +1,4 @@
+import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
 import { component } from "./Components/Component";
 import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
@@ -8,12 +9,14 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { renderListItems, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
 import { popup } from "./Components/MegaMenu/Render";
+import { smallMenuPopup } from "./Components/SmallMenu/Render";
+import { MegaMenuExtraData } from "./Components/MegaMenu/Parse";
 
 type GlobalNavigation = {
   closeEverything: () => void;
@@ -118,6 +121,7 @@ mountpoint: HTMLElement
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
   mountpoint.classList.add('site-pivot');
+  if (data.darkFont) mountpoint.classList.add('dark-font');
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
   ]
@@ -129,25 +133,45 @@ mountpoint: HTMLElement
   const _errors_ = await Promise.all(mmPromises.map(async (mmPromise, idx) => {
     try {
       const [content, errors] = await mmPromise;
-      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id);
+      const extraData: MegaMenuExtraData = { type: "MegaMenuExtraData", breadcrumbs: data.breadcrumbs };
+      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, extraData);
       return errors;
     } catch (error) {
       return [error];
     }
   }).flat());
 
+  const smallMenus = [
+    ...mountpoint.querySelectorAll('button.small-menu ~ .feds-popup')
+  ];
+  const smallMenuComponents = data.components.filter(com => com.type === "SmallMenu");
+  smallMenuComponents.forEach((com, idx) => {
+    const [content] = com.content;
+    smallMenus[idx].innerHTML = smallMenuPopup(content, smallMenus[idx].id);
+  });
+
   return mountpoint;
 };
 
+
 export const renderGnavString = ({
   components,
+  breadcrumbs,
   productCTA,
   unavEnabled,
   placeholders,
+  localnav,
 }: GlobalNavigationData
 ): string => {
+  // In localnav mobile, the menu-wrapper is repurposed as the localnav bar
+  // (a thin clickable strip below the main nav row that expands inline to
+  // reveal the remaining mega-menu entries). Its label mirrors the last
+  // breadcrumb crumb so it reads as the current section.
+  const localnavBarLabel = localnav && breadcrumbs !== null && breadcrumbs.items.length > 0
+    ? breadcrumbs.items[breadcrumbs.items.length - 1].text
+    : '';
   return `
-<nav data-lenis-prevent>
+<nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</a>
   <ul role="presentation">
@@ -156,6 +180,14 @@ export const renderGnavString = ({
         c.type === "Brand"
       ) ?? null;
       const menuComponents = components.filter((c) => c.type !== "Brand");
+      // In localnav mode the hamburger should open the first mega menu's
+      // popup directly rather than the menu wrapper / gnav-items list.
+      const firstMegaMenu = localnav
+        ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
+        : null;
+      const toggleControlsId = firstMegaMenu !== null
+        ? sanitize(firstMegaMenu.title)
+        : 'feds-menu-wrapper';
       const toggleButton = `
         <button
           class="feds-nav-toggle"
@@ -163,7 +195,7 @@ export const renderGnavString = ({
           aria-label="Navigation menu"
           daa-ll="hamburgermenu|open"
           aria-expanded="false"
-          aria-controls="feds-menu-wrapper"
+          aria-controls="${toggleControlsId}"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 7" fill="currentColor" aria-hidden="true">
             <path d="M13.25 5.5H0.75C0.33594 5.5 0 5.83594 0 6.25C0 6.66406 0.33594 7 0.75 7H13.25C13.6641 7 14 6.66406 14 6.25C14 5.83594 13.6641 5.5 13.25 5.5Z"/>
@@ -173,7 +205,14 @@ export const renderGnavString = ({
       `.trim();
 
       const brandHTML = brandComponent ? component(brandComponent) : "";
-      const menuItemsHTML = renderListItems(menuComponents, component);
+
+      const menuItemsHTMLList = ((): HTML[] => {
+        const lis = menuComponents
+                       .map((c, index) => `<li>${component(c, index)}</li>`);
+        const [first, ...rest] = lis;
+        return localnav ? [first, '<li class="divider"></li>', ...rest] : lis;
+      })();
+      const menuItemsHTML = menuItemsHTMLList.join('');
 
       return `
         <li class="feds-brand-wrapper">
@@ -184,6 +223,15 @@ export const renderGnavString = ({
           id="feds-menu-wrapper"
           class="feds-menu-wrapper"
         >
+          ${localnav ? `
+            <button
+              class="feds-localnav-bar"
+              type="button"
+              aria-controls="feds-menu-wrapper"
+              aria-expanded="false"
+              daa-ll="localnav-bar|Open"
+            ><span class="feds-localnav-bar-label">${localnavBarLabel}</span></button>
+          ` : ''}
           <ul class="feds-gnav-items">
             ${menuItemsHTML}
           </ul>
@@ -193,6 +241,7 @@ export const renderGnavString = ({
   </ul>
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
+  ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>
 </nav>
 `;
@@ -211,6 +260,10 @@ export const postRenderingTasks = async (
   else
     unav.errors.forEach((error: RecoverableError) => errors.add(error));
 
+  const activeLink = findActiveLink(input.mountpoint);
+  const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
+  activeDropDown?.classList.add('active-element');
+  initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -220,6 +273,7 @@ export const postRenderingTasks = async (
   initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
+  initCompactOverflow(input.mountpoint);
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -246,11 +300,18 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
 
   menuWrapper?.addEventListener('toggle', () => {
     const isOpen = menuWrapper.classList.contains(IS_OPEN_CLASS);
-    navToggle?.setAttribute('aria-expanded', String(isOpen));
-    navToggle?.setAttribute(
-      'daa-ll',
-      isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
-    );
+    // Only reflect open-state on the hamburger when it actually controls the
+    // menu-wrapper. In localnav the hamburger's aria-controls points at the
+    // first mega-menu's popup (the menu-wrapper is opened via the localnav
+    // bar instead), so reflecting menu-wrapper state on the hamburger here
+    // would be incorrect.
+    if (navToggle?.getAttribute('aria-controls') === 'feds-menu-wrapper') {
+      navToggle.setAttribute('aria-expanded', String(isOpen));
+      navToggle.setAttribute(
+        'daa-ll',
+        isOpen ? 'hamburgermenu|close' : 'hamburgermenu|open'
+      );
+    }
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
   });
 
@@ -298,12 +359,56 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const menuWrapper = mountpoint.querySelector<HTMLElement>("#feds-menu-wrapper");
   const isMenuOpen = (): boolean => isPopupOpen(menuWrapper);
 
-  const updateHeaderState = (scrolledPast: boolean): void => {
+  const nav = mountpoint.querySelector<HTMLElement>("nav");
+  const isLocalnav = (): boolean => nav?.classList.contains("localnav") ?? false;
+
+  // Track the most recent "queued add" so a subsequent toggle can cancel it.
+  // Prevents a race where the user re-opens the bar mid-slide-down and the
+  // deferred add still fires, applying `feds-header-scrolled` over an
+  // already-open menu.
+  let pendingAddCleanup: (() => void) | null = null;
+  const cancelPendingAdd = (): void => {
+    if (pendingAddCleanup !== null) {
+      pendingAddCleanup();
+      pendingAddCleanup = null;
+    }
+  };
+
+  const updateHeaderState = (
+    scrolledPast: boolean,
+    fromToggle: boolean = false
+  ): void => {
+    cancelPendingAdd();
     if (isMenuOpen() || !scrolledPast) {
       header.classList.remove("feds-header-scrolled");
+      header.classList.remove("feds-localnav-closing");
       return;
     }
     header.classList.add("feds-header-scrolled");
+    // Closing the localnav bar in scrolled state: the header's `top` animates
+    // from -64px back to 0 over 0.3s. The `feds-header-scrolled` class is
+    // needed immediately for color (the bar title would otherwise flash from
+    // dark back to its default light shade during the slide-down). But the
+    // same class pulls `inset: xs xs 0 xs` onto `nav` via
+    // `header.feds-header-scrolled nav`, which would instantly pin nav to
+    // `top: xs` and kill the slide (nav holds the visible content). The
+    // `feds-localnav-closing` marker class is added in tandem and consumed by
+    // a CSS rule that suppresses that inset for the duration of the
+    // transition; we remove the marker on `transitionend`.
+    if (fromToggle && isLocalnav()) {
+      header.classList.add("feds-localnav-closing");
+      const onTransitionEnd = (event: TransitionEvent): void => {
+        if (event.target !== header || event.propertyName !== "top") return;
+        header.removeEventListener("transitionend", onTransitionEnd);
+        pendingAddCleanup = null;
+        header.classList.remove("feds-localnav-closing");
+      };
+      header.addEventListener("transitionend", onTransitionEnd);
+      pendingAddCleanup = (): void => {
+        header.removeEventListener("transitionend", onTransitionEnd);
+        header.classList.remove("feds-localnav-closing");
+      };
+    }
   };
 
   // A 20px sentinel placed at the top of the document body. When it scrolls
@@ -325,7 +430,7 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   observer.observe(sentinel);
 
   menuWrapper?.addEventListener("toggle", () =>
-    updateHeaderState(scrolledPast)
+    updateHeaderState(scrolledPast, true)
   );
 };
 
@@ -338,4 +443,97 @@ const initHeaderAnalytics = (
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
 };
 
+const initCompactOverflow = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (!header) return;
+
+  const brandWrapper = mountpoint.querySelector<HTMLElement>('.feds-brand-wrapper');
+  const gnavItems = mountpoint.querySelector<HTMLElement>('.feds-gnav-items');
+  const utilities = mountpoint.querySelector<HTMLElement>('.feds-utilities');
+  const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
+
+  const check = (): void => {
+    if (!isDesktop.matches) {
+      header.classList.remove('is-compact');
+      return;
+    }
+    // Temporarily strip is-compact so we measure the natural desktop widths,
+    // then restore via toggle at the end.
+    header.classList.remove('is-compact');
+
+    // Sum individual li widths inside gnav-items — these are not flex-grow so
+    // their offsetWidth reflects their true content width. Brand and utilities
+    // are fixed-size flex items so offsetWidth is correct for them too.
+    const brandWidth = brandWrapper?.offsetWidth ?? 0;
+    const itemsWidth = gnavItems?.offsetWidth ?? 0;
+    const utilitiesWidth = utilities?.offsetWidth ?? 0;
+    const ctaWidth = productCta?.offsetWidth ?? 0;
+    const contentWidth = brandWidth + itemsWidth + utilitiesWidth + ctaWidth + 40;
+
+    header.classList.toggle('is-compact', contentWidth > header.clientWidth);
+  };
+
+  const observer = new ResizeObserver(check);
+  observer.observe(header);
+  isDesktop.addEventListener('change', check);
+  check();
+};
+
+const isCurrentPageHref = (href: string): boolean => {
+  const url = `${window.location.origin}${window.location.pathname}`;
+  return href === url
+      || href.startsWith(`${url}?`)
+      || href.startsWith(`${url}#`);
+};
+
+const findActiveLink = (
+  mountpoint: HTMLElement
+): HTMLAnchorElement | null => {
+  return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
+    .filter(a => !a.closest('.feds-breadcrumbs'))
+    .find(a => isCurrentPageHref(a.href)) ?? null;
+};
+
+/**
+ * In localnav mode, clicking a TOP-LEVEL localnav link whose href points to
+ * the current page (the very same URL, with optional ?query) is redundant —
+ * the page is already loaded. Instead of triggering a no-op navigation, we
+ * suppress the default and close the localnav so the user sees the page
+ * they're already on. Scope is strictly limited to
+ * `nav.localnav ul.feds-gnav-items > li > a`; nested links (mega-menu
+ * popups, links-card, CTAs, breadcrumbs, etc.) are left untouched and
+ * continue to navigate normally. Hash-only same-page links also navigate
+ * normally (so in-page anchor jumps still work) while still closing the
+ * localnav.
+ */
+const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => {
+  const localnav = mountpoint.querySelector('nav.localnav');
+  if (localnav === null) return;
+  const topLevelAnchors = localnav.querySelectorAll<HTMLAnchorElement>(
+    'ul.feds-gnav-items > li > a'
+  );
+  topLevelAnchors.forEach(anchor => {
+    if (!isCurrentPageHref(anchor.href)) return;
+    anchor.addEventListener('click', (event) => {
+      // Defensive: ensure DOM still matches the structural contract at
+      // click-time (guards against late mutations broadening scope).
+      const target = event.currentTarget as HTMLAnchorElement;
+      if (!target.matches('ul.feds-gnav-items > li > a')) return;
+      if (target.closest('nav')?.classList.contains('localnav') !== true) return;
+
+      const href = target.href;
+      const url = `${window.location.origin}${window.location.pathname}`;
+      const isHashOnly = href.startsWith(`${url}#`);
+      if (!isHashOnly) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      closePopovers(mountpoint);
+      const focusTarget
+        = mountpoint.querySelector<HTMLElement>('.feds-localnav-bar')
+        ?? mountpoint.querySelector<HTMLElement>('.feds-nav-toggle');
+      focusTarget?.focus();
+    });
+  });
+};
 

@@ -28,9 +28,9 @@
 .feds-popup .featured-card h2 {
   margin: 0;
   font-family: var(--feds-heading-font-family);
-  font-size: var(--s2a-typography-font-size-title-5);
-  line-height: var(--s2a-typography-line-height-title-5-temp);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-5);
+  font-size: var(--s2a-typography-font-size-heading-4);
+  line-height: var(--s2a-typography-line-height-heading-4);
+  letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
   color: var(--s2a-color-content-default);
   padding: var(--s2a-spacing-md) 0 var(--s2a-spacing-xs) 0;
   font-weight: var(--s2a-font-weight-adobe-clean-black);
@@ -91,17 +91,17 @@
    ========================================= */
 
 @media (min-width: 1024px) {
-  .feds-popup .featured-card {
+  header.global-navigation:not(.is-compact) .feds-popup .featured-card {
     border-radius: 12px;
   }
 
-  .featured-card a.feds-secondary-cta {
+  header.global-navigation:not(.is-compact) .featured-card a.feds-secondary-cta {
     background: transparent;
     color: var(--s2a-color-gray-1000);
     border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
   }
 
-  .feds-popup .feds-gnav-cards:has(.featured-card) {
+  header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards:has(.featured-card) {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     flex-wrap: unset;
@@ -114,11 +114,11 @@
    ========================================= */
 
 @media (min-width: 1280px) {
-  .feds-popup .feds-gnav-cards:has(.featured-card) {
+  header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards:has(.featured-card) {
     grid-template-columns: repeat(5, 1fr);
   }
 
-  .feds-popup .featured-card {
+  header.global-navigation:not(.is-compact) .feds-popup .featured-card {
     min-height: 307px;
   }
 }
@@ -128,11 +128,11 @@
    ========================================= */
 
 @media (min-width: 1024px) and (hover: hover) {
-  .featured-card a.feds-secondary-cta {
+  header.global-navigation:not(.is-compact) .featured-card a.feds-secondary-cta {
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
 
-  .featured-card a.feds-secondary-cta:hover {
+  header.global-navigation:not(.is-compact) .featured-card a.feds-secondary-cta:hover {
     background: var(--s2a-color-gray-1000);
     color: var(--s2a-color-gray-25);
     border-color: var(--s2a-color-gray-25);

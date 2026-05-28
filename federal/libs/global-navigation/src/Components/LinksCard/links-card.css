@@ -147,9 +147,9 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
 
 .feds-popup .links-card .links-card-title {
   margin: 0;
-  font-size: var(--s2a-typography-font-size-heading-4);
-  line-height: var(--s2a-typography-line-height-heading-4);
-  letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
+  font-size: var(--s2a-typography-font-size-heading-5);
+  line-height: var(--s2a-typography-line-height-heading-5);
+  letter-spacing: var(--s2a-typography-letter-spacing-heading-5);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   color: var(--s2a-color-gray-1000);
   font-family: var(--feds-heading-font-family);

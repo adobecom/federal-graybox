@@ -38,7 +38,7 @@
 .feds-popup .product-list .tabs {
   margin-left: calc(0px - var(--s2a-spacing-lg));
   margin-right: calc(0px - var(--s2a-spacing-lg));
-  padding: 0 var(--s2a-spacing-lg);
+  padding: 0 var(--s2a-spacing-lg) var(--s2a-spacing-lg) var(--s2a-spacing-lg);
 }
 
 .product-list .tabs::-webkit-scrollbar {

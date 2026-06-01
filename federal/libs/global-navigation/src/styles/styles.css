@@ -17,16 +17,21 @@
 @import "../../consonant/dist/packages/tokens/css/dev/tokens.primitives.css";
 @import "../../consonant/dist/packages/tokens/css/dev/tokens.semantic.css";
 @import "../../consonant/dist/packages/tokens/css/dev/tokens.semantic.light.css";
+@import "../../consonant/dist/packages/tokens/css/min/tokens.min.css";
 
 /* Component styles */
 @import "../Components/Brand/brand.css";
+@import "../Components/Breadcrumbs/breadcrumbs.css";
 @import "../Components/MegaMenu/mega-menu.css";
+@import "../Components/SmallMenu/small-menu.css";
 @import "../Components/GnavCards/gnav-cards.css";
-@import "../Components/PromoCard/promo-card.css";
+@import "../Components/PromoCard/Standard/promo-card.css";
+@import "../Components/PromoCard/Small/promo-card-small.css";
 @import "../Components/LinksCard/links-card.css";
 @import "../Components/ProductList/productlist.css";
 @import "../Components/Panels/panels.css";
 @import "../Components/FeaturedCard/featured-card.css";
+@import "../Components/Localnav/localnav.css";
 
 /* =========================================
    Skip to Main Content Link
@@ -72,7 +77,10 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
 :root {
   --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
   --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
-  --s2a-typography-line-height-title-5-temp: 1;
+  --s2a-typography-line-height-heading-5-temp: 1;
+  /* Height of the breadcrumbs row; consumed by both the breadcrumbs
+     component and the nav::after backdrop that extends to cover it. */
+  --feds-breadcrumbs-height: 52px;
 }
 
 
@@ -89,6 +97,13 @@ header.global-navigation {
   /* right: 0;
   max-width: var(--grid-max-width-default);
   margin: auto; */
+  /* Drives the height of `nav::after` (the rounded backdrop frame).
+     Default value covers the nav row; the JS in
+     PostRendering/ClickListeners.ts mutates this property when a
+     mega-menu popover opens so the backdrop slides down to cover
+     the popover content. Using a custom property keeps the JS free
+     of CSSOM walks and immune to CSS selector refactors. */
+  --feds-popup-bg-height: 100%;
 }
 
 header.feds-header-scrolled .feds-link {
@@ -96,8 +111,17 @@ header.feds-header-scrolled .feds-link {
 }
 
 header.feds-header-scrolled nav {
+  inset:
+    var(--s2a-spacing-xs)
+    var(--s2a-spacing-xs)
+    0
+    var(--s2a-spacing-xs);
   color: var(--s2a-color-gray-1000);
   box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
+}
+
+header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
+  inset: 0;
 }
 
 .global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
@@ -106,7 +130,8 @@ header.feds-header-scrolled nav {
   background-color: var(--s2a-color-gray-25);
 }
 
-.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .universal-nav-container .profile-signed-out button {
+.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .universal-nav-container .profile-signed-out button,
+.global-navigation.dark-font .universal-nav-container .profile-signed-out button {
   color: inherit;
   border-color: var(--s2a-color-gray-1000);
   background-color: transparent;
@@ -127,8 +152,143 @@ header.feds-header-scrolled nav {
   padding-right: var(--s2a-spacing-md);
 }
 
+/* =========================================
+   Product Entry CTA
+   ========================================= */
+
+.global-navigation.site-pivot .feds-product-entry-cta {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+[dir="rtl"] .global-navigation.site-pivot .feds-product-entry-cta {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .global-navigation.site-pivot .feds-product-entry-cta + .feds-utilities {
+  padding-right: 0;
+  padding-left: var(--s2a-spacing-md);
+  margin-left: 0;
+}
+
+.global-navigation.site-pivot .feds-product-entry-cta + .feds-utilities {
+  margin-left: 0;
+}
+
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta {
+  margin-left: var(--s2a-spacing-sm);
+}
+
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta,
+.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: content-box;
+  padding: 10px var(--s2a-spacing-lg);
+  border-radius: var(--s2a-border-radius-round);
+  border: var(--s2a-border-width-sm) solid transparent;
+  font-family: var(--feds-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Default (transparent gnav over imagery):
+   - primary: filled white pill with dark text
+   - secondary: outlined in white, transparent fill */
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta {
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-25);
+}
+
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
+  background-color: transparent;
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-25);
+}
+
+.global-navigation.site-pivot.dark-font ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.site-pivot.dark-font .feds-product-entry-cta .feds-secondary-cta {
+   border-color: var(--s2a-color-gray-1000);
+   color: var(--s2a-color-gray-1000);
+}
+
+/* Scrolled (blurred whitish backdrop):
+   - primary: filled dark pill with white text (inverse of default)
+   - secondary: outlined in dark, transparent fill (matches popup secondary) */
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
+  background-color: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-secondary-cta {
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+/* Open popup / mobile drawer state: gnav gets a light/grey backdrop, so
+   force the dark-outline treatment regardless of scroll state, mirroring
+   the unav profile button at styles.css:109-113. */
+.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-primary-cta,
+.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-secondary-cta {
+  background-color: transparent;
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+/* Hover. In the non-scrolled state the resting color of the secondary CTA
+   is white (over a transparent gnav), so on hover we darken the text as
+   well so it remains legible against the hover fill. The primary
+   CTA already resolves to white text on hover in both states. */
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta:hover,
+.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta:hover {
+  background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
+  color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta:hover,
+.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta:hover {
+  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+}
+
+.global-navigation.site-pivot.feds-header-scrolled ul.feds-gnav-items > li > .feds-primary-cta:hover,
+.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta:hover {
+  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+}
+
 .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
+}
+
+/* Scrolled OR any popup/drawer open → backdrop is light/gray, so
+   flip the pipe to the black-alpha equivalent for visibility (same
+   state split as breadcrumbs.css). */
+.global-navigation.site-pivot.feds-header-scrolled .feds-gnav-items > li:first-child + li::before,
+.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-gnav-items > li:first-child + li::before {
+  background-color: var(--s2a-color-transparent-black-16);
 }
 
 /* =========================================
@@ -145,11 +305,6 @@ header.feds-header-scrolled nav {
 
 header.global-navigation nav {
   position: fixed;
-  inset:
-    var(--s2a-spacing-xs)
-    var(--s2a-spacing-xs)
-    0
-    var(--s2a-spacing-xs);
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
   margin: 0 auto;
@@ -167,7 +322,7 @@ header.global-navigation nav::after {
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%;
+  height: var(--feds-popup-bg-height);
   padding: 0;
   background-color: transparent;
   backdrop-filter: blur(0px);
@@ -179,9 +334,28 @@ header.global-navigation nav::after {
 
 header.global-navigation.feds-header-scrolled nav::after {
   backdrop-filter: blur(var(--s2a-blur-sm));
+  box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
 }
 
-header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
+/* When breadcrumbs are present they sit absolutely below the nav row.
+   Bump --feds-popup-bg-height by the breadcrumbs height so the rounded
+   backdrop frame visually contains both rows. We modify the variable
+   (rather than setting `height` directly on `::after`) so this rule
+   coexists with the JS-driven popup-open height set on <header> by
+   PostRendering/ClickListeners.ts.
+
+   The :not() guard intentionally excludes only LARGE menus
+   (`.feds-popup.is-open:not(.small-menu)`) — small menus do not hide
+   breadcrumbs (see Components/Breadcrumbs/breadcrumbs.css), so the
+   backdrop must keep covering them. For the small-menu-open state
+   this rule wins over the inline `--feds-popup-bg-height` JS writes
+   on <header>, because the variable is being declared on a closer
+   ancestor (nav) of the consuming pseudo-element (nav::after). */
+header.global-navigation nav:has(> .feds-breadcrumbs):not(:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)) {
+  --feds-popup-bg-height: calc(100% + var(--feds-breadcrumbs-height));
+}
+
+header.global-navigation nav:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)::after {
   width: 100vw;
   border-radius: 0 0 var(--s2a-border-radius-16) var(--s2a-border-radius-16);
   background-color: var(--s2a-color-gray-75);
@@ -190,9 +364,19 @@ header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open
   backdrop-filter: blur(0px);
 }
 
+header.global-navigation nav.localnav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
+  top: calc(0px - var(--s2a-spacing-xs));
+}
+
 @media (max-width: 1023px) {
-  header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
+  header.global-navigation nav:has(.feds-popup.is-open)::after {
     height: calc(100dvh + var(--s2a-spacing-xs));
+  }
+  header.global-navigation nav:not(.localnav):has(.feds-menu-wrapper.is-open)::after {
+    height: calc(100dvh + var(--s2a-spacing-64));
+  }
+  header.global-navigation nav.localnav:has(.feds-menu-wrapper.is-open)::after {
+    height: var(--feds-popup-bg-height);
   }
 }
 
@@ -207,6 +391,10 @@ header.global-navigation.feds-header-scrolled nav::after {
   height: inherit;
   align-items: center;
   padding-left: 0;
+}
+
+[dir="rtl"] .global-navigation nav > ul {
+  padding-right: 0;
 }
 
 .global-navigation nav > ul > li {
@@ -237,24 +425,68 @@ header.global-navigation.feds-header-scrolled nav::after {
   color: var(--s2a-color-gray-25);
   opacity: 1;
   text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  header.global-navigation.site-pivot:not(.is-compact) ul.feds-gnav-items {
+    display: flex;
+    gap: var(--s2a-spacing-lg);
+    & > li > .feds-link {
+      padding: 0;
+    }
+  }
+
+  header.global-navigation.site-pivot:not(.is-compact):has(.feds-popup.is-open) ul.feds-gnav-items > li .feds-link {
+    padding: 0;
+  }
+}
+.global-navigation.dark-font .feds-link {
+  color: var(--s2a-color-gray-1000);
 }
 
 .feds-link:hover {
   text-decoration: underline;
 }
 
-.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link {
+.feds-link__mobile-text { display: none; }
+
+@media (max-width: 1023px) {
+  .feds-link__desktop-text { display: none; }
+  .feds-link__mobile-text { display: inline; }
+}
+
+/* Match `.feds-menu-active` in addition to `.is-open` so the open-state
+   styling persists through the close transition. `is-open` is removed
+   immediately on close, but `feds-menu-active` is removed on transitionend
+   (see PopupWiring.ts) — which is exactly the window during which the
+   menu-wrapper's contents are still animating out (max-height collapse in
+   localnav, opacity fade in the off-canvas drawer). Without this the items
+   would snap back to the small body-sm font mid-close. */
+.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open, .feds-menu-wrapper.feds-menu-active) .feds-gnav-items > li > .feds-link {
   color: var(--s2a-color-gray-1000);
-  font-size: var(--s2a-typography-font-size-title-2);
-  line-height: var(--s2a-typography-line-height-title-2);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-2);
+  font-size: var(--s2a-typography-font-size-heading-2);
+  line-height: var(--s2a-typography-line-height-heading-2);
+  letter-spacing: var(--s2a-typography-letter-spacing-heading-2);
   padding: var(--s2a-spacing-xs) 0;
+}
+
+.global-navigation.site-pivot:not(.dark-font):has(.feds-popup.is-open.small-menu) .feds-gnav-items>li>.feds-link {
+  color: var(--s2a-color-gray-25);
+}
+
+.global-navigation.site-pivot.feds-header-scrolled:has(.feds-popup.is-open.small-menu) .feds-gnav-items>li>.feds-link {
+  color: var(--s2a-color-gray-1000);
 }
 
 .global-navigation .feds-gnav-items > li > .feds-link:hover {
   text-decoration: none;
   opacity: 1;
   color: var(--s2a-color-gray-25);
+}
+
+.global-navigation.dark-font .feds-gnav-items > li > .feds-link:hover {
+  color: var(--s2a-color-gray-1000);
 }
 
 .global-navigation.feds-header-scrolled .feds-gnav-items > li > .feds-link:hover {
@@ -292,6 +524,11 @@ header.global-navigation.feds-header-scrolled nav::after {
   color: var(--s2a-color-gray-25);
 }
 
+.global-navigation.dark-font nav .feds-nav-toggle,
+.global-navigation.dark-font nav .feds-nav-toggle svg {
+  color: var(--s2a-color-gray-1000);
+}
+
 .global-navigation.feds-header-scrolled nav .feds-nav-toggle svg {
   color: var(--s2a-color-gray-1000);
 }
@@ -306,9 +543,16 @@ header.global-navigation.feds-header-scrolled nav::after {
   fill: var(--s2a-color-gray-25);
 }
 
-.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .unav-comp-app-switcher.unav-comp-icon svg,
+.global-navigation.dark-font .unav-comp-app-switcher.unav-comp-icon svg,
+.global-navigation.dark-font .unav-comp-external-notifications svg path,
+.global-navigation.dark-font .unav-comp-cart svg {
+  fill: var(--s2a-color-gray-1000);
+}
+
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .unav-comp-app-switcher.unav-comp-icon svg,
 .global-navigation .unav-comp-app-switcher.unav-comp-icon.unav-comp-app-switcher-open svg,
-.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .unav-comp-cart svg {
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .unav-comp-cart svg,
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .unav-comp-external-notifications svg path {
   fill: var(--s2a-color-gray-1000);
 }
 
@@ -332,9 +576,9 @@ header.global-navigation.feds-header-scrolled nav::after {
   background-color: transparent;
 }
 
-header.global-navigation:has(.feds-popup.is-open) .unav-comp-app-switcher.unav-comp-icon svg,
-header.global-navigation:has(.feds-popup.is-open) .unav-comp-external-notifications svg path,
-header.global-navigation:has(.feds-popup.is-open) .unav-comp-cart svg {
+header.global-navigation:has(.feds-popup.is-open:not(.small-menu)) .unav-comp-app-switcher.unav-comp-icon svg,
+header.global-navigation:has(.feds-popup.is-open:not(.small-menu)) .unav-comp-external-notifications svg path,
+header.global-navigation:has(.feds-popup.is-open:not(.small-menu)) .unav-comp-cart svg {
   fill: inherit;
 }
 
@@ -359,6 +603,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   overflow: auto;
   overscroll-behavior: contain;
   background-color:transparent;
+  z-index: 1;
 }
 
 .feds-popup.is-open {
@@ -378,6 +623,16 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   align-items: center;
   justify-content: space-between;
   padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg);
+}
+
+.global-navigation:has(.mega-menu.small-menu[aria-haspopup='true']) .feds-popup {
+  .feds-popup-header {
+     padding: var(--s2a-spacing-lg);
+  }
+
+  .links-card {
+    margin-bottom: 0;
+  }
 }
 
 .feds-popup .feds-popup-header-left {
@@ -400,16 +655,20 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 .feds-popup .feds-popup-back-button svg {
   width: var(--s2a-spacing-20);
   height: var(--s2a-spacing-20);
+  margin-right: 10px; /* replace with token if we find one later */
+}
+
+[dir='rtl'] .feds-popup .feds-popup-back-button svg {
+  transform: scaleX(-1);
 }
 
 .feds-popup .feds-popup-back-button .feds-popup-title {
-  font-size: var(--s2a-typography-font-size-title-2);
-  line-height: var(--s2a-typography-line-height-title-2);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-2);
+  font-size: var(--s2a-typography-font-size-heading-3);
+  line-height: var(--s2a-typography-line-height-heading-3);
+  letter-spacing: var(--s2a-typography-letter-spacing-heading-3);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   font-family: var(--feds-heading-font-family);
   color: var(--s2a-color-content-default);
-  margin-left: 10px; /* replace with token if we find one later */
 }
 
 /* =========================================
@@ -448,9 +707,9 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
 .feds-popup .feds-product-card__title {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
-  font-size: var(--s2a-typography-font-size-title-5);
-  line-height: var(--s2a-typography-line-height-title-5-temp);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-5);
+  font-size: var(--s2a-typography-font-size-heading-4);
+  line-height: var(--s2a-typography-line-height-heading-4);
+  letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
   font-family: var(--feds-heading-font-family);
 }
 
@@ -539,6 +798,32 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   justify-content: space-between;
 }
 
+
+.feds-popup .feds-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 11px 14px 10px;;
+  border-radius: var(--s2a-border-radius-round);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-body-sm);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  color: var(--s2a-color-gray-25);
+  text-decoration: none;
+  background-color: rgba(59, 99, 251, 1);
+}
+
+.feds-popup .feds-primary-cta {
+  &:hover {
+    background-color: var(--s2a-color-button-background-accent-solid-on-light-hover, #274dea);
+  }
+  &:active {
+    background-color: var(--s2a-color-button-background-accent-solid-on-light-active, #1e3bb8);
+  }
+}
+
 /* =========================================
    Secondary CTAs
    ========================================= */
@@ -560,7 +845,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 }
 
 .feds-popup .feds-secondary-cta:hover {
-  background: var(--s2a-color-gray-75);
+  background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
 }
 
 /* =========================================
@@ -568,17 +853,17 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
    ========================================= */
 
 @media (min-width: 1024px) {
-  .global-navigation nav .feds-nav-toggle {
+  header.global-navigation:not(.is-compact) nav .feds-nav-toggle {
     display: none;
   }
 
-  .global-navigation nav > ul > li.feds-menu-wrapper {
+  header.global-navigation:not(.is-compact) nav > ul > li.feds-menu-wrapper {
     position: static;
     display: flex;
     flex-direction: row;
     flex-grow: 1;
     width: auto;
-    height: unset;
+    height: inherit;
     border: 0;
     outline: 0;
     box-shadow: none;
@@ -590,23 +875,33 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     transition: unset;
   }
 
-  .global-navigation.site-pivot nav {
+  header.global-navigation:not(.is-compact).site-pivot nav {
     display: flex;
     align-items: center;
     justify-content: flex-start;
   }
 
-  .global-navigation nav .feds-gnav-items {
+  [dir="rtl"] header.global-navigation:not(.is-compact).site-pivot nav .feds-gnav-items {
+    padding-right: 0;
+  }
+
+  header.global-navigation:not(.is-compact) nav .feds-gnav-items {
     align-items: center;
     padding-left: 0;
     margin: 0;
     display: flex;
+    height: inherit;
+    & > li {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
   }
 
-  .global-navigation.site-pivot .feds-gnav-items > li > .feds-link {
+  header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .feds-link {
     letter-spacing: var(--s2a-typography-letter-spacing-label);
   }
-  .global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link {
+  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link {
     opacity: 60%;
     font-weight: var(--s2a-font-weight-adobe-clean-bold);
     font-size: var(--s2a-typography-font-size-label);
@@ -615,44 +910,62 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     padding: var(--s2a-spacing-sm);
   }
 
-  .global-navigation.site-pivot:not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) .feds-gnav-items:has(.feds-link:hover) > li > .feds-link:not(:hover) {
+  header.global-navigation:not(.is-compact).site-pivot:not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) .feds-gnav-items:has(.feds-link:hover) > li > .feds-link:not(:hover) {
     opacity: 0.65;
   }
 
-
-  .global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link[aria-expanded="true"],
-  .global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link:hover {
+  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link[aria-expanded="true"],
+  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link:hover {
     opacity: 1;
   }
 
-  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
+  header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
     position: relative;
   }
 
-  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+  [dir="rtl"] header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+    margin-left: 0;
+    margin-right: 6px;
+  }
+
+  header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
     margin-top: 3px;
     margin-left: 6px;
     flex-shrink: 0;
     transition: transform 0.15s ease;
   }
 
-  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link[aria-expanded="true"] .chevron-down {
+  header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .mega-menu.feds-link[aria-expanded="true"] .chevron-down {
     transform: rotate(180deg);
   }
 
-  .feds-popup .feds-popup-header {
+  header.global-navigation:not(.is-compact) .feds-popup .feds-popup-header {
     display: none;
   }
 
-  .feds-popup > div {
+  header.global-navigation:not(.is-compact) .feds-popup > div {
     max-width: 1920px;
   }
-  .feds-popup .feds-product-card__title {
+
+  header.global-navigation:not(.is-compact) .feds-popup .feds-product-card__title {
     font-weight: var(--s2a-font-weight-adobe-clean-bold);
     font-size: var(--s2a-typography-font-size-eyebrow);
     line-height: var(--s2a-typography-line-height-eyebrow);
     letter-spacing: var(--s2a-typography-letter-spacing-eyebrow);
     font-family: var(--feds-font-family);
+  }
+
+  header.global-navigation:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
+    border-bottom: 2px var(--s2a-color-gray-25) solid;
+  }
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open:not(.small-menu)) nav.localnav ul.feds-gnav-items > li.active-element {
+    border-bottom: 2px var(--s2a-color-gray-1000) solid;
+  }
+  header.global-navigation.feds-header-scrolled:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
+    border-bottom: 2px var(--s2a-color-gray-1000) solid;
+  }
+  header.global-navigation.dark-font:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
+    border-bottom: 2px var(--s2a-color-gray-1000) solid;
   }
 }
 
@@ -679,6 +992,12 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     transform: rotate(-90deg) scale(2.5);
   }
 
+  [dir="rtl"] .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+    margin-left: 0;
+    margin-right: var(--s2a-spacing-xs);
+    transform: rotate(90deg) scale(2.5);
+  }
+
   .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down path {
     stroke-width: 0.5;
   }
@@ -695,7 +1014,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   }
 
   .feds-popup .feds-product-card {
-    gap: var(--s2a-spacing-2xl);     
+    gap: var(--s2a-spacing-2xl);
     border-radius: var(--s2a-border-radius-24);
   }
 
@@ -708,8 +1027,22 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     border-radius: 0;
   }
 
+  header.global-navigation nav.localnav:has(.feds-menu-wrapper.is-open)::after {
+    border-radius: 0 0 var(--s2a-border-radius-16) var(--s2a-border-radius-16);
+  }
+
   .feds-popup .feds-product-card__subtitle {
     margin-top: var(--s2a-spacing-xs);
+  }
+
+  .global-navigation:has(.mega-menu.small-menu[aria-haspopup='true']) .feds-popup {
+    .feds-gnav-cards {
+      padding: 0 var(--s2a-spacing-lg);
+      margin-bottom: 0;
+    }
+    .links-card {
+      margin-bottom: var(--s2a-spacing-sm);
+    }
   }
 }
 
@@ -718,11 +1051,11 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
    ========================================= */
 
 @media (min-width: 1920px) {
-  header.global-navigation nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
+  header.global-navigation:not(.is-compact) nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
     left: calc(0px - var(--s2a-spacing-xs) - (100vw - 1920px) / 2);
   }
 
-  header.global-navigation nav .feds-popup > div {
+  header.global-navigation:not(.is-compact) nav .feds-popup > div {
     margin: 0 auto;
   }
 }
@@ -744,7 +1077,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 }
 
 @media (min-width: 1024px) {
-  .feds-popup {
+  header.global-navigation:not(.is-compact) .feds-popup {
     border-bottom-left-radius: 18px;
     border-bottom-right-radius: 18px;
     background-color: transparent;
@@ -758,31 +1091,61 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     transition-delay: 0s;
   }
 
-  .feds-popup.is-open {
+  header.global-navigation:not(.is-compact) .feds-popup.is-open {
     background-color: transparent;
     opacity: 1;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     transition-delay: 0.15s;
   }
 
-  .feds-popup.is-open > :not(.feds-popup-header) {
+  header.global-navigation:not(.is-compact):has(.feds-localnav-bar) :not(.small-menu).feds-popup.is-open {
+    margin-top: -6px;
+    padding-top: var(--s2a-spacing-lg);
+    border-top: 1px solid var(--s2a-color-transparent-black-08);
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
     overflow-y: auto;
     max-height: calc(100dvh - var(--s2a-spacing-64));
   }
 
   @starting-style {
-    .feds-popup.is-open {
+    header.global-navigation:not(.is-compact) .feds-popup.is-open {
       background-color: rgba(255,255,255,0.51);
       opacity: 0;
       clip-path: polygon(0 0, 100% 0, 100% 0%, 0 0%);
     }
   }
 
-  header.global-navigation nav:has(.feds-popup.is-open) .feds-backdrop {
+  header.global-navigation:not(.is-compact) nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-backdrop {
     background-color: rgba(0, 0, 0, 0.60);
     backdrop-filter: blur(32px);
   }
 }
+
+header.global-navigation nav:has(.feds-menu-wrapper.is-open) .feds-backdrop {
+  background-color: rgba(0, 0, 0, 0.60);
+  backdrop-filter: blur(32px);
+}
+
+@media (max-width: 768px) {
+  .global-navigation .feds-menu-wrapper:not(.feds-menu-active) .feds-primary-cta {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .feds-popup .feds-popup-back-button .feds-popup-title {
+    font-size: var(--s2a-typography-font-size-heading-2);
+    line-height: var(--s2a-typography-line-height-heading-2);
+    letter-spacing: var(--s2a-typography-letter-spacing-heading-2);
+  }
+}
+
+/* is-compact equivalent of @media (max-width: 768px) primary CTA width */
+/* header.global-navigation.is-compact .feds-menu-wrapper:not(.feds-menu-active) .feds-primary-cta {
+  box-sizing: border-box;
+  width: 100%;
+} */
 
 /* =========================================
    Content Entrance Animations (Desktop Only)
@@ -815,20 +1178,20 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 @media (min-width: 1024px) {
 
   /* 1. Pane Content (Base Slide & Fade) */
-  .feds-popup.is-open > div {
+  header.global-navigation:not(.is-compact) .feds-popup.is-open > div {
     transform: translateY(6px);
     animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
     animation-delay: var(--feds-anim-panel-delay);
   }
 
   /* 2. Filters and Cards (Staggered) */
-  .feds-popup.is-open .feds-gnav-cards > li,
-  .feds-popup.is-open .product-list ul.tabs > li {
+  header.global-navigation:not(.is-compact) .feds-popup.is-open .feds-gnav-cards > li,
+  header.global-navigation:not(.is-compact) .feds-popup.is-open .product-list ul.tabs > li {
     transform: translateY(6px);
     animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
   }
 
-  .product-list .tab-content [role="tabpanel"] {
+  header.global-navigation:not(.is-compact) .product-list .tab-content [role="tabpanel"] {
     opacity: 0;
     transition:
       display 0.48s allow-discrete,
@@ -839,12 +1202,12 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     }
   }
 
-  .product-list .tab-content [role="tabpanel"]:not([hidden]) {
+  header.global-navigation:not(.is-compact) .product-list .tab-content [role="tabpanel"]:not([hidden]) {
     opacity: 1;
   }
 
   @starting-style {
-    .product-list .tab-content [role="tabpanel"]:not([hidden]) {
+    header.global-navigation:not(.is-compact) .product-list .tab-content [role="tabpanel"]:not([hidden]) {
       opacity: 0;
     }
   }
@@ -953,11 +1316,15 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     background-color: transparent;
     padding: 0;
   }
-  
+
+  [dir="rtl"] .global-navigation nav > ul > li.feds-menu-wrapper {
+    right: 0;
+    left: var(--s2a-spacing-20);
+  }
+
   .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
     transition: opacity 0.2s ease, visibility 0s linear 0.2s;
   }
-  
   .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
     display: flex;
     opacity: 1;
@@ -968,86 +1335,106 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     padding: 0;
     margin-top: 0;
   }
-  
-  .global-navigation nav > ul > li.feds-menu-wrapper.is-open .feds-gnav-items {
+
+  /* Match `.feds-menu-active` in addition to `.is-open` for the same reason
+     as the .feds-link rule above: `is-open` is removed immediately on close,
+     but `feds-menu-active` lingers until the wrapper's transitionend. Without
+     this, the gnav-items' open-state padding/alignment/width snaps back
+     mid-close, causing items to reflow and resize visibly during the close
+     transition. */
+  .global-navigation nav > ul > li.feds-menu-wrapper.is-open .feds-gnav-items,
+  .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active .feds-gnav-items {
     align-items: flex-start;
     padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg) var(--s2a-spacing-sm);
     width: calc(100% - var(--s2a-spacing-3xl));
   }
 
   .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
-    & .feds-gnav-items > li > .feds-link {
+    /* Direct children of <li> in .feds-gnav-items are either .feds-link
+       (regular nav links / mega-menu triggers) or a CTA anchor
+       (.feds-primary-cta / .feds-secondary-cta). Animate both so CTAs
+       slide in alongside the rest of the bar entries. */
+    & .feds-gnav-items > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
       opacity: 0;
       transform: translateX(18px);
       animation: mobile-main-menu-slide-in 0.35s cubic-bezier(0.42, 0, 0, 1) forwards;
     }
-  
-    & .feds-gnav-items > li:nth-child(1) > .feds-link { animation-delay: 0.18s; }
-    & .feds-gnav-items > li:nth-child(2) > .feds-link { animation-delay: 0.24s; }
-    & .feds-gnav-items > li:nth-child(3) > .feds-link { animation-delay: 0.30s; }
-    & .feds-gnav-items > li:nth-child(4) > .feds-link { animation-delay: 0.36s; }
-    & .feds-gnav-items > li:nth-child(5) > .feds-link { animation-delay: 0.42s; }
-    & .feds-gnav-items > li:nth-child(6) > .feds-link { animation-delay: 0.48s; }
-    & .feds-gnav-items > li:nth-child(7) > .feds-link { animation-delay: 0.54s; }
-    & .feds-gnav-items > li:nth-child(8) > .feds-link { animation-delay: 0.60s; }
-    & .feds-gnav-items > li:nth-child(9) > .feds-link { animation-delay: 0.66s; }
-    & .feds-gnav-items > li:nth-child(10) > .feds-link { animation-delay: 0.72s; }
+
+    & .feds-gnav-items > li:nth-child(1) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.18s; }
+    & .feds-gnav-items > li:nth-child(2) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.24s; }
+    & .feds-gnav-items > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.30s; }
+    & .feds-gnav-items > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.36s; }
+    & .feds-gnav-items > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.42s; }
+    & .feds-gnav-items > li:nth-child(6) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.48s; }
+    & .feds-gnav-items > li:nth-child(7) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.54s; }
+    & .feds-gnav-items > li:nth-child(8) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.60s; }
+    & .feds-gnav-items > li:nth-child(9) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.66s; }
+    & .feds-gnav-items > li:nth-child(10) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.72s; }
   }
 
   .feds-nav-toggle path {
     transform-origin: 7px 3.5px;
     transition: transform 0.35s cubic-bezier(.4,0,.2,1);
   }
-  
+
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle svg {
     height: 11px;
   }
-  
+
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:first-child {
     transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
   }
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:last-child {
     transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
   }
-  
   /* Mobile gnav-item slide-out / re-enter when subscreen opens / closes.
      The popup-interior animations live in a separate rule below because the
      popup is no longer a descendant of .feds-gnav-items (we reparent it to
      <nav> at render time to escape transformed containing blocks). */
   header.global-navigation > nav > ul > li.feds-menu-wrapper > ul.feds-gnav-items {
+    /* Include CTAs (.feds-primary-cta, .feds-secondary-cta) alongside
+       .feds-link so they exit/re-enter with the rest of the bar entries
+       when a sub-menu opens/closes. */
     /* open subscreen */
     &.subscreen-opening {
-      & > li > .feds-link {
+      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
         opacity: 1;
         transform: translateX(0);
         animation: main-menu-items-exit 0.5s cubic-bezier(0.42, 0, 0, 1) forwards;
       }
-      & > li:nth-child(1) > .feds-link { animation-delay: 0s; }
-      & > li:nth-child(2) > .feds-link { animation-delay: 0.025s; }
-      & > li:nth-child(3) > .feds-link { animation-delay: 0.05s; }
-      & > li:nth-child(4) > .feds-link { animation-delay: 0.075s; }
-      & > li:nth-child(5) > .feds-link { animation-delay: 0.1s; }
+      & > li:nth-child(1) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0s; }
+      & > li:nth-child(2) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.025s; }
+      & > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.05s; }
+      & > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.075s; }
+      & > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.1s; }
     }
     /* close subscreen */
     &.subscreen-closing {
-      & > li > .feds-link {
+      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
         opacity: 0;
         transform: translateX(-18px);
         animation: main-menu-items-re-enter 0.26s ease forwards 0.24s;
       }
-      & > li:nth-child(1) > .feds-link { animation-delay: 0.24s; }
-      & > li:nth-child(2) > .feds-link { animation-delay: 0.27s; }
-      & > li:nth-child(3) > .feds-link { animation-delay: 0.30s; }
-      & > li:nth-child(4) > .feds-link { animation-delay: 0.33s; }
-      & > li:nth-child(5) > .feds-link { animation-delay: 0.36s; }
+      & > li:nth-child(1) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.24s; }
+      & > li:nth-child(2) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.27s; }
+      & > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.30s; }
+      & > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.33s; }
+      & > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.36s; }
     }
   }
 
   /* Popup-interior animations driven by the gnav-items subscreen state.
      Popup lives at <nav> level now, so we cross-reference via :has(). */
   header.global-navigation > nav:has(.feds-gnav-items.subscreen-opening) .feds-popup.is-open {
-    opacity: 0;
-    animation: fade-in 0s linear 0.3s forwards; /* zero-duration instant jump after delay */
+    /* Hide every popup child during the gnav-items slide-out phase, then
+       jump them visible at 0.3s. The element-specific rules below still
+       drive per-element entrance animations after that point.
+       Breadcrumbs are intentionally excluded — they appear immediately
+       alongside the popup background, with no entrance animation. */
+    & > :not(.feds-breadcrumbs) {
+      opacity: 0;
+      animation: fade-in 0s linear 0.3s forwards; /* zero-duration instant jump after delay */
+    }
 
     & .feds-popup-header {
       opacity: 0;
@@ -1098,6 +1485,7 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
     animation: none;
     color: var(--s2a-color-gray-1000);
   }
+
 }
 
 ul.feds-gnav-cards,
@@ -1113,4 +1501,290 @@ ul[role="tabpanel"],
   & > li:nth-child(8) { animation-delay: 0.2s; }
   & > li:nth-child(9) { animation-delay: 0.225s; }
   & > li:nth-child(10) { animation-delay: 0.25s; }
+}
+
+/* =========================================
+   is-compact: mirrors @media (max-width: 1023px) mobile behaviour.
+   Applied by JS when nav items overflow the available space at desktop widths.
+   Must come AFTER all desktop @media (min-width: 1024px) blocks so these
+   rules win the cascade without needing !important.
+   ========================================= */
+
+/* ::after height rules (mirrors lines 372-382) */
+header.global-navigation.is-compact nav:has(.feds-popup.is-open)::after {
+  height: calc(100dvh + var(--s2a-spacing-xs));
+}
+header.global-navigation.is-compact nav:not(.localnav):has(.feds-menu-wrapper.is-open)::after {
+  height: calc(100dvh + var(--s2a-spacing-64));
+}
+header.global-navigation.is-compact nav.localnav:has(.feds-menu-wrapper.is-open)::after {
+  height: var(--feds-popup-bg-height);
+}
+
+/* feds-link text variants (mirrors lines 441-443) */
+header.global-navigation.is-compact .feds-link__desktop-text { display: none; }
+header.global-navigation.is-compact .feds-link__mobile-text { display: inline; }
+
+/* Hide product entry CTA (mirrors line 162-164) */
+header.global-navigation.is-compact.site-pivot .feds-product-entry-cta {
+  display: none;
+}
+
+/* Show hamburger (overrides desktop display:none) */
+header.global-navigation.is-compact nav .feds-nav-toggle {
+  display: flex;
+}
+
+/* Nav links: mobile font & chevron style (mirrors lines 944-970) */
+header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link {
+  width: 100%;
+  justify-content: space-between;
+  text-align: left;
+}
+
+header.global-navigation.is-compact .feds-gnav-items > li > .feds-link {
+  font-family: var(--feds-heading-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
+}
+
+header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+  order: 2;
+  margin-left: var(--s2a-spacing-xs);
+  flex-shrink: 0;
+  transform: rotate(-90deg) scale(2.5);
+}
+
+header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link .chevron-down path {
+  stroke-width: 0.5;
+}
+
+/* feds-product-card gap & border-radius (mirrors lines 983-985) */
+header.global-navigation.is-compact .feds-popup .feds-product-card {
+  gap: var(--s2a-spacing-2xl);
+  border-radius: var(--s2a-border-radius-24);
+}
+
+/* feds-product-card__subtitle margin (mirrors line 1001) */
+header.global-navigation.is-compact .feds-popup .feds-product-card__subtitle {
+  margin-top: var(--s2a-spacing-xs);
+}
+
+/* small-menu gnav-cards padding (mirrors lines 1002-1010) */
+header.global-navigation.is-compact:has(.mega-menu.small-menu[aria-haspopup='true']) .feds-popup .feds-gnav-cards {
+  padding: 0 var(--s2a-spacing-lg);
+  margin-bottom: 0;
+}
+
+header.global-navigation.is-compact:has(.mega-menu.small-menu[aria-haspopup='true']) .feds-popup .links-card {
+  margin-bottom: var(--s2a-spacing-sm);
+}
+
+/* Popup positioning (mirrors lines 972-981) */
+header.global-navigation.is-compact .feds-popup {
+  inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px) 0 0 0;
+}
+
+header.global-navigation.is-compact .feds-popup.is-open {
+  position: fixed;
+  z-index: 3;
+}
+
+/* Undo desktop-only popup styles */
+header.global-navigation.is-compact .feds-popup {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background-color: transparent;
+  opacity: 1;
+  max-height: none;
+  clip-path: none;
+  transition: none;
+}
+
+header.global-navigation.is-compact .feds-popup .feds-popup-header {
+  display: flex;
+}
+
+/* Scroll lock (mirrors line 988-991) */
+body:has(header.global-navigation.is-compact .feds-popup.is-open),
+body:has(header.global-navigation.is-compact .feds-menu-wrapper.is-open) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* ::after border-radius (mirrors lines 993-999) */
+header.global-navigation.is-compact nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
+  border-radius: 0;
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-menu-wrapper.is-open)::after {
+  border-radius: 0 0 var(--s2a-border-radius-16) var(--s2a-border-radius-16);
+}
+
+/* Menu wrapper drawer (mirrors lines 1249-1297) */
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper {
+  position: fixed;
+  top: var(--s2a-spacing-64);
+  left: 0;
+  right: var(--s2a-spacing-20);
+  flex-direction: column;
+  height: calc(100dvh - var(--s2a-spacing-64));
+  border: 0;
+  width: 100%;
+  opacity: 0;
+  display: flex;
+  visibility: hidden;
+  color: var(--s2a-color-gray-1000);
+  background-color: transparent;
+  padding: 0;
+  /* undo desktop flex-grow / static positioning */
+  flex-grow: 0;
+  justify-content: flex-start;
+  translate: unset;
+  transition: unset;
+  outline: 0;
+  box-shadow: none;
+}
+
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.feds-menu-active {
+  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
+
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.is-open {
+  display: flex;
+  opacity: 1;
+  z-index: 2;
+  transition: opacity 0.4s ease, visibility 0s linear 0s;
+  visibility: visible;
+  align-items: flex-start;
+  padding: 0;
+  margin-top: 0;
+}
+
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.is-open .feds-gnav-items,
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.feds-menu-active .feds-gnav-items {
+  align-items: flex-start;
+  padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg) var(--s2a-spacing-sm);
+  width: calc(100% - var(--s2a-spacing-3xl));
+}
+
+/* Undo desktop gnav-items flex row */
+header.global-navigation.is-compact nav .feds-gnav-items {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+header.global-navigation.is-compact nav > ul > li.feds-menu-wrapper.is-open {
+  & .feds-gnav-items > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: mobile-main-menu-slide-in 0.35s cubic-bezier(0.42, 0, 0, 1) forwards;
+  }
+  & .feds-gnav-items > li:nth-child(1) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.18s; }
+  & .feds-gnav-items > li:nth-child(2) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.24s; }
+  & .feds-gnav-items > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.30s; }
+  & .feds-gnav-items > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.36s; }
+  & .feds-gnav-items > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.42s; }
+  & .feds-gnav-items > li:nth-child(6) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.48s; }
+  & .feds-gnav-items > li:nth-child(7) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.54s; }
+  & .feds-gnav-items > li:nth-child(8) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.60s; }
+  & .feds-gnav-items > li:nth-child(9) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.66s; }
+  & .feds-gnav-items > li:nth-child(10) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.72s; }
+}
+
+/* Hamburger → X animation (mirrors lines 1322-1336) */
+header.global-navigation.is-compact .feds-nav-toggle path {
+  transform-origin: 7px 3.5px;
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+}
+
+header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle svg {
+  height: 11px;
+}
+
+header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:first-child {
+  transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
+}
+
+header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:last-child {
+  transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
+}
+
+/* Subscreen slide-out / re-enter animations (mirrors lines 1342-1407) */
+header.global-navigation.is-compact > nav > ul > li.feds-menu-wrapper > ul.feds-gnav-items {
+  &.subscreen-opening {
+    & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+      opacity: 1;
+      transform: translateX(0);
+      animation: main-menu-items-exit 0.5s cubic-bezier(0.42, 0, 0, 1) forwards;
+    }
+    & > li:nth-child(1) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0s; }
+    & > li:nth-child(2) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.025s; }
+    & > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.05s; }
+    & > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.075s; }
+    & > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.1s; }
+  }
+  &.subscreen-closing {
+    & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+      opacity: 0;
+      transform: translateX(-18px);
+      animation: main-menu-items-re-enter 0.26s ease forwards 0.24s;
+    }
+    & > li:nth-child(1) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.24s; }
+    & > li:nth-child(2) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.27s; }
+    & > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.30s; }
+    & > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.33s; }
+    & > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.36s; }
+  }
+}
+
+header.global-navigation.is-compact > nav:has(.feds-gnav-items.subscreen-opening) .feds-popup.is-open {
+  & > :not(.feds-breadcrumbs) {
+    opacity: 0;
+    animation: fade-in 0s linear 0.3s forwards;
+  }
+  & .feds-popup-header {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1) 0.3s;
+  }
+  & .tabs {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
+    animation-delay: 0.36s;
+  }
+  & .feds-gnav-cards > li {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
+  }
+  & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.36s; }
+  & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.42s; }
+}
+
+header.global-navigation.is-compact > nav:has(.feds-gnav-items.subscreen-closing) .feds-popup.is-open {
+  & .feds-popup-header {
+    opacity: 1;
+    transform: translateX(0px);
+    animation: sub-menu-items-exit 0.2s forwards ease;
+  }
+  & .tabs {
+    opacity: 1;
+    transform: translateX(0px);
+    animation: sub-menu-items-exit 0.2s forwards ease;
+  }
+  & .feds-gnav-cards > li {
+    opacity: 1;
+    transform: translateX(0px);
+    animation: sub-menu-items-exit 0.2s forwards ease;
+  }
+  & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.04s; }
+  & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.08s; }
+}
+
+/* App-switcher animation reset (mirrors lines 1444-1447) */
+header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-brand-image svg,
+header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-nav-toggle svg {
+  animation: none;
+  color: var(--s2a-color-gray-1000);
 }

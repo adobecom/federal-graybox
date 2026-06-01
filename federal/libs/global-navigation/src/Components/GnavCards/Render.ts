@@ -1,6 +1,7 @@
 import { featuredcards } from "../FeaturedCard/Render";
 import { linkscard } from "../LinksCard/Render";
-import { promoCard } from "../PromoCard/Render";
+import { promoCard } from "../PromoCard/Standard/Render";
+import { promoCardSmall } from "../PromoCard/Small/Render";
 import { GnavCards, GnavColumn } from "../MegaMenu/Parse";
 
 const renderCard = (card: GnavColumn["cards"][number], megaMenuTitle: string): HTML => {
@@ -11,6 +12,8 @@ const renderCard = (card: GnavColumn["cards"][number], megaMenuTitle: string): H
       return linkscard(card);
     case "PromoCard":
       return promoCard(card);
+    case "PromoCardSmall":
+      return promoCardSmall(card);
     default: card satisfies never;
   }
   return "";

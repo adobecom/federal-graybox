@@ -3,23 +3,164 @@
    ========================================= */
 
 .feds-popup .links-card {
-  border-radius: var(--s2a-border-radius-24); /* Don't have a token */
+  border-radius: var(--s2a-border-radius-16);
   background: var(--s2a-color-gray-25);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: var(--s2a-spacing-xl) var(--s2a-spacing-lg);
+  padding: var(--s2a-spacing-lg);
+  margin-bottom: var(--s2a-spacing-sm);
+}
+
+.feds-popup .links-card .links-card-title-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &[aria-expanded="false"] .links-card-title {
+    margin-bottom: 0;
+  }
+}
+
+.feds-popup.small-menu .links-card .links-card-title-container {
+  display: none;
+}
+
+.feds-popup .links-card .links-card-chevron {
+  margin-left: auto;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.feds-popup.small-menu .links-card .links-card-chevron {
+  display: none;
+}
+
+.feds-popup .links-card .links-card-chevron svg {
+  width: 16px;
+  height: 16px;
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+.feds-popup .links-card .links-card-chevron svg path {
+  stroke-width: 0.7;
+}
+
+.feds-popup .links-card.closed .links-card-title-container svg {
+  transform: rotate(0deg);
+}
+
+/* =========================================
+   Mobile open/close animation
+   The collapsible content (links list + footer) animates its max-height
+   between 0 and a value large enough to accommodate any realistic card.
+   When `.opening` is briefly set by JS on the closed → open transition,
+   the list items and footer fade + slide in with a staggered delay,
+   mirroring the subscreen entrance animation.
+   ========================================= */
+
+@media (max-width: 1024px) {
+  .feds-popup .links-card .links-card-title-container ~ *,
+  .feds-popup .links-card .links-card-footer {
+    overflow: hidden;
+    max-height: 1000px;
+    transition: max-height 0.4s ease;
+  }
+
+  .feds-popup .links-card.closed .links-card-title-container ~ *,
+  .feds-popup .links-card.closed .links-card-footer {
+    max-height: 0;
+  }
+
+  .feds-popup .links-card.opening .links-card-links > li {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.4s forwards cubic-bezier(0.42, 0, 0, 1);
+  }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(1)  { animation-delay: 0.08s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(2)  { animation-delay: 0.12s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(3)  { animation-delay: 0.16s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(4)  { animation-delay: 0.20s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(5)  { animation-delay: 0.24s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(6)  { animation-delay: 0.28s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(7)  { animation-delay: 0.32s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(8)  { animation-delay: 0.36s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(9)  { animation-delay: 0.40s; }
+  .feds-popup .links-card.opening .links-card-links > li:nth-child(10) { animation-delay: 0.44s; }
+
+  .feds-popup .links-card.opening .links-card-footer {
+    opacity: 0;
+    transform: translateX(18px);
+    animation: sub-menu-items-enter 0.4s forwards cubic-bezier(0.42, 0, 0, 1);
+    animation-delay: 0.32s;
+  }
+}
+
+/* =========================================
+   is-compact: mirrors @media (max-width: 1024px) mobile behaviour
+   ========================================= */
+
+header.global-navigation.is-compact .feds-popup .links-card .links-card-title-container ~ *,
+header.global-navigation.is-compact .feds-popup .links-card .links-card-footer {
+  overflow: hidden;
+  max-height: 1000px;
+  transition: max-height 0.4s ease;
+}
+
+header.global-navigation.is-compact .feds-popup .links-card.closed .links-card-title-container ~ *,
+header.global-navigation.is-compact .feds-popup .links-card.closed .links-card-footer {
+  max-height: 0;
+}
+
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li {
+  opacity: 0;
+  transform: translateX(18px);
+  animation: sub-menu-items-enter 0.4s forwards cubic-bezier(0.42, 0, 0, 1);
+}
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(1)  { animation-delay: 0.08s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(2)  { animation-delay: 0.12s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(3)  { animation-delay: 0.16s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(4)  { animation-delay: 0.20s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(5)  { animation-delay: 0.24s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(6)  { animation-delay: 0.28s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(7)  { animation-delay: 0.32s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(8)  { animation-delay: 0.36s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(9)  { animation-delay: 0.40s; }
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-links > li:nth-child(10) { animation-delay: 0.44s; }
+
+header.global-navigation.is-compact .feds-popup .links-card.opening .links-card-footer {
+  opacity: 0;
+  transform: translateX(18px);
+  animation: sub-menu-items-enter 0.4s forwards cubic-bezier(0.42, 0, 0, 1);
+  animation-delay: 0.32s;
+}
+
+nav.localnav .feds-popup:not(.small-menu) .links-card {
+  margin-bottom: var(--s2a-spacing-xs);
 }
 
 .feds-popup .links-card .links-card-title {
-  margin: 0 0 var(--s2a-spacing-sm);
-  font-size: var(--s2a-typography-font-size-title-5);
-  line-height: var(--s2a-typography-line-height-title-5-temp);
-  letter-spacing: var(--s2a-typography-letter-spacing-title-5);
+  margin: 0;
+  font-size: var(--s2a-typography-font-size-heading-5);
+  line-height: var(--s2a-typography-line-height-heading-5);
+  letter-spacing: var(--s2a-typography-letter-spacing-heading-5);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   color: var(--s2a-color-gray-1000);
   font-family: var(--feds-heading-font-family);
+  margin-bottom: var(--s2a-spacing-sm);
+  /* Sync the bottom-margin collapse with the content's max-height
+     transition (mobile + is-compact) so the title doesn't jump abruptly
+     between its open- and closed-state spacing while the rest of the
+     card is still mid-animation. The transition is harmless on desktop
+     since the rule that toggles margin-bottom only fires when
+     aria-expanded is present, which JS only sets on mobile. */
+  transition: margin-bottom 0.4s ease;
 }
 
 /* =========================================
@@ -46,20 +187,47 @@
   display: inline-flex;
 }
 
+.feds-popup .links-card .links-card-links .links-card-links__item-link {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2a-spacing-2xs, 4px);
+}
+
+.feds-popup .links-card .links-card-links .links-card-links__item-description {
+  font-size: var(--s2a-font-family-body);
+  color: var(--s2a-color-content-default);
+  line-height: var(--s2a-typography-line-height-body-sm);
+  font-weight: var(--s2a-font-weight-adobe-clean-regular);
+  letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+  white-space: break-spaces;
+}
+
+.feds-popup .links-card .links-card-links .feds-link--highlight {
+  color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
+  font-weight: 700;
+}
+
+.links-card-links__item-title {
+  font-weight: 700;
+  font-size: var(--s2a-typography-font-size-eyebrow);
+  line-height: var(--s2a-typography-line-height-eyebrow);
+  letter-spacing: var(--s2a-typography-letter-spacing-eyebrow);
+}
+
 /* =========================================
    Links Card Footer
    ========================================= */
 
 .feds-popup .links-card .links-card-footer {
   width: 100%;
-  margin-top: var(--s2a-spacing-lg);
+  margin-top: var(--s2a-spacing-sm);
 }
 
 .feds-popup .links-card .links-card-footer .feds-secondary-cta {
-  width: 100%;
-  box-sizing: border-box;
-  justify-content: center;
-  background-color: transparent;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0);
+    justify-content: center;
+    width: 100%;
 }
 
 /* =========================================
@@ -67,18 +235,22 @@
    ========================================= */
 
 @media (min-width: 1024px) {
-  .feds-popup .links-card {
-    border-radius: var(--s2a-border-radius-16); /* Don't have a token */
+  header.global-navigation:not(.is-compact) .feds-popup .links-card {
+    border-radius: var(--s2a-border-radius-16);
     padding: var(--s2a-spacing-lg) var(--s2a-spacing-lg) var(--s2a-spacing-md);
   }
 
-  .feds-popup .links-card .links-card-footer .feds-secondary-cta {
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-chevron {
+    display: none;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-footer .feds-secondary-cta {
     color: var(--s2a-color-gray-1000);
     background-color: transparent;
   }
-  .feds-popup .links-card .links-card-footer .feds-secondary-cta:hover {
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-footer .feds-secondary-cta:hover {
     color: var(--s2a-color-gray-25);
-    background-color:var(--s2a-color-gray-1000);
+    background-color: var(--s2a-color-gray-1000);
   }
 }
 
@@ -87,7 +259,7 @@
    ========================================= */
 
 @media (min-width: 1280px) {
-  .feds-popup .links-card {
+  header.global-navigation:not(.is-compact) .feds-popup .links-card {
     padding-bottom: var(--s2a-spacing-lg);
   }
-} 
+}

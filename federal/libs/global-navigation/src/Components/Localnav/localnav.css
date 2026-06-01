@@ -1,0 +1,558 @@
+/**
+ * Localnav-specific styles
+ *
+ * When `<nav>` carries the `.localnav` class the global navigation switches
+ * to "mobile" UX (hamburger + collapsible localnav bar) up to 1023px — the
+ * same breakpoint as the standard non-localnav mobile UX. From 1024px and
+ * above, localnav uses the regular desktop UX.
+ *
+ * This file is the single home for every nav.localnav-scoped rule.
+ */
+
+/* Localnav bar element renders only when localnav=true (see Main.ts).
+   Hide by default so it stays invisible outside the mobile localnav range. */
+.feds-localnav-bar {
+  display: none;
+}
+
+/* While the localnav bar is sliding back down to its docked position, suppress
+   the scrolled-state `inset` on nav. `nav` is `position: fixed`, so any
+   explicit `top` (set via the scrolled-state `inset` shorthand) pins it to
+   the viewport independent of its parent header's position — which would
+   kill the slide-down (header's `top` animates from -64px -> 0px, but the
+   nav, which carries the visible content, would teleport to `top: xs`
+   immediately). Main.ts adds `feds-localnav-closing` on the header for the
+   duration of the transition and removes it on `transitionend`. */
+header.feds-header-scrolled.feds-localnav-closing nav.localnav {
+  inset: auto;
+}
+
+/* In localnav the popup is reached via either the hamburger (first mega-menu)
+   or a sibling button in the expanded bar — there's no back stack to step
+   through inside the popup, so hide the back-button SVG. */
+nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
+  display: none;
+}
+
+/* =========================================
+   Mobile-shape localnav UX (<= 1023px)
+   =========================================
+   Houses every nav.localnav rule that mirrors mobile behavior. Wrapped in a
+   single (max-width: 1023px) media query so the rules apply at the standard
+   mobile breakpoint (same as non-localnav mobile UX). */
+@media (max-width: 1023px) {
+
+  /* The hamburger toggle's aria-controls points directly at the first mega-menu's
+     popup (see Main.ts). In localnav we hide the FIRST mega-menu's trigger (it's
+     reached via the hamburger) and any CTAs so they don't appear in the localnav
+     bar's expanded list. Other mega-menu links remain visible inside the open bar.
+
+     We hide the trigger button only (not the parent li) so its sibling popup
+     stays mountable for the hamburger to open directly.
+
+     The product entry CTA renders outside .feds-gnav-items (direct child of
+     <nav>) and is intentionally untouched. */
+  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child > .feds-link {
+    display: none;
+  }
+
+  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta,
+  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
+    margin: 0;
+  }
+
+  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta {
+    background-color: #3b63fb;
+    color: var(--s2a-color-button-content-primary-solid-default);
+    border: none;
+    margin-top: var(--s2a-spacing-lg);
+    &:hover {
+      background-color: #3b63fb;
+      color: var(--s2a-color-button-content-primary-solid-default);
+      border: none;
+    }
+  }
+
+  .global-navigation nav.localnav > ul > li.feds-menu-wrapper:has(.feds-popup.is-open) {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* =========================================
+     Localnav bar (li.feds-menu-wrapper repurposed)
+     =========================================
+     In localnav the menu-wrapper li is repurposed as an expanding bar
+     positioned directly below the main nav row (where breadcrumbs would
+     otherwise sit). The .feds-localnav-bar button (rendered in Main.ts
+     when localnav=true, labeled with the last breadcrumb's text) is the
+     clickable surface. It has aria-controls="feds-menu-wrapper" so
+     wirePopups treats it as the trigger.
+
+     Closed: the bar is the visible strip (height = breadcrumbs-height).
+     Open: the wrapper grows to fit the gnav-items list below it (first
+     mega-menu and CTAs stay hidden via the rule above). */
+  .global-navigation nav.localnav > ul > li.feds-menu-wrapper {
+    /* Override the off-canvas drawer positioning that the non-localnav
+       mobile rule applies. We position absolutely directly below the nav
+       row, full width, so the bar visually replaces the breadcrumb row. */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: auto;
+    width: 100%;
+    opacity: 1;
+    visibility: visible;
+    display: block;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    color: inherit;
+    z-index: 2;
+  }
+
+  /* Slide the whole header up by the nav's height when the localnav bar is
+     expanded, so the bar (positioned at top:100% of the nav) ends up flush
+     with the viewport top. BOTH directions transition symmetrically:
+     opening slides up (top: 0 -> -64px), closing slides back down.
+
+     We animate `top` (not `transform`) because `transform` — even
+     `translateY(0)` — establishes a new containing block for
+     `position: fixed` descendants. The mega-menu popups (`.feds-popup`) are
+     fixed-position descendants of <header>; if <header> created a containing
+     block they'd be re-anchored to it AND would lose their ability to
+     escape the `overflow: hidden` clip on `.feds-gnav-items` (which is
+     `max-height: 0` when the bar is closed), so they'd be invisible.
+     Animating `top` is not GPU-compositable, but it leaves the containing
+     block hierarchy intact so popups continue to be positioned relative to
+     the viewport. */
+  header.global-navigation:has(nav.localnav) {
+    transition: top 0.3s ease;
+  }
+
+  header.global-navigation:has(nav.localnav > ul > li.feds-menu-wrapper.is-open) {
+    top: calc(0px - var(--s2a-spacing-64));
+  }
+
+  .global-navigation nav.localnav .feds-localnav-bar {
+    /* The localnav bar is hidden by default (top-level rule above); inside
+       the mobile range we make it visible. position:relative anchors the
+       ::before separator pseudo (used in the open state) so it can extend
+       past the nav's xs side margins. overflow:visible is explicit to keep
+       the ::before separator from being clipped on browsers that apply UA
+       overflow to <button>. */
+    display: flex;
+    position: relative;
+    overflow: visible;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    height: var(--feds-breadcrumbs-height);
+    padding: var(--s2a-spacing-md);
+    background: transparent;
+    border: 0;
+    border-top: var(--s2a-border-width-sm) solid rgba(255, 255, 255, 0.24);
+    /* Default (header not scrolled, no menu/popup open) sits over the
+       translucent-dark gnav backdrop so white reads best. The dark
+       palette kicks in for scrolled / menu-open states where the
+       backdrop turns light or gray — same treatment used by the
+       last breadcrumb (see Components/Breadcrumbs/breadcrumbs.css). */
+    color: var(--s2a-color-gray-25);
+    cursor: pointer;
+    font-family: var(--feds-font-family);
+    font-weight: 700;
+    font-size: var(--s2a-typography-font-size-label);
+    line-height: var(--s2a-typography-line-height-label);
+    letter-spacing: var(--s2a-typography-letter-spacing-label);
+    text-align: left;
+  }
+
+  .global-navigation.dark-font nav.localnav .feds-localnav-bar {
+    color: var(--s2a-color-gray-1000);
+    border-top-color: var(--s2a-color-transparent-black-08);
+  }
+
+  .global-navigation.feds-header-scrolled nav.localnav .feds-localnav-bar,
+  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) nav.localnav .feds-localnav-bar {
+    border-top-color: rgba(0, 0, 0, 0.12);
+    color: var(--s2a-color-content-default);
+  }
+
+  /* Chevron indicator on the right of the bar. Rotates when open. */
+  .global-navigation nav.localnav .feds-localnav-bar::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.3s ease;
+  }
+
+  .global-navigation nav.localnav > ul > li.feds-menu-wrapper.is-open .feds-localnav-bar::after {
+    transform: translateY(2px) rotate(225deg);
+  }
+
+  /* Separator between the bar's title and the list items when expanded.
+     Drawn as an absolutely-positioned pseudo on the bar. The calc(50% - 50vw)
+     trick anchors each edge to the viewport edge regardless of the bar's
+     container width or padding, so the line always spans the full screen
+     width. Matches the bar's own open-state top border so the title sits
+     between two identical hairlines. */
+  .global-navigation nav.localnav > ul > li.feds-menu-wrapper.is-open .feds-localnav-bar::before {
+    content: '';
+    position: absolute;
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw);
+    bottom: 0;
+    border-bottom: var(--s2a-border-width-sm) solid rgba(0, 0, 0, 0.12);
+  }
+
+  /* Collapsed state: hide the gnav-items list inside the bar. Use max-height
+     rather than display:none so descendant popups (first mega-menu, opened
+     by the hamburger) remain mounted and visible — they're position:fixed
+     so they escape this overflow clip. */
+  .global-navigation nav.localnav > ul > li.feds-menu-wrapper > ul.feds-gnav-items {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  /* Same `.feds-menu-active` extension as elsewhere — keep the localnav
+     bar's expanded padding through the close transition so the items don't
+     horizontally jump as the bar collapses. The max-height transition itself
+     still keys off `.is-open` (the close timing is governed by the base
+     rule's `transition: max-height 0.3s ease`). */
+  .global-navigation nav.localnav > ul > li.feds-menu-wrapper.is-open > ul.feds-gnav-items,
+  .global-navigation nav.localnav > ul > li.feds-menu-wrapper.feds-menu-active > ul.feds-gnav-items {
+    overflow-y: auto;
+    padding: var(--s2a-spacing-xs) var(--s2a-spacing-md) var(--s2a-spacing-sm);
+  }
+  .global-navigation nav.localnav:has(.feds-popup.is-open) > ul > li.feds-menu-wrapper.feds-menu-active > ul.feds-gnav-items {
+    overflow-y: hidden;
+  }
+
+  .global-navigation nav.localnav > ul > li.feds-menu-wrapper.is-open > ul.feds-gnav-items {
+    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-breadcrumbs-height));
+    transition: max-height 0.4s ease;
+  }
+
+  /* In localnav the first child of .feds-gnav-items is the hidden first
+     mega-menu (its popup is opened directly by the hamburger). The default
+     subscreen-opening stagger keys off nth-child(1)..(5), but in localnav
+     the first visible item starts at nth-child(2), which made the stagger
+     skew so the last visible items felt much later than the first.
+     We zero out the per-item delay in localnav so all visible items exit
+     in sync when a sub-menu opens. */
+  .global-navigation nav.localnav .feds-gnav-items.subscreen-opening > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+    animation-delay: 0s !important;
+  }
+  .global-navigation nav.localnav .feds-gnav-items.subscreen-closing > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+    animation-delay: 0.24s !important;
+  }
+
+  /* Localnav popup positioning has two distinct cases:
+
+     (A) Bar-expanded -> click a mega-menu inside the bar.
+         The bar (menu-wrapper) is open. The popup must start BELOW the bar
+         so its header doesn't overlap the bar's label.
+     (B) Hamburger flow (no menu-wrapper.is-open, a feds-popup.is-open).
+         The bar disappears and the popup is pulled flush with the nav row.
+         The popup's first child is its breadcrumbs row (rendered static via
+         the existing .feds-popup.is-open:not(.small-menu) > ul.feds-breadcrumbs
+         rule in breadcrumbs.css), so it lands exactly where the bar was. */
+  nav.localnav .feds-popup {
+    /* Bar-open flow: the header has slid up by 64px, so the nav row is
+       offscreen and only the bar (height = --feds-breadcrumbs-height) sits at
+       viewport top. Anchor the (position:fixed) popup directly under the bar
+       — no need to reserve nav-row height. */
+    top: calc(var(--feds-breadcrumbs-height) - 1px);
+    max-height: calc(100dvh - var(--feds-breadcrumbs-height));
+    height: fit-content;
+    overflow-x: hidden; /* Fix problem where horizontal scroll appears briefly */
+  }
+
+  nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup {
+    top: var(--s2a-spacing-64);
+    max-height: calc(100dvh - var(--s2a-spacing-64));
+  }
+
+  /* In the hamburger flow (case B above) hide the localnav bar button so the
+     popup's breadcrumb row can occupy its slot without visual duplication.
+     We can't display:none the whole .feds-menu-wrapper li because the popup
+     is a DOM descendant of it — display:none on the wrapper would also hide
+     the popup. Hiding just the bar button is enough since the wrapper's
+     other child (.feds-gnav-items) is already max-height:0 when collapsed. */
+  .global-navigation nav.localnav:has(.feds-popup.is-open):not(:has(.feds-menu-wrapper.is-open)) .feds-localnav-bar {
+    display: none;
+  }
+
+  /* Hamburger flow: the popup's inline breadcrumb row (rendered position:static
+     at the top of the popup) carries a border-top from the base breadcrumbs
+     rule, which reads as a stray separator line right under the nav row.
+     Remove it — in the hamburger flow there's no separate bar above the
+     popup, so the breadcrumb row should sit flush with the nav. */
+  .global-navigation nav.localnav:has(.feds-popup.is-open):not(:has(.feds-menu-wrapper.is-open)) .feds-popup.is-open > ul.feds-breadcrumbs {
+    border-top: 0;
+  }
+
+  /* Bar-expanded flow (case A): the bar already shows the breadcrumb label,
+     so the popup's inline breadcrumb row is redundant — and it pushes the
+     popup-header (title) down by --feds-breadcrumbs-height, which is what
+     made the sub-menu look "too far down". Hide it so the popup-header
+     sits flush right under the bar. */
+  .global-navigation nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup.is-open > ul.feds-breadcrumbs {
+    display: none;
+  }
+
+  /* The standalone breadcrumb row (rendered as <ul.feds-breadcrumbs> as a
+     direct child of <nav>) is hidden in localnav-mobile because the bar
+     occupies that visual slot and uses the last crumb's text as its label.
+     (The non-localnav-mobile equivalent of this rule lives in
+     Components/Breadcrumbs/breadcrumbs.css at the 1023px mobile breakpoint.) */
+  header.global-navigation.site-pivot nav.localnav > .feds-breadcrumbs {
+    display: none;
+  }
+}
+
+/* =========================================
+   is-compact: mirrors @media (max-width: 1023px) localnav mobile behaviour
+   ========================================= */
+
+header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li:first-child > .feds-link {
+  display: none;
+}
+
+header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta,
+header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
+  margin: 0;
+}
+
+header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta {
+  background-color: #3b63fb;
+  color: var(--s2a-color-button-content-primary-solid-default);
+  border: none;
+  margin-top: var(--s2a-spacing-lg);
+  &:hover {
+    background-color: #3b63fb;
+    color: var(--s2a-color-button-content-primary-solid-default);
+    border: none;
+  }
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper:has(.feds-popup.is-open) {
+  opacity: 1;
+  visibility: visible;
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: auto;
+  width: 100%;
+  opacity: 1;
+  visibility: visible;
+  display: block;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  color: inherit;
+  z-index: 2;
+  /* undo off-canvas drawer styles */
+  flex-grow: 0;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+header.global-navigation.is-compact:has(nav.localnav) {
+  transition: top 0.3s ease;
+}
+
+header.global-navigation.is-compact:has(nav.localnav > ul > li.feds-menu-wrapper.is-open) {
+  top: calc(0px - var(--s2a-spacing-64));
+}
+
+header.global-navigation.is-compact nav.localnav .feds-localnav-bar {
+  display: flex;
+  position: relative;
+  overflow: visible;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  box-sizing: border-box;
+  height: var(--feds-breadcrumbs-height);
+  padding: var(--s2a-spacing-md);
+  background: transparent;
+  border: 0;
+  border-top: var(--s2a-border-width-sm) solid rgba(255, 255, 255, 0.24);
+  color: var(--s2a-color-gray-25);
+  cursor: pointer;
+  font-family: var(--feds-font-family);
+  font-weight: 700;
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  text-align: left;
+}
+
+header.global-navigation.is-compact.dark-font nav.localnav .feds-localnav-bar {
+  color: var(--s2a-color-gray-1000);
+  border-top-color: var(--s2a-color-transparent-black-08);
+}
+
+header.global-navigation.is-compact.feds-header-scrolled nav.localnav .feds-localnav-bar,
+header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) nav.localnav .feds-localnav-bar {
+  border-top-color: rgba(0, 0, 0, 0.12);
+  color: var(--s2a-color-content-default);
+}
+
+header.global-navigation.is-compact nav.localnav .feds-localnav-bar::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.3s ease;
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.is-open .feds-localnav-bar::after {
+  transform: translateY(2px) rotate(225deg);
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.is-open .feds-localnav-bar::before {
+  content: '';
+  position: absolute;
+  left: calc(50% - 50vw);
+  right: calc(50% - 50vw);
+  bottom: 0;
+  border-bottom: var(--s2a-border-width-sm) solid rgba(0, 0, 0, 0.12);
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper > ul.feds-gnav-items {
+  max-height: 0;
+  overflow: hidden;
+  padding: 0;
+  transition: max-height 0.3s ease;
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.is-open > ul.feds-gnav-items,
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.feds-menu-active > ul.feds-gnav-items {
+  overflow-y: auto;
+  padding: var(--s2a-spacing-xs) var(--s2a-spacing-md) var(--s2a-spacing-sm);
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-popup.is-open) > ul > li.feds-menu-wrapper.feds-menu-active > ul.feds-gnav-items {
+  overflow-y: hidden;
+}
+
+header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper.is-open > ul.feds-gnav-items {
+  max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-breadcrumbs-height));
+  transition: max-height 0.4s ease;
+}
+
+header.global-navigation.is-compact nav.localnav .feds-gnav-items.subscreen-opening > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+  animation-delay: 0s !important;
+}
+
+header.global-navigation.is-compact nav.localnav .feds-gnav-items.subscreen-closing > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+  animation-delay: 0.24s !important;
+}
+
+header.global-navigation.is-compact nav.localnav .feds-popup {
+  top: calc(var(--feds-breadcrumbs-height) - 1px);
+  max-height: calc(100dvh - var(--feds-breadcrumbs-height));
+  height: fit-content;
+  overflow-x: hidden;
+}
+
+header.global-navigation.is-compact nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup {
+  top: var(--s2a-spacing-64);
+  max-height: calc(100dvh - var(--s2a-spacing-64));
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-popup.is-open):not(:has(.feds-menu-wrapper.is-open)) .feds-localnav-bar {
+  display: none;
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-popup.is-open):not(:has(.feds-menu-wrapper.is-open)) .feds-popup.is-open > ul.feds-breadcrumbs {
+  border-top: 0;
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup.is-open > ul.feds-breadcrumbs {
+  display: none;
+}
+
+header.global-navigation.is-compact.site-pivot nav.localnav > .feds-breadcrumbs {
+  display: none;
+}
+
+
+/* =========================================
+   Desktop (>= 1024px) — separator between first and second gnav item
+   =========================================
+   On desktop, when the nav is a localnav, draw the same vertical pipe
+   separator that the breadcrumbs use between adjacent crumbs — but only
+   on <li> elements explicitly tagged with the `.divider` class in
+   .feds-gnav-items. Authoring opts in per-item rather than relying on
+   structural position, so dividers can appear wherever they're needed
+   (and never where they aren't). The pseudo lives on the tagged li (via
+   `li.divider::before`) and is drawn once per such item. Matches the
+   breadcrumb pipe pixel-exactly (1×15px filled box) and follows the same
+   default/dark-palette state split: white-alpha on the translucent-dark
+   default backdrop, black-alpha when the header is scrolled or a
+   menu/popup is open and the backdrop turns light/gray. See
+   Components/Breadcrumbs/breadcrumbs.css for the source separator the
+   styling mirrors. */
+@media (min-width: 1024px) {
+  /* Make the tagged li lay out its own children inline-centered (matches the
+     breadcrumb pattern at Components/Breadcrumbs/breadcrumbs.css:35-40), so
+     the ::before pipe and the .feds-link sit on the same baseline rather
+     than stacking as block-level boxes. */
+  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li.divider,
+  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li.divider {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li.divider::before,
+  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li.divider::before {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 15px;
+    background-color: var(--s2a-color-transparent-white-16);
+  }
+
+  header.global-navigation:not(.is-compact) .global-navigation.dark-font.site-pivot nav.localnav .feds-gnav-items > li.divider::before,
+  header.global-navigation:not(.is-compact).dark-font.site-pivot nav.localnav .feds-gnav-items > li.divider::before {
+    background-color: var(--s2a-color-transparent-black-16);
+  }
+
+  header.global-navigation:not(.is-compact).site-pivot.feds-header-scrolled nav.localnav .feds-gnav-items > li.divider::before,
+  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav.localnav .feds-gnav-items > li.divider::before {
+    background-color: var(--s2a-color-transparent-black-16);
+  }
+}
+
+/* =========================================
+   Small breakpoint (<768px) CTA width
+   =========================================
+   At narrow screens the CTAs inside the expanded localnav bar take the
+   full container width. From 768-1315px they keep their default
+   content-sized width (see the .feds-primary-cta / .feds-secondary-cta
+   rules in the mobile block above). */
+@media (max-width: 768px) {
+  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta,
+  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+    text-align: center;
+  }
+}
+

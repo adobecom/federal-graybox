@@ -3,6 +3,7 @@
  * Contains pure functions and state management for UNAV functionality
  */
 
+import { getMiloConfig } from '../../Utils/Utils';
 import type {
   UserProfile,
   UnavConfig,
@@ -85,6 +86,51 @@ export const [setUserProfile, getUserProfile] = ((): [
 })();
 
 // ============================================================================
+// Component Visibility
+// ============================================================================
+
+/**
+ * Returns true when the `uc_carts` cookie is present, gating the cart icon.
+ */
+export const isCartEnabled = (): boolean => /uc_carts=/.test(document.cookie);
+
+/**
+ * Filters the meta-tag component list down to the entries that UNAV will
+ * actually render, applying the same rules used for the CLS width calc:
+ *
+ *  - `cart` is removed unless the `uc_carts` cookie is set. When the cookie
+ *    is set, `cart` is visible in BOTH signed-in and signed-out states.
+ *  - when signed out, every other icon is replaced by the sign-in CTA except
+ *    the icons in {@link SIGNED_OUT_ICONS} and the `signup` profile-modifier
+ *    flag, which are kept.
+ *
+ * Profile is intentionally NOT in this list: it is always rendered (as the
+ * profile menu when signed-in or as the sign-in CTA when signed-out) and is
+ * added unconditionally by the loader.
+ *
+ * @param unavComponents - Raw component names parsed from the meta tag
+ * @param signedOut - Whether the user is signed out
+ * @returns The filtered list of components that should be rendered
+ */
+export const getVisibleUnavComponents = (
+  unavComponents: string[] | null | undefined,
+  signedOut: boolean
+): string[] => {
+  const list = unavComponents ?? [];
+  const cartFiltered = isCartEnabled()
+    ? list
+    : list.filter((c) => c !== 'cart');
+  if (signedOut) {
+    // Note: `cart` survives this filter when uc_carts is set because the cart
+    // is available in both signed-in and signed-out states.
+    return cartFiltered.filter(
+      (c) => SIGNED_OUT_ICONS.includes(c) || c === 'cart' || c === 'signup'
+    );
+  }
+  return cartFiltered;
+};
+
+// ============================================================================
 // Width Calculation
 // ============================================================================
 
@@ -102,31 +148,35 @@ export function getUnavWidthCSS(
 ): string {
   const iconWidth = 32; // px
   const flexGap = 0.25; // rem
-  const sectionDivider = false; // hardcoded for now
   const sectionDividerMargin = 4; // px (left and right margins)
-  const cartEnabled = /uc_carts=/.test(document.cookie);
 
-  // Filter out cart if not enabled via cookie
-  const components = (!cartEnabled
-    ? unavComponents?.filter((x) => x !== 'cart')
-    : unavComponents) ?? [];
-  const n = components.length ?? 3;
-
-  if (signedOut) {
-    // Calculate width for signed-out state (fewer icons + sign-in button)
-    const l = components
-      .filter((c: string) => SIGNED_OUT_ICONS.includes(c))
-      .length;
-    const signInButton = 92; // px
-    return `calc(${signInButton}px + ${l * iconWidth}px + ${l * flexGap}rem${
-      sectionDivider ? ` + 2px + ${2 * sectionDividerMargin}px + ${flexGap}rem` : ''
-    })`;
+  // Read section divider preference from MiloConfig, gracefully tolerating
+  // the case where the config has not been initialised yet (e.g. in tests).
+  let sectionDivider = false;
+  try {
+    sectionDivider = getMiloConfig()?.unav?.showSectionDivider === true;
+  } catch {
+    sectionDivider = false;
   }
 
-  // Calculate width for signed-in state (all icons)
-  return `calc(${n * iconWidth}px + ${(n - 1) * flexGap}rem${
-    sectionDivider ? ` + 2px + ${2 * sectionDividerMargin}px + ${flexGap}rem` : ''
-  })`;
+  const dividerCss = sectionDivider
+    ? ` + 2px + ${2 * sectionDividerMargin}px + ${flexGap}rem`
+    : '';
+
+  if (signedOut) {
+    // Signed-out: every visible icon contributes one slot (appswitcher, help,
+    // and cart when uc_carts is set). Profile becomes the sign-in CTA whose
+    // width is accounted for separately via SIGN_IN_BUTTON_WIDTH_PX. `signup`
+    // is a profile-modifier flag — not a rendered icon — so it's excluded.
+    const l = getVisibleUnavComponents(unavComponents, true)
+      .filter((c) => c !== 'signup')
+      .length;
+    return `calc(${SIGN_IN_BUTTON_WIDTH_PX}px + ${l * iconWidth}px + ${l * flexGap}rem${dividerCss})`;
+  }
+
+  // Signed-in: every visible component contributes one icon slot
+  const n = getVisibleUnavComponents(unavComponents, false).length;
+  return `calc(${n * iconWidth}px + ${(n - 1) * flexGap}rem${dividerCss})`;
 }
 
 // ============================================================================

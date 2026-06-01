@@ -278,3 +278,27 @@
     row-gap: 14px;
   }
 }
+
+/* =========================================
+   is-compact: mirrors @media (max-width: 1023px) mobile behaviour
+   ========================================= */
+
+header.global-navigation.is-compact .panels {
+  display: block !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+  padding: 22px var(--s2a-spacing-md) 28px;
+}
+
+header.global-navigation.is-compact .panels > li + li {
+  margin-top: 22px;
+}
+
+header.global-navigation.is-compact .list-image-panel {
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "header"
+    "image"
+    "list";
+  row-gap: 14px;
+}

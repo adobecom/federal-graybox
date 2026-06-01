@@ -13,6 +13,16 @@ export const triggerForPopupId = (
   return root.querySelector<HTMLElement>(`[aria-controls="${CSS.escape(id)}"]`);
 };
 
+export const triggersForPopupId = (
+  root: ParentNode,
+  id: string,
+): HTMLElement[] => {
+  if (id === '') return [];
+  return [
+    ...root.querySelectorAll<HTMLElement>(`[aria-controls="${CSS.escape(id)}"]`)
+  ];
+};
+
 const dispatchToggle = (el: HTMLElement, opening: boolean): void => {
   const init = {
     newState: opening ? 'open' : 'closed',
@@ -59,38 +69,48 @@ export const togglePopup = (el: HTMLElement | null | undefined): void => {
 // Click-to-toggle + aria reflection for every popup. Mutual exclusion only
 // applies between mega-menu popups; the hamburger does NOT close them
 // (light-dismiss owns that, matching original popover behaviour).
+// A single popup may have multiple triggers (e.g. in localnav the hamburger
+// and the mega-menu button both point at the same popup via aria-controls).
 export const wirePopups = (mountpoint: HTMLElement): void => {
   const popups = mountpoint
     .querySelectorAll<HTMLElement>(`.feds-popup, #${MENU_WRAPPER_ID}`);
 
   popups.forEach(popup => {
-    const trigger = triggerForPopupId(mountpoint, popup.id);
-    if (trigger === null) return;
+    const triggers = triggersForPopupId(mountpoint, popup.id);
+    if (triggers.length === 0) return;
     const isMenuWrapper = popup.id === MENU_WRAPPER_ID;
 
-    trigger.addEventListener('click', (event) => {
-      event.preventDefault();
-      const willOpen = !isPopupOpen(popup);
-      if (willOpen && !isMenuWrapper) {
-        mountpoint
-          .querySelectorAll<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`)
-          .forEach(other => {
-            if (other !== popup) closePopup(other);
-          });
-      }
-      togglePopup(popup);
+    triggers.forEach(trigger => {
+      trigger.addEventListener('click', (event) => {
+        event.preventDefault();
+        const willOpen = !isPopupOpen(popup);
+        if (willOpen && !isMenuWrapper) {
+          mountpoint
+            .querySelectorAll<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`)
+            .forEach(other => {
+              if (other !== popup) closePopup(other);
+            });
+        }
+        togglePopup(popup);
+      });
     });
 
     popup.addEventListener('toggle', () => {
       const open = isPopupOpen(popup);
-      trigger.setAttribute('aria-expanded', String(open));
-      trigger.setAttribute(
-        'daa-ll',
-        isMenuWrapper
-          ? (open ? 'hamburgermenu|close' : 'hamburgermenu|open')
-          : (open ? 'header|Close' : 'header|Open'),
-      );
-      if (isMenuWrapper && open) popup.classList.add('feds-menu-active');
+      triggers.forEach(trigger => {
+        const isHamburger = trigger.classList.contains('feds-nav-toggle');
+        const isLocalnavBar = trigger.classList.contains('feds-localnav-bar');
+        trigger.setAttribute('aria-expanded', String(open));
+        trigger.setAttribute(
+          'daa-ll',
+          isHamburger
+            ? (open ? 'hamburgermenu|close' : 'hamburgermenu|open')
+            : isLocalnavBar
+              ? (open ? 'localnav-bar|Close' : 'localnav-bar|Open')
+              : (open ? 'header|Close' : 'header|Open'),
+        );
+      });
+      popup.classList.toggle('feds-menu-active');
     });
 
     if (isMenuWrapper) {
@@ -111,8 +131,14 @@ export const initLightDismiss = (mountpoint: HTMLElement): void => {
     const openPopups = mountpoint.querySelectorAll<HTMLElement>(`.${IS_OPEN_CLASS}`);
     if ([...openPopups].some(open => open.contains(target))) return;
     openPopups.forEach(popup => {
-      const trigger = triggerForPopupId(mountpoint, popup.id);
-      if (trigger?.contains(target) === true) return;
+      // A popup can have multiple triggers (e.g. in localnav the hamburger
+      // and the mega-menu inline button both have aria-controls pointing at
+      // the first mega-menu's popup). We must check ALL of them — using only
+      // the first match would mis-classify clicks on the other trigger(s)
+      // as outside-clicks and immediately close the popup the click was
+      // trying to open.
+      const triggers = triggersForPopupId(mountpoint, popup.id);
+      if (triggers.some(trigger => trigger.contains(target))) return;
       closePopup(popup);
     });
   });

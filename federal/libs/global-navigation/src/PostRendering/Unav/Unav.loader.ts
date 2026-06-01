@@ -19,6 +19,7 @@ import type {
 } from './Unav.types';
 import {
   getUnavWidthCSS,
+  getVisibleUnavComponents,
   getVisitorGuid,
   getDevice,
   getUniversalNavLocale,
@@ -131,11 +132,20 @@ export const loadUnav = async (
           component === 'signup'
       );
 
-    // Pre-calculate width for signed-out state to prevent layout shift
-    if (signedOut) {
-      const width = getUnavWidthCSS(unavComponents, signedOut);
-      utilitiesContainer.style.setProperty('min-width', width);
-    }
+    // Apply visibility rules (uc_carts cookie + signed-out icon allowlist)
+    // so the children array we pass to UniversalNav matches what gets rendered
+    // and matches the width reserved for CLS prevention.
+    const visibleComponents = getVisibleUnavComponents(
+      unavComponents,
+      signedOut
+    );
+
+    // Pre-calculate width for BOTH states to prevent layout shift while
+    // UniversalNav boots. For signed-in users the constraint is removed
+    // after init (Step 8) so the profile pill can size to the user's name;
+    // for signed-out users it stays applied to anchor the sign-in CTA layout.
+    const width = getUnavWidthCSS(unavComponents, signedOut);
+    utilitiesContainer.style.setProperty('min-width', width);
 
     // ========================================================================
     // Step 4: Gather analytics and environment data
@@ -196,8 +206,9 @@ export const loadUnav = async (
       // Reset isSignUpRequired flag
       setProfileSignUpRequired(children, false);
 
-      // Process each component from meta tag
-      unavComponents.forEach((component: string) => {
+      // Process each visible component (already filtered for uc_carts cookie
+      // and, when signed-out, restricted to SIGNED_OUT_ICONS + signup modifier)
+      visibleComponents.forEach((component: string) => {
         if (component === 'profile') return; // Already added
 
         if (component === 'signup') {

@@ -1,7 +1,8 @@
 import { getAnalyticsAttrs, sanitize, icons, localizeHref } from "../../Utils/Utils";
+import { breadcrumbs } from "../Breadcrumbs/Render";
 import { gnavCards } from "../GnavCards/Render";
 import { productlist } from "../ProductList/Render";
-import { MegaMenu, MegaMenuContent } from "./Parse";
+import { MegaMenu, MegaMenuContent, MegaMenuExtraData } from "./Parse";
 
 export const megaMenu = ({
   title,
@@ -22,6 +23,7 @@ export const megaMenu = ({
 export const popup = (
   data: MegaMenuContent,
   _popupId: string,
+  extraData?: MegaMenuExtraData,
 ): HTML => {
   const { megaMenuTitle: title } = data;
   const headerContent = `
@@ -47,6 +49,12 @@ export const popup = (
           : ''}
     </div>
   `.trim();
+  const renderedBreadCrumbs: HTML =
+    extraData !== null
+    && extraData !== undefined
+    && extraData.breadcrumbs !== null
+    ? breadcrumbs(extraData.breadcrumbs)
+    : '';
 
   let popupContent: HTML = '';
   switch (data.type) {
@@ -58,5 +66,5 @@ export const popup = (
       break;
     default: data satisfies never;
   }
-  return `${popupHeader}${popupContent}`;
+  return `${renderedBreadCrumbs}${popupHeader}${popupContent}`;
 }

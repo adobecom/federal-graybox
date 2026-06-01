@@ -21,7 +21,7 @@
    ========================================= */
 
 @media (min-width: 1024px) {
-  .feds-popup .feds-gnav-cards {
+  header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards {
     display: flex;
     flex-wrap: nowrap;
     gap: var(--s2a-spacing-xs);
@@ -30,12 +30,12 @@
     padding-top: 0;
   }
 
-  .feds-popup .feds-gnav-cards > li {
+  header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards > li {
     flex: 1 1 0;
     min-width: 0;
   }
 
-  .feds-popup .feds-gnav-cards:has(.promo-card) > li {
+  header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards:has(.promo-card) > li {
     flex: 0 0 auto;
   }
 }

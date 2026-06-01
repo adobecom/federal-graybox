@@ -3,11 +3,13 @@ import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 export type Link = {
   type: 'Link';
   text: string;
+  mobileText?: string;
   href: string;
   daaLl?: string | null;
   ariaLabel?: string;
   ariaAttrs?: Record<string, string>;
   svgIcon?: string;
+  highlight?: boolean;
 };
 
 const ERRORS = {
@@ -26,9 +28,11 @@ export const parseLink = (
   if (anchor.tagName !== 'A')
     throw new IrrecoverableError(ERRORS.notAnchor);
 
-  const [text, ariaLabel] = anchor?.textContent?.split('|').map(s => s.trim()) ?? ['', ''];
-  if (text === '')
+  const [rawText, ariaLabel] = anchor?.textContent?.split('|').map(s => s.trim()) ?? ['', ''];
+  if (rawText === '')
     throw new IrrecoverableError(ERRORS.textContentNotFound)
+
+  const [text, mobileText] = rawText.split('::').map(s => s.trim());
 
   const href = anchor?.getAttribute("href") ?? '';
   if (href === '')
@@ -39,6 +43,7 @@ export const parseLink = (
     {
       type: "Link",
       text,
+      ...(mobileText !== undefined && { mobileText }),
       href,
       daaLl,
       ariaLabel

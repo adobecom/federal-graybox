@@ -363,6 +363,9 @@ describe('UNAV Loader Integration Tests', () => {
       const meta = document.head.querySelector('meta[name="universal-nav"]');
       meta.content = 'profile,appswitcher,notifications,help,jarvis,cart';
 
+      // Enable cart via uc_carts cookie so it is not filtered out
+      document.cookie = 'uc_carts=true';
+
       let capturedConfig;
       window.UniversalNav = (config) => {
         capturedConfig = config;
@@ -373,7 +376,10 @@ describe('UNAV Loader Integration Tests', () => {
       };
 
       await loadUnav(navElement);
-      
+
+      // Clean up cookie so it does not leak into other tests
+      document.cookie = 'uc_carts=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+
       expect(capturedConfig.children.length).to.be.greaterThan(5);
       const names = capturedConfig.children.map(c => c.name);
       expect(names).to.include('profile');

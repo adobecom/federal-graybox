@@ -1300,7 +1300,6 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
   .feds-popup.is-open {
     position: fixed;
   }
-
   .global-navigation nav > ul > li.feds-menu-wrapper {
     position: fixed;
     top: var(--s2a-spacing-64);
@@ -1326,7 +1325,6 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
   .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
     transition: opacity 0.2s ease, visibility 0s linear 0.2s;
   }
-
   .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
     display: flex;
     opacity: 1;
@@ -1389,7 +1387,6 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:last-child {
     transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
   }
-
   /* Mobile gnav-item slide-out / re-enter when subscreen opens / closes.
      The popup-interior animations live in a separate rule below because the
      popup is no longer a descendant of .feds-gnav-items (we reparent it to

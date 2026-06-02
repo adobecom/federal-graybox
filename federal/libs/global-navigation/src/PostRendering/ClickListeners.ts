@@ -291,6 +291,7 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
           }, 900);
         }
         updateExpanded();
+        articleTitle.setAttribute('daa-ll', article.classList.contains('closed') ? 'Open' : 'Close');
       };
 
       articleTitle.addEventListener('click', toggle);

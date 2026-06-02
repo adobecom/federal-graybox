@@ -244,7 +244,6 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
     .forEach(article => {
       const articleTitle = article.querySelector<HTMLElement>('div.links-card-title-container');
       if (articleTitle === null) return;
-
       // The title-container acts as a collapse/expand toggle on mobile only
       // (the chevron is hidden and the click handler short-circuits on
       // desktop). To make it keyboard-reachable we expose it as a button

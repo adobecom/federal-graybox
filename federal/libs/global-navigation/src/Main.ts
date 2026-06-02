@@ -167,9 +167,9 @@ export const renderGnavString = ({
   // (a thin clickable strip below the main nav row that expands inline to
   // reveal the remaining mega-menu entries). Its label mirrors the last
   // breadcrumb crumb so it reads as the current section.
-  const localnavBarLabel = localnav && breadcrumbs !== null && breadcrumbs.items.length > 0
-    ? breadcrumbs.items[breadcrumbs.items.length - 1].text
-    : '';
+  const localnavBarLabel = localnav && breadcrumbs !== null &&
+    breadcrumbs.items.length > 0 ?
+    breadcrumbs.items[breadcrumbs.items.length - 1].text : '';
   return `
 <nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
@@ -468,7 +468,8 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
     const itemsWidth = gnavItems?.offsetWidth ?? 0;
     const utilitiesWidth = utilities?.offsetWidth ?? 0;
     const ctaWidth = productCta?.offsetWidth ?? 0;
-    const contentWidth = brandWidth + itemsWidth + utilitiesWidth + ctaWidth + 40;
+    const contentWidth = brandWidth + itemsWidth +
+      utilitiesWidth + ctaWidth + 40;
 
     header.classList.toggle('is-compact', contentWidth > header.clientWidth);
   };
@@ -506,6 +507,7 @@ const findActiveLink = (
  * normally (so in-page anchor jumps still work) while still closing the
  * localnav.
  */
+// eslint-disable-next-line max-len
 const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => {
   const localnav = mountpoint.querySelector('nav.localnav');
   if (localnav === null) return;

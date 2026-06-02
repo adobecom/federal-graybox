@@ -1575,8 +1575,10 @@ header.global-navigation.is-compact:has(.mega-menu.small-menu[aria-haspopup='tru
   margin-bottom: 0;
 }
 
-header.global-navigation.is-compact:has(.mega-menu.small-menu[aria-haspopup='true']) .feds-popup .links-card {
-  margin-bottom: var(--s2a-spacing-sm);
+header.global-navigation.is-compact:has(.mega-menu.small-menu[aria-haspopup='true']) .feds-popup {
+  .links-card, .featured-card {
+    margin-bottom: var(--s2a-spacing-sm);
+  }
 }
 
 /* Popup positioning (mirrors lines 972-981) */

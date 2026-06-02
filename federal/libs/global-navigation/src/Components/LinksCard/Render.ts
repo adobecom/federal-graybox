@@ -14,7 +14,7 @@ const renderCard = ({
 }: LinksCardItem): HTML => `
   <article class="links-card" ${getAnalyticsAttrs(title, '')}>
     <div>
-      <div class="links-card-title-container">
+      <div class="links-card-title-container" daa-ll="Close">
         <h2 id="links-card-${sanitize(title)}" class="links-card-title" role="heading" aria-level="2">${title}</h2>
         <span class="links-card-chevron" aria-hidden="true">${icons.chevronDown}</span>
       </div>

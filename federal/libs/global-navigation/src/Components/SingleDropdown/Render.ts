@@ -15,7 +15,7 @@ export const singleDropdown = (
   >
     ${title}${icons.chevronDown}
   </button>
-  <div id="single-dropdown-${sanitize(title)}" class="feds-popup single-dropdown-popup">
+  <div id="single-dropdown-${sanitize(title)}" class="feds-popup single-dropdown-popup" daa-lh="${title}">
   </div>
 `.trim();
 

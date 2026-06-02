@@ -16,7 +16,7 @@ export const megaMenu = ({
   >
     ${title}${icons.chevronDown}
   </button>
-  <div id="${sanitize(title)}" class="feds-popup">
+  <div id="${sanitize(title)}" class="feds-popup" daa-lh="${title}">
   </div>
 `;
 

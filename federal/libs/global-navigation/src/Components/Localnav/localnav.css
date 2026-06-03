@@ -52,16 +52,16 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
 
      The product entry CTA renders outside .feds-gnav-items (direct child of
      <nav>) and is intentionally untouched. */
-  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li:first-child > .feds-link {
+  .global-navigation nav.localnav .feds-gnav-items > li:first-child > .feds-link {
     display: none;
   }
 
-  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta,
-  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
+  .global-navigation nav.localnav .feds-gnav-items > li > .feds-primary-cta,
+  .global-navigation nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
     margin: 0;
   }
 
-  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta {
+  .global-navigation nav.localnav .feds-gnav-items > li > .feds-primary-cta {
     background-color: #3b63fb;
     color: var(--s2a-color-button-content-primary-solid-default);
     border: none;
@@ -312,7 +312,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
      occupies that visual slot and uses the last crumb's text as its label.
      (The non-localnav-mobile equivalent of this rule lives in
      Components/Breadcrumbs/breadcrumbs.css at the 1023px mobile breakpoint.) */
-  header.global-navigation.site-pivot nav.localnav > .feds-breadcrumbs {
+  header.global-navigation nav.localnav > .feds-breadcrumbs {
     display: none;
   }
 }
@@ -321,16 +321,16 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
    is-compact: mirrors @media (max-width: 1023px) localnav mobile behaviour
    ========================================= */
 
-header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li:first-child > .feds-link {
+header.global-navigation.is-compact nav.localnav .feds-gnav-items > li:first-child > .feds-link {
   display: none;
 }
 
-header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta,
-header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
+header.global-navigation.is-compact nav.localnav .feds-gnav-items > li > .feds-primary-cta,
+header.global-navigation.is-compact nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
   margin: 0;
 }
 
-header.global-navigation.is-compact.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta {
+header.global-navigation.is-compact nav.localnav .feds-gnav-items > li > .feds-primary-cta {
   background-color: #3b63fb;
   color: var(--s2a-color-button-content-primary-solid-default);
   border: none;
@@ -487,7 +487,7 @@ header.global-navigation.is-compact nav.localnav:has(.feds-menu-wrapper.is-open)
   display: none;
 }
 
-header.global-navigation.is-compact.site-pivot nav.localnav > .feds-breadcrumbs {
+header.global-navigation.is-compact nav.localnav > .feds-breadcrumbs {
   display: none;
 }
 
@@ -513,14 +513,12 @@ header.global-navigation.is-compact.site-pivot nav.localnav > .feds-breadcrumbs 
      breadcrumb pattern at Components/Breadcrumbs/breadcrumbs.css:35-40), so
      the ::before pipe and the .feds-link sit on the same baseline rather
      than stacking as block-level boxes. */
-  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li.divider,
-  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li.divider {
+  header.global-navigation:not(.is-compact) nav.localnav .feds-gnav-items > li.divider {
     display: inline-flex;
     align-items: center;
   }
 
-  header.global-navigation:not(.is-compact) .global-navigation.site-pivot nav.localnav .feds-gnav-items > li.divider::before,
-  header.global-navigation:not(.is-compact).site-pivot nav.localnav .feds-gnav-items > li.divider::before {
+  header.global-navigation:not(.is-compact) nav.localnav .feds-gnav-items > li.divider::before {
     content: '';
     display: inline-block;
     width: 1px;
@@ -528,13 +526,12 @@ header.global-navigation.is-compact.site-pivot nav.localnav > .feds-breadcrumbs 
     background-color: var(--s2a-color-transparent-white-16);
   }
 
-  header.global-navigation:not(.is-compact) .global-navigation.dark-font.site-pivot nav.localnav .feds-gnav-items > li.divider::before,
-  header.global-navigation:not(.is-compact).dark-font.site-pivot nav.localnav .feds-gnav-items > li.divider::before {
+  header.global-navigation:not(.is-compact).dark-font nav.localnav .feds-gnav-items > li.divider::before {
     background-color: var(--s2a-color-transparent-black-16);
   }
 
-  header.global-navigation:not(.is-compact).site-pivot.feds-header-scrolled nav.localnav .feds-gnav-items > li.divider::before,
-  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav.localnav .feds-gnav-items > li.divider::before {
+  header.global-navigation:not(.is-compact).feds-header-scrolled nav.localnav .feds-gnav-items > li.divider::before,
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav.localnav .feds-gnav-items > li.divider::before {
     background-color: var(--s2a-color-transparent-black-16);
   }
 }
@@ -547,8 +544,8 @@ header.global-navigation.is-compact.site-pivot nav.localnav > .feds-breadcrumbs 
    content-sized width (see the .feds-primary-cta / .feds-secondary-cta
    rules in the mobile block above). */
 @media (max-width: 768px) {
-  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-primary-cta,
-  .global-navigation.site-pivot nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
+  .global-navigation nav.localnav .feds-gnav-items > li > .feds-primary-cta,
+  .global-navigation nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
     width: 100%;
     box-sizing: border-box;
     justify-content: center;

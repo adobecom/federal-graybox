@@ -124,30 +124,30 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
   inset: 0;
 }
 
-.global-navigation.site-pivot .universal-nav-container .profile-signed-out button {
+.global-navigation .universal-nav-container .profile-signed-out button {
   color: var(--s2a-color-gray-1000);
   border: 1px solid var(--s2a-color-gray-25);
   background-color: var(--s2a-color-gray-25);
 }
 
-.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .universal-nav-container .profile-signed-out button,
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .universal-nav-container .profile-signed-out button,
 .global-navigation.dark-font .universal-nav-container .profile-signed-out button {
   color: inherit;
   border-color: var(--s2a-color-gray-1000);
   background-color: transparent;
 }
 
-.global-navigation.site-pivot.feds-header-scrolled .universal-nav-container .profile-signed-out button:hover,
-.global-navigation.site-pivot.feds-header-scrolled .universal-nav-container .profile-signed-out button:focus-visible {
+.global-navigation.feds-header-scrolled .universal-nav-container .profile-signed-out button:hover,
+.global-navigation.feds-header-scrolled .universal-nav-container .profile-signed-out button:focus-visible {
   color: inherit;
   background-color: var(--s2a-color-gray-25);
 }
 
-.global-navigation.site-pivot .universal-nav-container #universal-nav {
+.global-navigation .universal-nav-container #universal-nav {
   justify-content: flex-end;
 }
 
-.global-navigation.site-pivot .feds-utilities {
+.global-navigation .feds-utilities {
   margin-left: auto;
   padding-right: var(--s2a-spacing-md);
 }
@@ -156,7 +156,7 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
    Product Entry CTA
    ========================================= */
 
-.global-navigation.site-pivot .feds-product-entry-cta {
+.global-navigation .feds-product-entry-cta {
   display: flex;
   align-items: center;
   margin-left: auto;
@@ -165,30 +165,30 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
   }
 }
 
-[dir="rtl"] .global-navigation.site-pivot .feds-product-entry-cta {
+[dir="rtl"] .global-navigation .feds-product-entry-cta {
   margin-left: 0;
   margin-right: auto;
 }
 
-[dir="rtl"] .global-navigation.site-pivot .feds-product-entry-cta + .feds-utilities {
+[dir="rtl"] .global-navigation .feds-product-entry-cta + .feds-utilities {
   padding-right: 0;
   padding-left: var(--s2a-spacing-md);
   margin-left: 0;
 }
 
-.global-navigation.site-pivot .feds-product-entry-cta + .feds-utilities {
+.global-navigation .feds-product-entry-cta + .feds-utilities {
   margin-left: 0;
 }
 
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta {
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta {
   margin-left: var(--s2a-spacing-sm);
 }
 
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta,
-.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta,
-.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation .feds-product-entry-cta .feds-primary-cta,
+.global-navigation .feds-product-entry-cta .feds-secondary-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -209,22 +209,22 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
 /* Default (transparent gnav over imagery):
    - primary: filled white pill with dark text
    - secondary: outlined in white, transparent fill */
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
-.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta {
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation .feds-product-entry-cta .feds-primary-cta {
   background-color: var(--s2a-color-gray-25);
   color: var(--s2a-color-gray-1000);
   border-color: var(--s2a-color-gray-25);
 }
 
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta,
-.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta {
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation .feds-product-entry-cta .feds-secondary-cta {
   background-color: transparent;
   color: var(--s2a-color-gray-25);
   border-color: var(--s2a-color-gray-25);
 }
 
-.global-navigation.site-pivot.dark-font ul.feds-gnav-items > li > .feds-secondary-cta,
-.global-navigation.site-pivot.dark-font .feds-product-entry-cta .feds-secondary-cta {
+.global-navigation.dark-font ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.dark-font .feds-product-entry-cta .feds-secondary-cta {
    border-color: var(--s2a-color-gray-1000);
    color: var(--s2a-color-gray-1000);
 }
@@ -232,15 +232,15 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
 /* Scrolled (blurred whitish backdrop):
    - primary: filled dark pill with white text (inverse of default)
    - secondary: outlined in dark, transparent fill (matches popup secondary) */
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta,
-.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
   background-color: var(--s2a-color-gray-1000);
   color: var(--s2a-color-gray-25);
   border-color: var(--s2a-color-gray-1000);
 }
 
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta,
-.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-secondary-cta {
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-secondary-cta {
   color: var(--s2a-color-gray-1000);
   border-color: var(--s2a-color-gray-1000);
 }
@@ -248,8 +248,8 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
 /* Open popup / mobile drawer state: gnav gets a light/grey backdrop, so
    force the dark-outline treatment regardless of scroll state, mirroring
    the unav profile button at styles.css:109-113. */
-.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-primary-cta,
-.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-secondary-cta {
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-primary-cta,
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-secondary-cta {
   background-color: transparent;
   color: var(--s2a-color-gray-1000);
   border-color: var(--s2a-color-gray-1000);
@@ -259,35 +259,35 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
    is white (over a transparent gnav), so on hover we darken the text as
    well so it remains legible against the hover fill. The primary
    CTA already resolves to white text on hover in both states. */
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-secondary-cta:hover,
-.global-navigation.site-pivot .feds-product-entry-cta .feds-secondary-cta:hover {
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta:hover,
+.global-navigation .feds-product-entry-cta .feds-secondary-cta:hover {
   background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
   color: var(--s2a-color-gray-1000);
 }
 
-.global-navigation.site-pivot ul.feds-gnav-items > li > .feds-primary-cta:hover,
-.global-navigation.site-pivot .feds-product-entry-cta .feds-primary-cta:hover {
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta:hover,
+.global-navigation .feds-product-entry-cta .feds-primary-cta:hover {
   background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
   color: var(--s2a-color-gray-25);
   border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
 }
 
-.global-navigation.site-pivot.feds-header-scrolled ul.feds-gnav-items > li > .feds-primary-cta:hover,
-.global-navigation.site-pivot.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta:hover {
+.global-navigation.feds-header-scrolled ul.feds-gnav-items > li > .feds-primary-cta:hover,
+.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta:hover {
   background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
   color: var(--s2a-color-gray-25);
   border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
 }
 
-.global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
+.global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
 }
 
 /* Scrolled OR any popup/drawer open → backdrop is light/gray, so
    flip the pipe to the black-alpha equivalent for visibility (same
    state split as breadcrumbs.css). */
-.global-navigation.site-pivot.feds-header-scrolled .feds-gnav-items > li:first-child + li::before,
-.global-navigation.site-pivot:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-gnav-items > li:first-child + li::before {
+.global-navigation.feds-header-scrolled .feds-gnav-items > li:first-child + li::before,
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-gnav-items > li:first-child + li::before {
   background-color: var(--s2a-color-transparent-black-16);
 }
 
@@ -295,7 +295,7 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
    Navigation Bar
    ========================================= */
 
-.global-navigation.site-pivot nav {
+.global-navigation nav {
   display: flex;
   align-items: center;
   height: var(--s2a-spacing-64);
@@ -402,7 +402,7 @@ header.global-navigation.feds-header-scrolled nav::after {
   align-items: center;
 }
 
-.global-navigation.site-pivot ul {
+.global-navigation ul {
   list-style: none;
   margin: 0;
 }
@@ -429,7 +429,7 @@ header.global-navigation.feds-header-scrolled nav::after {
 }
 
 @media (min-width: 1024px) {
-  header.global-navigation.site-pivot:not(.is-compact) ul.feds-gnav-items {
+  header.global-navigation:not(.is-compact) ul.feds-gnav-items {
     display: flex;
     gap: var(--s2a-spacing-lg);
     & > li > .feds-link {
@@ -437,7 +437,7 @@ header.global-navigation.feds-header-scrolled nav::after {
     }
   }
 
-  header.global-navigation.site-pivot:not(.is-compact):has(.feds-popup.is-open) ul.feds-gnav-items > li .feds-link {
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open) ul.feds-gnav-items > li .feds-link {
     padding: 0;
   }
 }
@@ -463,7 +463,7 @@ header.global-navigation.feds-header-scrolled nav::after {
    menu-wrapper's contents are still animating out (max-height collapse in
    localnav, opacity fade in the off-canvas drawer). Without this the items
    would snap back to the small body-sm font mid-close. */
-.global-navigation.site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open, .feds-menu-wrapper.feds-menu-active) .feds-gnav-items > li > .feds-link {
+.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open, .feds-menu-wrapper.feds-menu-active) .feds-gnav-items > li > .feds-link {
   color: var(--s2a-color-gray-1000);
   font-size: var(--s2a-typography-font-size-heading-2);
   line-height: var(--s2a-typography-line-height-heading-2);
@@ -471,11 +471,11 @@ header.global-navigation.feds-header-scrolled nav::after {
   padding: var(--s2a-spacing-xs) 0;
 }
 
-.global-navigation.site-pivot:not(.dark-font):has(.feds-popup.is-open.small-menu) .feds-gnav-items>li>.feds-link {
+.global-navigation:not(.dark-font):has(.feds-popup.is-open.small-menu) .feds-gnav-items>li>.feds-link {
   color: var(--s2a-color-gray-25);
 }
 
-.global-navigation.site-pivot.feds-header-scrolled:has(.feds-popup.is-open.small-menu) .feds-gnav-items>li>.feds-link {
+.global-navigation.feds-header-scrolled:has(.feds-popup.is-open.small-menu) .feds-gnav-items>li>.feds-link {
   color: var(--s2a-color-gray-1000);
 }
 
@@ -875,13 +875,13 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     transition: unset;
   }
 
-  header.global-navigation:not(.is-compact).site-pivot nav {
+  header.global-navigation:not(.is-compact) nav {
     display: flex;
     align-items: center;
     justify-content: flex-start;
   }
 
-  [dir="rtl"] header.global-navigation:not(.is-compact).site-pivot nav .feds-gnav-items {
+  [dir="rtl"] header.global-navigation:not(.is-compact) nav .feds-gnav-items {
     padding-right: 0;
   }
 
@@ -898,10 +898,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     }
   }
 
-  header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .feds-link {
+  header.global-navigation:not(.is-compact) .feds-gnav-items > li > .feds-link {
     letter-spacing: var(--s2a-typography-letter-spacing-label);
   }
-  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link {
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link {
     opacity: 60%;
     font-weight: var(--s2a-font-weight-adobe-clean-bold);
     font-size: var(--s2a-typography-font-size-label);
@@ -910,32 +910,32 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     padding: var(--s2a-spacing-sm);
   }
 
-  header.global-navigation:not(.is-compact).site-pivot:not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) .feds-gnav-items:has(.feds-link:hover) > li > .feds-link:not(:hover) {
+  header.global-navigation:not(.is-compact):not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) .feds-gnav-items:has(.feds-link:hover) > li > .feds-link:not(:hover) {
     opacity: 0.65;
   }
 
-  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link[aria-expanded="true"],
-  header.global-navigation:not(.is-compact).site-pivot:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link:hover {
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link[aria-expanded="true"],
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-gnav-items > li > .feds-link:hover {
     opacity: 1;
   }
 
-  header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
+  header.global-navigation:not(.is-compact) .feds-gnav-items > li > .mega-menu.feds-link {
     position: relative;
   }
 
-  [dir="rtl"] header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+  [dir="rtl"] header.global-navigation:not(.is-compact) .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
     margin-left: 0;
     margin-right: 6px;
   }
 
-  header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+  header.global-navigation:not(.is-compact) .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
     margin-top: 3px;
     margin-left: 6px;
     flex-shrink: 0;
     transition: transform 0.15s ease;
   }
 
-  header.global-navigation:not(.is-compact).site-pivot .feds-gnav-items > li > .mega-menu.feds-link[aria-expanded="true"] .chevron-down {
+  header.global-navigation:not(.is-compact) .feds-gnav-items > li > .mega-menu.feds-link[aria-expanded="true"] .chevron-down {
     transform: rotate(180deg);
   }
 
@@ -974,31 +974,31 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
    ========================================= */
 
 @media (max-width: 1023px) {
-  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link {
+  .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
     width: 100%;
     justify-content: space-between;
     text-align: left;
   }
 
-  .global-navigation.site-pivot .feds-gnav-items > li > .feds-link {
+  .global-navigation .feds-gnav-items > li > .feds-link {
     font-family: var(--feds-heading-font-family);
     font-weight: var(--s2a-font-weight-adobe-clean-black);
   }
 
-  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+  .global-navigation .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
     order: 2;
     margin-left: var(--s2a-spacing-xs);
     flex-shrink: 0;
     transform: rotate(-90deg) scale(2.5);
   }
 
-  [dir="rtl"] .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+  [dir="rtl"] .global-navigation .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
     margin-left: 0;
     margin-right: var(--s2a-spacing-xs);
     transform: rotate(90deg) scale(2.5);
   }
 
-  .global-navigation.site-pivot .feds-gnav-items > li > .mega-menu.feds-link .chevron-down path {
+  .global-navigation .feds-gnav-items > li > .mega-menu.feds-link .chevron-down path {
     stroke-width: 0.5;
   }
 
@@ -1526,7 +1526,7 @@ header.global-navigation.is-compact .feds-link__desktop-text { display: none; }
 header.global-navigation.is-compact .feds-link__mobile-text { display: inline; }
 
 /* Hide product entry CTA (mirrors line 162-164) */
-header.global-navigation.is-compact.site-pivot .feds-product-entry-cta {
+header.global-navigation.is-compact .feds-product-entry-cta {
   display: none;
 }
 

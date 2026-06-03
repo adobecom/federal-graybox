@@ -13,7 +13,7 @@ import { IS_OPEN_CLASS } from '../../../src/PostRendering/PopupWiring';
  */
 function buildLocalnavGnav() {
   const gnav = document.createElement('div');
-  gnav.className = 'global-navigation site-pivot';
+  gnav.className = 'global-navigation';
   gnav.innerHTML = `
     <nav class="localnav">
       <ul>
@@ -103,7 +103,7 @@ describe('Gnav keyboard init', () => {
 
   it('returns a cleanup function', () => {
     gnav = document.createElement('nav');
-    gnav.className = 'global-navigation site-pivot';
+    gnav.className = 'global-navigation';
     gnav.innerHTML = `
       <ul>
         <li><a href="#" class="feds-link">Link 1</a></li>
@@ -117,7 +117,7 @@ describe('Gnav keyboard init', () => {
 
   it('navigates top bar with ArrowLeft/ArrowRight', () => {
     gnav = document.createElement('nav');
-    gnav.className = 'global-navigation site-pivot';
+    gnav.className = 'global-navigation';
     gnav.innerHTML = `
       <ul class="feds-gnav-items">
         <li><a href="#" class="feds-link" id="l1">L1</a></li>
@@ -144,7 +144,7 @@ describe('Gnav keyboard init', () => {
 
   it('cleanup removes listener', () => {
     gnav = document.createElement('nav');
-    gnav.className = 'global-navigation site-pivot';
+    gnav.className = 'global-navigation';
     gnav.innerHTML = `
       <ul class="feds-gnav-items">
         <li><a href="#" class="feds-link" id="a">A</a></li>
@@ -186,7 +186,7 @@ describe('Gnav keyboard init', () => {
     it('does NOT trap when not localnav (no nav.localnav present)', () => {
       forceMobile();
       gnav = document.createElement('div');
-      gnav.className = 'global-navigation site-pivot';
+      gnav.className = 'global-navigation';
       gnav.innerHTML = `
         <nav>
           <ul class="feds-gnav-items">

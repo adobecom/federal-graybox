@@ -80,7 +80,7 @@ ul.tabs .product-links {
     display: block;
   }
 
-  header.global-navigation.site-pivot:not(.is-compact):has(.feds-popup.is-open) ul.feds-gnav-items > li .product-links .feds-link {
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open) ul.feds-gnav-items > li .product-links .feds-link {
     font-family: var(--feds-font-family);
     padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
   }

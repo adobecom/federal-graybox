@@ -1407,6 +1407,11 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
       & > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.05s; }
       & > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.075s; }
       & > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.1s; }
+      & > li:nth-child(6) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.125s; }
+      & > li:nth-child(7) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.15s; }
+      & > li:nth-child(8) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.175s; }
+      & > li:nth-child(9) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.2s; }
+      & > li:nth-child(10) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.225s; }
     }
     /* close subscreen */
     &.subscreen-closing {
@@ -1420,6 +1425,11 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
       & > li:nth-child(3) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.30s; }
       & > li:nth-child(4) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.33s; }
       & > li:nth-child(5) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.36s; }
+      & > li:nth-child(6) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.39s; }
+      & > li:nth-child(7) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.42s; }
+      & > li:nth-child(8) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.45s; }
+      & > li:nth-child(9) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.48s; }
+      & > li:nth-child(10) > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) { animation-delay: 0.51s; }
     }
   }
 

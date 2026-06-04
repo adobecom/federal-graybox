@@ -120,7 +120,6 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
-  mountpoint.classList.add('site-pivot');
   if (data.darkFont) mountpoint.classList.add('dark-font');
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
@@ -263,6 +262,7 @@ export const postRenderingTasks = async (
   const activeLink = findActiveLink(input.mountpoint);
   const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
   activeDropDown?.classList.add('active-element');
+  initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
@@ -411,23 +411,25 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
     }
   };
 
-  // A 20px sentinel placed at the top of the document body. When it scrolls
-  // out of the viewport the page has passed the threshold.
-  const sentinel = document.createElement("div");
-  sentinel.style.cssText = "position:absolute;top:20px;height:1px;width:1px;pointer-events:none;visibility:hidden;";
-  sentinel.setAttribute("aria-hidden", "true");
-  sentinel.setAttribute("tabindex", "-1");
-  document.body.prepend(sentinel);
+  const SCROLL_THRESHOLD = 20;
+  let scrolledPast = window.scrollY > SCROLL_THRESHOLD;
+  let scrollRafId: number | null = null;
 
-  let scrolledPast = false;
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      scrolledPast = !entry.isIntersecting;
+  // Set the initial state synchronously before the first paint.
+  updateHeaderState(scrolledPast);
+
+  const onScroll = (): void => {
+    if (scrollRafId !== null) return;
+    scrollRafId = requestAnimationFrame(() => {
+      scrollRafId = null;
+      const next = window.scrollY > SCROLL_THRESHOLD;
+      if (next === scrolledPast) return;
+      scrolledPast = next;
       updateHeaderState(scrolledPast);
-    },
-    { threshold: 0 }
-  );
-  observer.observe(sentinel);
+    });
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
 
   menuWrapper?.addEventListener("toggle", () =>
     updateHeaderState(scrolledPast, true)
@@ -493,6 +495,24 @@ const findActiveLink = (
   return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
     .filter(a => !a.closest('.feds-breadcrumbs'))
     .find(a => isCurrentPageHref(a.href)) ?? null;
+};
+
+/**
+ * Sets a `--i` CSS custom property on each top-level `<li>` inside every
+ * `ul.feds-gnav-items`, indexed from 0. This drives the staggered
+ * open/close animations in `styles.css` via
+ * `animation-delay: calc(var(--i) * ...)`, removing the need for a
+ * hand-maintained `nth-child` table that must be extended every time the
+ * menu grows.
+ */
+const initGnavItemsStaggerIndex = (mountpoint: HTMLElement): void => {
+  const lists = mountpoint.querySelectorAll<HTMLUListElement>('ul.feds-gnav-items');
+  lists.forEach(list => {
+    const items = list.querySelectorAll<HTMLLIElement>(':scope > li');
+    items.forEach((li, index) => {
+      li.style.setProperty('--i', String(index));
+    });
+  });
 };
 
 /**

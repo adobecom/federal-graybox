@@ -498,18 +498,6 @@ const findActiveLink = (
 };
 
 /**
- * In localnav mode, clicking a TOP-LEVEL localnav link whose href points to
- * the current page (the very same URL, with optional ?query) is redundant —
- * the page is already loaded. Instead of triggering a no-op navigation, we
- * suppress the default and close the localnav so the user sees the page
- * they're already on. Scope is strictly limited to
- * `nav.localnav ul.feds-gnav-items > li > a`; nested links (mega-menu
- * popups, links-card, CTAs, breadcrumbs, etc.) are left untouched and
- * continue to navigate normally. Hash-only same-page links also navigate
- * normally (so in-page anchor jumps still work) while still closing the
- * localnav.
- */
-/**
  * Sets a `--i` CSS custom property on each top-level `<li>` inside every
  * `ul.feds-gnav-items`, indexed from 0. This drives the staggered
  * open/close animations in `styles.css` via
@@ -527,6 +515,18 @@ const initGnavItemsStaggerIndex = (mountpoint: HTMLElement): void => {
   });
 };
 
+/**
+ * In localnav mode, clicking a TOP-LEVEL localnav link whose href points to
+ * the current page (the very same URL, with optional ?query) is redundant —
+ * the page is already loaded. Instead of triggering a no-op navigation, we
+ * suppress the default and close the localnav so the user sees the page
+ * they're already on. Scope is strictly limited to
+ * `nav.localnav ul.feds-gnav-items > li > a`; nested links (mega-menu
+ * popups, links-card, CTAs, breadcrumbs, etc.) are left untouched and
+ * continue to navigate normally. Hash-only same-page links also navigate
+ * normally (so in-page anchor jumps still work) while still closing the
+ * localnav.
+ */
 // eslint-disable-next-line max-len
 const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => {
   const localnav = mountpoint.querySelector('nav.localnav');

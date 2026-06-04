@@ -411,23 +411,25 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
     }
   };
 
-  // A 20px sentinel placed at the top of the document body. When it scrolls
-  // out of the viewport the page has passed the threshold.
-  const sentinel = document.createElement("div");
-  sentinel.style.cssText = "position:absolute;top:20px;height:1px;width:1px;pointer-events:none;visibility:hidden;";
-  sentinel.setAttribute("aria-hidden", "true");
-  sentinel.setAttribute("tabindex", "-1");
-  document.body.prepend(sentinel);
+  const SCROLL_THRESHOLD = 20;
+  let scrolledPast = window.scrollY > SCROLL_THRESHOLD;
+  let scrollRafId: number | null = null;
 
-  let scrolledPast = false;
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      scrolledPast = !entry.isIntersecting;
+  // Set the initial state synchronously before the first paint.
+  updateHeaderState(scrolledPast);
+
+  const onScroll = (): void => {
+    if (scrollRafId !== null) return;
+    scrollRafId = requestAnimationFrame(() => {
+      scrollRafId = null;
+      const next = window.scrollY > SCROLL_THRESHOLD;
+      if (next === scrolledPast) return;
+      scrolledPast = next;
       updateHeaderState(scrolledPast);
-    },
-    { threshold: 0 }
-  );
-  observer.observe(sentinel);
+    });
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
 
   menuWrapper?.addEventListener("toggle", () =>
     updateHeaderState(scrolledPast, true)

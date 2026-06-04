@@ -262,6 +262,7 @@ export const postRenderingTasks = async (
   const activeLink = findActiveLink(input.mountpoint);
   const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
   activeDropDown?.classList.add('active-element');
+  initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
@@ -506,6 +507,24 @@ const findActiveLink = (
  * normally (so in-page anchor jumps still work) while still closing the
  * localnav.
  */
+/**
+ * Sets a `--i` CSS custom property on each top-level `<li>` inside every
+ * `ul.feds-gnav-items`, indexed from 0. This drives the staggered
+ * open/close animations in `styles.css` via
+ * `animation-delay: calc(var(--i) * ...)`, removing the need for a
+ * hand-maintained `nth-child` table that must be extended every time the
+ * menu grows.
+ */
+const initGnavItemsStaggerIndex = (mountpoint: HTMLElement): void => {
+  const lists = mountpoint.querySelectorAll<HTMLUListElement>('ul.feds-gnav-items');
+  lists.forEach(list => {
+    const items = list.querySelectorAll<HTMLLIElement>(':scope > li');
+    items.forEach((li, index) => {
+      li.style.setProperty('--i', String(index));
+    });
+  });
+};
+
 // eslint-disable-next-line max-len
 const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => {
   const localnav = mountpoint.querySelector('nav.localnav');

@@ -32,8 +32,7 @@ const productCardHeader = ({
 };
 
 const productCardLink = ({
-  iconHref,
-  iconAlt: _,
+  icons,
   title,
   href,
   subtitle,
@@ -41,18 +40,24 @@ const productCardLink = ({
   daaLl,
   daaLh
 }: ProductCardLink): HTML => {
-  const hasIcon = iconHref !== null;
   const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? title);
-  const icon = !hasIcon
+  const visibleIcons = icons.filter(
+    ({ iconHref }) => iconHref !== null && iconHref !== ""
+  );
+  const iconsMarkup = visibleIcons.length === 0
     ? ""
     : `
-      <picture class="feds-product-card__icon">
-        <img
-          loading="lazy"
-          src="${federateUrl(iconHref)}"
-          class="feds-product-card__icon-img"
-        >
-      </picture>
+      <div class="feds-product-card__icons">
+        ${visibleIcons.map(({ iconHref }) => `
+          <picture class="feds-product-card__icon">
+            <img
+              loading="lazy"
+              src="${federateUrl(iconHref as string)}"
+              class="feds-product-card__icon-img"
+            >
+          </picture>
+        `).join("")}
+      </div>
     `;
   const badgesMarkup = badges.length === 0
     ? ""
@@ -72,7 +77,7 @@ const productCardLink = ({
   return `
     <a class="feds-product-card" href="${localizeHref(href)}"${analyticsAttrs}>
       <div class="feds-product-card-header">
-        ${icon}
+        ${iconsMarkup}
         ${badgesMarkup}
       </div>
       <div class="feds-product-card__content">

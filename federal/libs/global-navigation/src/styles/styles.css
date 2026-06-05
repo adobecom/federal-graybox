@@ -692,6 +692,13 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   color: var(--s2a-color-gray-25);
 }
 
+.feds-popup .feds-product-card__icons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--s2a-spacing-2xs);
+}
+
 .feds-popup .feds-product-card__icon {
   display: block;
   width: var(--s2a-spacing-lg);

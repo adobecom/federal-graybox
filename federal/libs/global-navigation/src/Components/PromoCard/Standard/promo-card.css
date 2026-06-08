@@ -40,6 +40,15 @@
   height: var(--s2a-spacing-lg);
 }
 
+[dir="rtl"] {
+  .feds-gnav-cards .promo-card__icon {
+    right: var(--s2a-spacing-md);
+  }
+  .feds-gnav-cards .promo-card__text-content {
+    right: 0;
+  }
+}
+
 .feds-gnav-cards .promo-card__text-content {
   position: absolute;
   bottom: 0;

@@ -25,8 +25,8 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 
 .feds-brand {
   align-items: center;
-  outline-offset: var(--s2a-spacing-2xs);
-  padding: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
+  outline-offset: var(--s2a-spacing-sm);
+  margin: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
   column-gap: 10px;
 }
 

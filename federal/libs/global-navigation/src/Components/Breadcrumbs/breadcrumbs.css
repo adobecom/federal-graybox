@@ -32,6 +32,10 @@
   border-top: var(--s2a-border-width-sm) solid rgba(255, 255, 255, 0.24);
 }
 
+[dir="rtl"] .global-navigation .feds-breadcrumbs {
+  padding-right: var(--s2a-spacing-md);
+}
+
 .global-navigation.dark-font .feds-breadcrumbs {
   border-top-color: var(--s2a-color-transparent-black-08);
 }

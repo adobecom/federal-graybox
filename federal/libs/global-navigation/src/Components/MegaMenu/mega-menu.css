@@ -38,6 +38,10 @@ ul.tabs .product-links {
   display: none;
 }
 
+.mega-menu.feds-link {
+  white-space: normal;
+}
+
 /* =========================================
    Responsive: Desktop (min-width: 1024px)
    ========================================= */

@@ -173,6 +173,10 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     border-top-color: var(--s2a-color-transparent-black-08);
   }
 
+  .global-navigation.dark-font nav.localnav:has(.feds-localnav-bar[aria-expanded="true"]) {
+    margin-top: 0;
+  }
+
   .global-navigation.feds-header-scrolled nav.localnav .feds-localnav-bar,
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) nav.localnav .feds-localnav-bar {
     border-top-color: rgba(0, 0, 0, 0.12);

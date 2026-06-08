@@ -111,23 +111,16 @@ header.feds-header-scrolled .feds-link {
 }
 
 header.feds-header-scrolled nav {
-  inset:
-    var(--s2a-spacing-xs)
-    var(--s2a-spacing-xs)
-    0
-    var(--s2a-spacing-xs);
   color: var(--s2a-color-gray-1000);
   box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
-}
-
-header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
-  inset: 0;
 }
 
 .global-navigation .universal-nav-container .profile-signed-out button {
   color: var(--s2a-color-gray-1000);
   border: 1px solid var(--s2a-color-gray-25);
   background-color: var(--s2a-color-gray-25);
+  border-radius: var(--s2a-border-radius-round);
+  height: 40px;
 }
 
 .global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .universal-nav-container .profile-signed-out button,
@@ -160,13 +153,14 @@ header.feds-header-scrolled:has(.feds-popup.is-open:not(.small-menu)) nav {
   display: flex;
   align-items: center;
   margin-left: auto;
+  margin-right: var(--s2a-spacing-sm);
   @media (max-width: 1024px) {
     display: none;
   }
 }
 
 [dir="rtl"] .global-navigation .feds-product-entry-cta {
-  margin-left: 0;
+  margin-left: var(--s2a-spacing-sm);
   margin-right: auto;
 }
 
@@ -307,12 +301,11 @@ header.global-navigation nav {
   position: fixed;
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
-  margin: 0 auto;
+  margin: var(--s2a-spacing-xs) auto;
   border: none;
   padding: 0;
   overflow: visible;
   border-radius: var(--s2a-border-radius-16);
-
   background-color: transparent;
 }
 
@@ -368,18 +361,6 @@ header.global-navigation nav.localnav:has(.feds-popup.is-open, .feds-menu-wrappe
   top: calc(0px - var(--s2a-spacing-xs));
 }
 
-@media (max-width: 1023px) {
-  header.global-navigation nav:has(.feds-popup.is-open)::after {
-    height: calc(100dvh + var(--s2a-spacing-xs));
-  }
-  header.global-navigation nav:not(.localnav):has(.feds-menu-wrapper.is-open)::after {
-    height: calc(100dvh + var(--s2a-spacing-64));
-  }
-  header.global-navigation nav.localnav:has(.feds-menu-wrapper.is-open)::after {
-    height: var(--feds-popup-bg-height);
-  }
-}
-
 header.global-navigation.feds-header-scrolled nav::after {
   background-color: rgba(255, 255, 255, 0.51);
 }
@@ -387,7 +368,6 @@ header.global-navigation.feds-header-scrolled nav::after {
 .global-navigation nav > ul {
   display: flex;
   width: 100%;
-  max-width: 1200px;
   height: inherit;
   align-items: center;
   padding-left: 0;
@@ -450,11 +430,6 @@ header.global-navigation.feds-header-scrolled nav::after {
 }
 
 .feds-link__mobile-text { display: none; }
-
-@media (max-width: 1023px) {
-  .feds-link__desktop-text { display: none; }
-  .feds-link__mobile-text { display: inline; }
-}
 
 /* Match `.feds-menu-active` in addition to `.is-open` so the open-state
    styling persists through the close transition. `is-open` is removed
@@ -981,6 +956,18 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
    ========================================= */
 
 @media (max-width: 1023px) {
+  header.global-navigation nav:has(.feds-popup.is-open)::after {
+    height: calc(100dvh + var(--s2a-spacing-xs));
+  }
+
+  header.global-navigation nav:not(.localnav):has(.feds-menu-wrapper.is-open)::after {
+    height: calc(100dvh + var(--s2a-spacing-64));
+  }
+
+  header.global-navigation nav.localnav:has(.feds-menu-wrapper.is-open)::after {
+    height: var(--feds-popup-bg-height);
+  }
+
   .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
     width: 100%;
     justify-content: space-between;
@@ -1051,6 +1038,188 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
       margin-bottom: var(--s2a-spacing-sm);
     }
   }
+  .feds-link__desktop-text { display: none; }
+  .feds-link__mobile-text { display: inline; }
+
+  .feds-popup.is-open {
+    position: fixed;
+  }
+  .global-navigation nav > ul > li.feds-menu-wrapper {
+    position: fixed;
+    top: var(--s2a-spacing-64);
+    left: 0;
+    right: var(--s2a-spacing-20);
+    flex-direction: column;
+    height: calc(100dvh - var(--s2a-spacing-64));
+    border: 0;
+    width: 100%;
+    opacity: 0;
+    display: flex;
+    visibility: hidden;
+    color: var(--s2a-color-gray-1000);
+    background-color: transparent;
+    padding: 0;
+  }
+
+  [dir="rtl"] .global-navigation nav > ul > li.feds-menu-wrapper {
+    right: 0;
+    left: var(--s2a-spacing-20);
+  }
+
+  .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  }
+  .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
+    display: flex;
+    opacity: 1;
+    z-index: 2;
+    transition: opacity 0.4s ease, visibility 0s linear 0s;
+    visibility: visible;
+    align-items: flex-start;
+    padding: 0;
+    margin-top: 0;
+  }
+
+  /* Match `.feds-menu-active` in addition to `.is-open` for the same reason
+     as the .feds-link rule above: `is-open` is removed immediately on close,
+     but `feds-menu-active` lingers until the wrapper's transitionend. Without
+     this, the gnav-items' open-state padding/alignment/width snaps back
+     mid-close, causing items to reflow and resize visibly during the close
+     transition. */
+  .global-navigation nav > ul > li.feds-menu-wrapper.is-open .feds-gnav-items,
+  .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active .feds-gnav-items {
+    align-items: flex-start;
+    padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg) var(--s2a-spacing-sm);
+    width: calc(100% - var(--s2a-spacing-3xl));
+  }
+
+  .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
+    /* Direct children of <li> in .feds-gnav-items are either .feds-link
+       (regular nav links / mega-menu triggers) or a CTA anchor
+       (.feds-primary-cta / .feds-secondary-cta). Animate both so CTAs
+       slide in alongside the rest of the bar entries. */
+    & .feds-gnav-items > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+      opacity: 0;
+      transform: translateX(18px);
+      animation: mobile-main-menu-slide-in 0.35s cubic-bezier(0.42, 0, 0, 1) forwards;
+    }
+
+    & .feds-gnav-items > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+      /* --i is set on each <li> at render time (Main.ts, initStaggerIndex).
+         Falls back to 0 if absent — first-item timing. */
+      animation-delay: calc(0.18s + var(--i, 0) * 0.06s);
+    }
+  }
+
+  .feds-nav-toggle path {
+    transform-origin: 7px 3.5px;
+    transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+  }
+
+  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle svg {
+    height: 11px;
+  }
+
+  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:first-child {
+    transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
+  }
+  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:last-child {
+    transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
+  }
+  /* Mobile gnav-item slide-out / re-enter when subscreen opens / closes.
+     The popup-interior animations live in a separate rule below because the
+     popup is no longer a descendant of .feds-gnav-items (we reparent it to
+     <nav> at render time to escape transformed containing blocks). */
+  header.global-navigation > nav > ul > li.feds-menu-wrapper > ul.feds-gnav-items {
+    /* Include CTAs (.feds-primary-cta, .feds-secondary-cta) alongside
+       .feds-link so they exit/re-enter with the rest of the bar entries
+       when a sub-menu opens/closes. */
+    /* open subscreen */
+    &.subscreen-opening {
+      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+        opacity: 1;
+        transform: translateX(0);
+        animation: main-menu-items-exit 0.5s cubic-bezier(0.42, 0, 0, 1) forwards;
+      }
+      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+        animation-delay: calc(var(--i, 0) * 0.025s);
+      }
+    }
+    /* close subscreen */
+    &.subscreen-closing {
+      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+        opacity: 0;
+        transform: translateX(-18px);
+        animation: main-menu-items-re-enter 0.26s ease forwards 0.24s;
+      }
+      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
+        animation-delay: calc(0.24s + var(--i, 0) * 0.03s);
+      }
+    }
+  }
+
+  /* Popup-interior animations driven by the gnav-items subscreen state.
+     Popup lives at <nav> level now, so we cross-reference via :has(). */
+  header.global-navigation > nav:has(.feds-gnav-items.subscreen-opening) .feds-popup.is-open {
+    /* Hide every popup child during the gnav-items slide-out phase, then
+       jump them visible at 0.3s. The element-specific rules below still
+       drive per-element entrance animations after that point.
+       Breadcrumbs are intentionally excluded — they appear immediately
+       alongside the popup background, with no entrance animation. */
+    & > :not(.feds-breadcrumbs) {
+      opacity: 0;
+      animation: fade-in 0s linear 0.3s forwards; /* zero-duration instant jump after delay */
+    }
+
+    & .feds-popup-header {
+      opacity: 0;
+      transform: translateX(18px);
+      animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1) 0.3s;
+    }
+
+    & .tabs {
+      opacity: 0;
+      transform: translateX(18px);
+      animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
+      animation-delay: 0.36s;
+    }
+
+    & .feds-gnav-cards > li {
+      opacity: 0;
+      transform: translateX(18px);
+      animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
+    }
+    & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.36s; }
+    & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.42s; }
+  }
+
+  header.global-navigation > nav:has(.feds-gnav-items.subscreen-closing) .feds-popup.is-open {
+    & .feds-popup-header {
+      opacity: 1;
+      transform: translateX(0px);
+      animation: sub-menu-items-exit 0.2s forwards ease;
+    }
+
+    & .tabs {
+      opacity: 1;
+      transform: translateX(0px);
+      animation: sub-menu-items-exit 0.2s forwards ease;
+    }
+
+    & .feds-gnav-cards > li {
+      opacity: 1;
+      transform: translateX(0px);
+      animation: sub-menu-items-exit 0.2s forwards ease;
+    }
+    & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.04s; }
+    & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.08s; }
+  }
+
+  header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-brand-image svg,
+  header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-nav-toggle svg {
+    animation: none;
+    color: var(--s2a-color-gray-1000);
+  }
 }
 
 /* =========================================
@@ -1103,10 +1272,11 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     opacity: 1;
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     transition-delay: 0.15s;
+    margin-top: var(--s2a-spacing-xs);
   }
 
   header.global-navigation:not(.is-compact):has(.feds-localnav-bar) :not(.small-menu).feds-popup.is-open {
-    margin-top: -6px;
+    margin-top: 1px;
     padding-top: var(--s2a-spacing-lg);
     border-top: 1px solid var(--s2a-color-transparent-black-08);
   }
@@ -1114,6 +1284,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
     overflow-y: auto;
     max-height: calc(100dvh - var(--s2a-spacing-64));
+  }
+
+  .feds-gnav-items > li > .feds-link:first-child {
+    outline-offset: var(--s2a-spacing-sm);
   }
 
   @starting-style {
@@ -1301,189 +1475,6 @@ header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp
 @keyframes fade-out {
   from { opacity: 1; display: block; }
   to   { opacity: 0; display: none; }
-}
-
-@media (max-width: 1023px) {
-  .feds-popup.is-open {
-    position: fixed;
-  }
-  .global-navigation nav > ul > li.feds-menu-wrapper {
-    position: fixed;
-    top: var(--s2a-spacing-64);
-    left: 0;
-    right: var(--s2a-spacing-20);
-    flex-direction: column;
-    height: calc(100dvh - var(--s2a-spacing-64));
-    border: 0;
-    width: 100%;
-    opacity: 0;
-    display: flex;
-    visibility: hidden;
-    color: var(--s2a-color-gray-1000);
-    background-color: transparent;
-    padding: 0;
-  }
-
-  [dir="rtl"] .global-navigation nav > ul > li.feds-menu-wrapper {
-    right: 0;
-    left: var(--s2a-spacing-20);
-  }
-
-  .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active {
-    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
-  }
-  .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
-    display: flex;
-    opacity: 1;
-    z-index: 2;
-    transition: opacity 0.4s ease, visibility 0s linear 0s;
-    visibility: visible;
-    align-items: flex-start;
-    padding: 0;
-    margin-top: 0;
-  }
-
-  /* Match `.feds-menu-active` in addition to `.is-open` for the same reason
-     as the .feds-link rule above: `is-open` is removed immediately on close,
-     but `feds-menu-active` lingers until the wrapper's transitionend. Without
-     this, the gnav-items' open-state padding/alignment/width snaps back
-     mid-close, causing items to reflow and resize visibly during the close
-     transition. */
-  .global-navigation nav > ul > li.feds-menu-wrapper.is-open .feds-gnav-items,
-  .global-navigation nav > ul > li.feds-menu-wrapper.feds-menu-active .feds-gnav-items {
-    align-items: flex-start;
-    padding: var(--s2a-spacing-xs) var(--s2a-spacing-lg) var(--s2a-spacing-sm);
-    width: calc(100% - var(--s2a-spacing-3xl));
-  }
-
-  .global-navigation nav > ul > li.feds-menu-wrapper.is-open {
-    /* Direct children of <li> in .feds-gnav-items are either .feds-link
-       (regular nav links / mega-menu triggers) or a CTA anchor
-       (.feds-primary-cta / .feds-secondary-cta). Animate both so CTAs
-       slide in alongside the rest of the bar entries. */
-    & .feds-gnav-items > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
-      opacity: 0;
-      transform: translateX(18px);
-      animation: mobile-main-menu-slide-in 0.35s cubic-bezier(0.42, 0, 0, 1) forwards;
-    }
-
-    & .feds-gnav-items > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
-      /* --i is set on each <li> at render time (Main.ts, initStaggerIndex).
-         Falls back to 0 if absent — first-item timing. */
-      animation-delay: calc(0.18s + var(--i, 0) * 0.06s);
-    }
-  }
-
-  .feds-nav-toggle path {
-    transform-origin: 7px 3.5px;
-    transition: transform 0.35s cubic-bezier(.4,0,.2,1);
-  }
-
-  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle svg {
-    height: 11px;
-  }
-
-  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:first-child {
-    transform: translateY(-2.75px) rotate(-45deg) scaleX(1.25);
-  }
-  .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) .feds-nav-toggle path:last-child {
-    transform: translateY(2.75px) rotate(45deg) scaleX(1.25);
-  }
-  /* Mobile gnav-item slide-out / re-enter when subscreen opens / closes.
-     The popup-interior animations live in a separate rule below because the
-     popup is no longer a descendant of .feds-gnav-items (we reparent it to
-     <nav> at render time to escape transformed containing blocks). */
-  header.global-navigation > nav > ul > li.feds-menu-wrapper > ul.feds-gnav-items {
-    /* Include CTAs (.feds-primary-cta, .feds-secondary-cta) alongside
-       .feds-link so they exit/re-enter with the rest of the bar entries
-       when a sub-menu opens/closes. */
-    /* open subscreen */
-    &.subscreen-opening {
-      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
-        opacity: 1;
-        transform: translateX(0);
-        animation: main-menu-items-exit 0.5s cubic-bezier(0.42, 0, 0, 1) forwards;
-      }
-      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
-        animation-delay: calc(var(--i, 0) * 0.025s);
-      }
-    }
-    /* close subscreen */
-    &.subscreen-closing {
-      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
-        opacity: 0;
-        transform: translateX(-18px);
-        animation: main-menu-items-re-enter 0.26s ease forwards 0.24s;
-      }
-      & > li > :is(.feds-link, .feds-primary-cta, .feds-secondary-cta) {
-        animation-delay: calc(0.24s + var(--i, 0) * 0.03s);
-      }
-    }
-  }
-
-  /* Popup-interior animations driven by the gnav-items subscreen state.
-     Popup lives at <nav> level now, so we cross-reference via :has(). */
-  header.global-navigation > nav:has(.feds-gnav-items.subscreen-opening) .feds-popup.is-open {
-    /* Hide every popup child during the gnav-items slide-out phase, then
-       jump them visible at 0.3s. The element-specific rules below still
-       drive per-element entrance animations after that point.
-       Breadcrumbs are intentionally excluded — they appear immediately
-       alongside the popup background, with no entrance animation. */
-    & > :not(.feds-breadcrumbs) {
-      opacity: 0;
-      animation: fade-in 0s linear 0.3s forwards; /* zero-duration instant jump after delay */
-    }
-
-    & .feds-popup-header {
-      opacity: 0;
-      transform: translateX(18px);
-      animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1) 0.3s;
-    }
-
-    & .tabs {
-      opacity: 0;
-      transform: translateX(18px);
-      animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
-      animation-delay: 0.36s;
-    }
-
-    & .feds-gnav-cards > li {
-      opacity: 0;
-      transform: translateX(18px);
-      animation: sub-menu-items-enter 0.5s forwards cubic-bezier(0.42, 0, 0, 1);
-    }
-    & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.36s; }
-    & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.42s; }
-  }
-
-  header.global-navigation > nav:has(.feds-gnav-items.subscreen-closing) .feds-popup.is-open {
-    & .feds-popup-header {
-      opacity: 1;
-      transform: translateX(0px);
-      animation: sub-menu-items-exit 0.2s forwards ease;
-    }
-
-    & .tabs {
-      opacity: 1;
-      transform: translateX(0px);
-      animation: sub-menu-items-exit 0.2s forwards ease;
-    }
-
-    & .feds-gnav-cards > li {
-      opacity: 1;
-      transform: translateX(0px);
-      animation: sub-menu-items-exit 0.2s forwards ease;
-    }
-    & .feds-gnav-cards > li:nth-child(1) { animation-delay: 0.04s; }
-    & .feds-gnav-cards > li:nth-child(2) { animation-delay: 0.08s; }
-  }
-
-  header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-brand-image svg,
-  header.global-navigation.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-nav-toggle svg {
-    animation: none;
-    color: var(--s2a-color-gray-1000);
-  }
-
 }
 
 ul.feds-gnav-cards,

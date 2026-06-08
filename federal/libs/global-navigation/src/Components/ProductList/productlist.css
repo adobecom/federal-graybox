@@ -144,6 +144,13 @@
   flex-shrink: 0;
 }
 
+[dir="rtl"] {
+  .product-links .feds-link svg,
+  .featured-card .feds-link svg {
+    transform: scaleX(-1);
+  }
+}
+
 /* =========================================
    Responsive: Desktop (min-width: 1024px)
    ========================================= */

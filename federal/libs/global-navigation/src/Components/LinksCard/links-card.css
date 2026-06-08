@@ -56,6 +56,11 @@
   transform: rotate(0deg);
 }
 
+[dir="rtl"] .feds-popup .links-card .links-card-chevron {
+  margin-right: auto;
+  margin-left: 0;
+}
+
 /* =========================================
    Mobile open/close animation
    The collapsible content (links list + footer) animates its max-height

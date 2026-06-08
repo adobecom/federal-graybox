@@ -75,8 +75,6 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
    Header Shell
    ========================================= */
 :root {
-  --feds-font-family: var(--s2a-font-family-adobe-clean), adobe-clean, "Trebuchet MS", sans-serif;
-  --feds-heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
   --s2a-typography-line-height-heading-5-temp: 1;
   /* Height of the breadcrumbs row; consumed by both the breadcrumbs
      component and the nav::after backdrop that extends to cover it. */
@@ -190,7 +188,7 @@ header.feds-header-scrolled nav {
   padding: 10px var(--s2a-spacing-lg);
   border-radius: var(--s2a-border-radius-round);
   border: var(--s2a-border-width-sm) solid transparent;
-  font-family: var(--feds-font-family);
+  font-family: var(--body-font-family);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   font-size: var(--s2a-typography-font-size-label);
   line-height: var(--s2a-typography-line-height-label);
@@ -393,7 +391,7 @@ header.global-navigation.feds-header-scrolled nav::after {
 
 .feds-link {
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  font-family: var(--feds-font-family);
+  font-family: var(--body-font-family);
   font-size: var(--s2a-typography-font-size-body-sm);
   line-height: var(--s2a-typography-line-height-body-sm);
   letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
@@ -642,7 +640,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   line-height: var(--s2a-typography-line-height-heading-3);
   letter-spacing: var(--s2a-typography-letter-spacing-heading-3);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
-  font-family: var(--feds-heading-font-family);
+  font-family: var( --heading-font-family);
   color: var(--s2a-color-content-default);
 }
 
@@ -692,7 +690,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   font-size: var(--s2a-typography-font-size-heading-4);
   line-height: var(--s2a-typography-line-height-heading-4);
   letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
-  font-family: var(--feds-heading-font-family);
+  font-family: var( --heading-font-family);
 }
 
 .feds-popup .feds-product-card__badges {
@@ -934,7 +932,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     font-size: var(--s2a-typography-font-size-eyebrow);
     line-height: var(--s2a-typography-line-height-eyebrow);
     letter-spacing: var(--s2a-typography-letter-spacing-eyebrow);
-    font-family: var(--feds-font-family);
+    font-family: var(--body-font-family);
   }
 
   header.global-navigation:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
@@ -975,7 +973,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   }
 
   .global-navigation .feds-gnav-items > li > .feds-link {
-    font-family: var(--feds-heading-font-family);
+    font-family: var( --heading-font-family);
     font-weight: var(--s2a-font-weight-adobe-clean-black);
   }
 
@@ -1532,7 +1530,7 @@ header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link
 }
 
 header.global-navigation.is-compact .feds-gnav-items > li > .feds-link {
-  font-family: var(--feds-heading-font-family);
+  font-family: var( --heading-font-family);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
 }
 

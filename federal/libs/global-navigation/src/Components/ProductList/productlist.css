@@ -62,7 +62,7 @@
   border-radius: 75px;
   padding: var(--s2a-spacing-md) var(--s2a-spacing-lg);
   text-align: center;
-  font-family: var(--feds-font-family);
+  font-family: var(--body-font-family);
   font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-bold);
   line-height: 8px;

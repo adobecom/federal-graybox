@@ -31,7 +31,7 @@
 }
 
 .panels h4 {
-  font-family: var(--feds-heading-font-family);
+  font-family: var( --heading-font-family);
   font-size: var(--s2a-font-size-2xl);
   line-height: var(--s2a-font-line-height-20);
   margin-left: var(--s2a-spacing-lg);
@@ -229,7 +229,7 @@
 }
 
 .image-panel .text span:last-child {
-  font-family: var(--feds-heading-font-family);
+  font-family: var( --heading-font-family);
   font-size: 21px;
   font-weight: var(--s2a-font-weight-adobe-clean-extrabold);
   line-height: 1.2;

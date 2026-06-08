@@ -160,7 +160,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
        last breadcrumb (see Components/Breadcrumbs/breadcrumbs.css). */
     color: var(--s2a-color-gray-25);
     cursor: pointer;
-    font-family: var(--feds-font-family);
+    font-family: var(--body-font-family);
     font-weight: 700;
     font-size: var(--s2a-typography-font-size-label);
     line-height: var(--s2a-typography-line-height-label);
@@ -395,7 +395,7 @@ header.global-navigation.is-compact nav.localnav .feds-localnav-bar {
   border-top: var(--s2a-border-width-sm) solid rgba(255, 255, 255, 0.24);
   color: var(--s2a-color-gray-25);
   cursor: pointer;
-  font-family: var(--feds-font-family);
+  font-family: var(--body-font-family);
   font-weight: 700;
   font-size: var(--s2a-typography-font-size-label);
   line-height: var(--s2a-typography-line-height-label);

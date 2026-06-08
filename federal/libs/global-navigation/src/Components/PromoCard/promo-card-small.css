@@ -57,7 +57,7 @@
 
 .feds-gnav-cards .promo-card-small__title {
   margin: 0;
-  font-family: var(--feds-heading-font-family);
+  font-family: var( --heading-font-family);
   font-size: var(--s2a-typography-font-size-heading-5);
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   line-height: var(--s2a-typography-line-height-heading-5);

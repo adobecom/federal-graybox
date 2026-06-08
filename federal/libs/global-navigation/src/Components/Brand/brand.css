@@ -26,7 +26,6 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 .feds-brand {
   align-items: center;
   outline-offset: var(--s2a-spacing-sm);
-  margin: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
   column-gap: 10px;
 }
 
@@ -197,5 +196,9 @@ header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .f
 
   header.global-navigation:not(.is-compact) .feds-brand-image.mobile-brand {
     display: none;
+  }
+
+  .feds-brand {
+    margin: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
   }
 }

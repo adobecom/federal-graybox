@@ -4,7 +4,7 @@ import { parseListAndAccumulateErrors } from "../../Utils/Utils";
 
 export type Breadcrumbs = {
   type: 'Breadcrumbs';
-  items: Array<Link>;
+  items: Array<Link | string>;
 };
 
 const ERRORS = {
@@ -18,14 +18,23 @@ export const parseBreadcrumbs = (
   if (element === null)
     throw new IrrecoverableError(ERRORS.elementNull);
 
-  // The breadcrumbs block is authored as one <ul> per crumb, each
-  // containing a single <li><a>. Collect every anchor in document
-  // order and parse it as a Link.
-  const anchors = [...element.querySelectorAll('ul > li > a')];
-  if (anchors.length === 0)
+  // The breadcrumbs block is authored as <ul> with one <li> per crumb.
+  // Most <li>s wrap an <a> (a navigable
+  // crumb), but the final crumb is typically a raw text node
+  // representing the current page. Collect every <li> in document
+  // order and parse it either as a Link or as a plain string.
+  const listItems = [...element.querySelectorAll('ul > li')];
+  if (listItems.length === 0)
     throw new IrrecoverableError(ERRORS.noItems);
 
-  const [items, errors] = parseListAndAccumulateErrors(anchors, parseLink);
+  const parseItem = (li: Element): Parsed<Link | string, RecoverableError> => {
+    const anchor = li.querySelector(':scope > a');
+    if (anchor !== null) return parseLink(anchor);
+    const text = li.textContent?.trim() ?? '';
+    return [text, []];
+  };
+
+  const [items, errors] = parseListAndAccumulateErrors(listItems, parseItem);
 
   return [
     {

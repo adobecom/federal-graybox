@@ -166,9 +166,15 @@ export const renderGnavString = ({
   // (a thin clickable strip below the main nav row that expands inline to
   // reveal the remaining mega-menu entries). Its label mirrors the last
   // breadcrumb crumb so it reads as the current section.
-  const localnavBarLabel = localnav && breadcrumbs !== null &&
-    breadcrumbs.items.length > 0 ?
-    breadcrumbs.items[breadcrumbs.items.length - 1].text : '';
+  const lastBreadcrumb = localnav && breadcrumbs !== null &&
+    breadcrumbs.items.length > 0
+      ? breadcrumbs.items[breadcrumbs.items.length - 1]
+      : null;
+  const localnavBarLabel = lastBreadcrumb === null
+    ? ''
+    : typeof lastBreadcrumb === 'string'
+      ? lastBreadcrumb
+      : lastBreadcrumb.text;
   return `
 <nav data-lenis-prevent class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>

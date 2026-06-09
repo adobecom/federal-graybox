@@ -40,6 +40,15 @@
   height: var(--s2a-spacing-lg);
 }
 
+[dir="rtl"] {
+  .feds-gnav-cards .promo-card__icon {
+    right: var(--s2a-spacing-md);
+  }
+  .feds-gnav-cards .promo-card__text-content {
+    right: 0;
+  }
+}
+
 .feds-gnav-cards .promo-card__text-content {
   position: absolute;
   bottom: 0;
@@ -67,7 +76,7 @@
   font-size: var(--s2a-typography-font-size-heading-5);
   line-height: var(--s2a-typography-line-height-heading-5);
   letter-spacing: var(--s2a-typography-letter-spacing-heading-5);
-  font-family: var(--feds-heading-font-family);
+  font-family: var( --heading-font-family);
 }
 
 /* =========================================

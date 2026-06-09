@@ -32,6 +32,10 @@
   border-top: var(--s2a-border-width-sm) solid rgba(255, 255, 255, 0.24);
 }
 
+[dir="rtl"] .global-navigation .feds-breadcrumbs {
+  padding-right: var(--s2a-spacing-md);
+}
+
 .global-navigation.dark-font .feds-breadcrumbs {
   border-top-color: var(--s2a-color-transparent-black-08);
 }
@@ -47,8 +51,8 @@
   padding: 0;
 }
 
-.global-navigation .feds-breadcrumbs > li > a {
-  font-family: var(--feds-font-family);
+.global-navigation .feds-breadcrumbs > li > :is(a, span) {
+  font-family: var(--body-font-family);
   font-size: var(--s2a-typography-font-size-label);
   line-height: var(--s2a-typography-line-height-label);
   letter-spacing: var(--s2a-typography-letter-spacing-label);
@@ -60,7 +64,7 @@
   text-decoration: none;
 }
 
-.global-navigation.dark-font .feds-breadcrumbs > li > a {
+.global-navigation.dark-font .feds-breadcrumbs > li > :is(a, span) {
   color: var(--s2a-color-gray-1000);
 }
 
@@ -72,15 +76,15 @@
    so flip crumb text to the dark palette. The two selectors share
    identical declarations and are split only to keep the contracts
    readable: scrolled state vs. menu-open state. */
-.global-navigation.feds-header-scrolled .feds-breadcrumbs > li > a,
-.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-breadcrumbs > li > a {
+.global-navigation.feds-header-scrolled .feds-breadcrumbs > li > :is(a, span),
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-breadcrumbs > li > :is(a, span) {
   color: var(--s2a-color-transparent-black-64);
 }
 
 /* Last crumb is the current page → use the higher-contrast token in
    the same dark-palette states. */
-.global-navigation.feds-header-scrolled .feds-breadcrumbs > li:last-child > a,
-.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-breadcrumbs > li:last-child > a {
+.global-navigation.feds-header-scrolled .feds-breadcrumbs > li:last-child > :is(a, span),
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-breadcrumbs > li:last-child > :is(a, span) {
   color: var(--s2a-color-content-default);
 }
 

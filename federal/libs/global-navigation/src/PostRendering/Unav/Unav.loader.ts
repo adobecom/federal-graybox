@@ -259,9 +259,21 @@ export const loadUnav = async (
     
     await window?.UniversalNav?.(getConfiguration());
 
-    // Remove min-width constraint for signed-in users (allow natural sizing)
     if (!signedOut) {
+      // Remove min-width constraint for signed-in users (allow natural sizing)
       utilitiesContainer?.style.removeProperty('min-width');
+    } else {
+      // The pre-calculated min-width uses a fixed English button width and will
+      // be too narrow for other locales. Override it once UNAV has injected its
+      // DOM and the container has reached its true rendered width.
+      const mo = new MutationObserver((_mutations, observer) => {
+        if (!utilitiesContainer.querySelector('button, a[role="button"]')) return;
+        observer.disconnect();
+        requestAnimationFrame(() => {
+          utilitiesContainer.style.removeProperty('min-width');
+        });
+      });
+      mo.observe(utilitiesContainer, { childList: true, subtree: true });
     }
 
     // ========================================================================

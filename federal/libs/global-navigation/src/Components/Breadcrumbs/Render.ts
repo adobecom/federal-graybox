@@ -3,8 +3,10 @@ import { Breadcrumbs } from "./Parse";
 
 export const breadcrumbs = ({ items }: Breadcrumbs): HTML => `
 <ul class="feds-breadcrumbs">
-  ${items.map(({ text, href }) =>
-    `<li><a href="${localizeHref(href)}">${text}</a></li>`
+  ${items.map((item) =>
+    typeof item === 'string'
+      ? `<li><span>${item}</span></li>`
+      : `<li><a href="${localizeHref(item.href)}">${item.text}</a></li>`
   ).join('')}
 </ul>
 `.trim();

@@ -642,6 +642,11 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   font-weight: var(--s2a-font-weight-adobe-clean-black);
   font-family: var( --heading-font-family);
   color: var(--s2a-color-content-default);
+  text-align: left;
+}
+
+[dir='rtl'] .feds-popup .feds-popup-back-button .feds-popup-title {
+  text-align: right;
 }
 
 /* =========================================

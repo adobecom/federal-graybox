@@ -26,8 +26,9 @@ describe('ProductCard Parse', () => {
       expect(result.title).to.equal('What is Creative Cloud?');
       expect(result.href).to.equal('https://www.adobe.com/creativecloud.html');
       expect(result.subtitle).to.equal('Creative apps and services for everyone');
-      expect(result.iconHref).to.equal('https://main--federal--adobecom.hlx.page/federal/assets/svgs/creative-cloud-40.svg');
-      expect(result.iconAlt).to.equal('Adobe Creative Cloud');
+      expect(result.icons).to.have.lengthOf(1);
+      expect(result.icons[0].iconHref).to.equal('https://main--federal--adobecom.hlx.page/federal/assets/svgs/creative-cloud-40.svg');
+      expect(result.icons[0].iconAlt).to.equal('Adobe Creative Cloud');
       expect(errors).to.have.lengthOf(0);
     });
 
@@ -53,9 +54,8 @@ describe('ProductCard Parse', () => {
       expect(result.title).to.equal('All Products');
       expect(result.href).to.equal('https://www.adobe.com/products.html');
       expect(result.subtitle).to.equal('View all Adobe products');
-      // Icon fields can be null or empty string when not provided
-      expect(result.iconHref === null || result.iconHref === '').to.be.true;
-      expect(result.iconAlt === null || result.iconAlt === '').to.be.true;
+      // Icons array should be empty when no icons are provided
+      expect(result.icons).to.have.lengthOf(0);
       expect(errors).to.have.lengthOf(0);
     });
 

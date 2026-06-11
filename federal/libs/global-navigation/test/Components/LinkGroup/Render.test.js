@@ -42,8 +42,7 @@ describe('ProductCard Render', () => {
     it('should render a product card link with icon and subtitle', () => {
       const data = {
         type: 'ProductCardLink',
-        iconHref: 'https://example.com/icon.svg',
-        iconAlt: 'Adobe Creative Cloud',
+        icons: [{ iconHref: 'https://example.com/icon.svg', iconAlt: 'Adobe Creative Cloud' }],
         title: 'What is Creative Cloud?',
         href: 'https://www.adobe.com/creativecloud.html',
         subtitle: 'Creative apps and services for everyone',
@@ -68,8 +67,7 @@ describe('ProductCard Render', () => {
     it('should render badges when provided', () => {
       const data = {
         type: 'ProductCardLink',
-        iconHref: null,
-        iconAlt: null,
+        icons: [],
         title: 'All Apps',
         href: 'https://www.adobe.com/apps',
         subtitle: 'Explore apps',
@@ -90,8 +88,7 @@ describe('ProductCard Render', () => {
     it('should render a product card without icon when iconHref is null', () => {
       const data = {
         type: 'ProductCardLink',
-        iconHref: null,
-        iconAlt: null,
+        icons: [],
         title: 'All Products',
         href: 'https://www.adobe.com/products.html',
         subtitle: 'View all Adobe products',

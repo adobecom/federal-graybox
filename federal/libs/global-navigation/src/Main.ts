@@ -293,7 +293,7 @@ export const postRenderingTasks = async (
 
   const localnavMarginTop = 8;
   const breadcrumbs = input.mountpoint.querySelector('nav > ul.feds-breadcrumbs');
-  const mobileLocalnav = input.mountpoint.querySelector('li.feds-menu-wrapper:has()');
+  const mobileLocalnav = input.mountpoint.querySelector('li.feds-menu-wrapper');
   type NavType = "Default" | "DefaultCompact" | "Localnav" | "LocalnavCompact";
   const getGnavHeight = (): number => {
     const nav = input.mountpoint.firstElementChild;

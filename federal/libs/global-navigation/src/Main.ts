@@ -112,7 +112,6 @@ export const main = async (
   return postRenderingTasks(input);
 };
 
-
 export const renderGnav = (
   data: GlobalNavigationData
 ) => async (

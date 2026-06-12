@@ -235,7 +235,7 @@ export const fetchAndProcessPlainHTML = async (
     // Apply personalization to the fetched HTML
     try {
       const { handleCommands, commands } = getPersonalizationConfig();
-      handleCommands(commands, body);
+      await handleCommands(commands, body);
     } catch (error) {
       // PersonalizationConfig not initialized or personalization failed
       // This is non-fatal, so we just log and continue

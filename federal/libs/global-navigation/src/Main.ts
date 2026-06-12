@@ -112,7 +112,6 @@ export const main = async (
   return postRenderingTasks(input);
 };
 
-
 export const renderGnav = (
   data: GlobalNavigationData
 ) => async (
@@ -121,6 +120,7 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
+  if (data.components.filter(c => c.type !== 'Brand').length === 0) mountpoint.classList.add('thin');
   if (data.darkFont) mountpoint.classList.add('dark-font');
   const megaMenus = [
     ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')

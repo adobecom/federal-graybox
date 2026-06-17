@@ -37,8 +37,6 @@ export type Input = {
   unavEnabled: boolean;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
-  getStageDomainMap: (domainmap: unknown[], env: string) =>
-    { [key: string]: string }
   // for now we only support inBlock commands.
   // Since MEP on gnav is relatively rare we'll
   // keep it at this and see if any problems crop up.
@@ -51,6 +49,11 @@ export type Input = {
   // later date.
   personalization: PersonalizationConfig;
   localizeLink?: LocalizeLink;
+  convertStageLinks?: (args: {
+    anchors: HTMLAnchorElement[];
+    hostname: string;
+    href: string;
+  }) => void;
 };
 
 export const main = async (
@@ -108,6 +111,12 @@ export const main = async (
 
   // TODO: Implement Aside
   await renderGnav(gnavData)(mountpoint);
+
+  input.convertStageLinks?.({
+    anchors: [...mountpoint.querySelectorAll('a')],
+    hostname: window.location.hostname,
+    href: window.location.href,
+  });
 
   return postRenderingTasks(input);
 };

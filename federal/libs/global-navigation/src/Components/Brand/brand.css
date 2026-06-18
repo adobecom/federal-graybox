@@ -11,6 +11,7 @@ li.feds-brand-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
+  flex-shrink: 0;
 }
 
 header.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) nav .feds-brand-image svg,
@@ -198,7 +199,7 @@ header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .f
     display: none;
   }
 
-  .feds-brand {
+  header.global-navigation:not(.is-compact) .feds-brand {
     margin: 0 var(--s2a-spacing-lg) 0 var(--s2a-spacing-md);
   }
 }

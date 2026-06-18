@@ -173,7 +173,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     border-top-color: var(--s2a-color-transparent-black-08);
   }
 
-  .global-navigation.dark-font nav.localnav:has(.feds-localnav-bar[aria-expanded="true"]) {
+  .global-navigation nav.localnav:has(.feds-localnav-bar[aria-expanded="true"]) {
     margin-top: 0;
   }
 
@@ -344,6 +344,10 @@ header.global-navigation.is-compact nav.localnav .feds-gnav-items > li > .feds-p
     color: var(--s2a-color-button-content-primary-solid-default);
     border: none;
   }
+}
+
+header.global-navigation.is-compact nav.localnav:has(.feds-localnav-bar[aria-expanded="true"]) {
+  margin-top: 0;
 }
 
 header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper:has(.feds-popup.is-open) {

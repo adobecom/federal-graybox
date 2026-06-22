@@ -81,6 +81,11 @@
   background-color: var(--s2a-color-content-subtle);
 }
 
+header.global-navigation:not(.is-compact) .product-list .tabs button.tab:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--s2a-color-blue-800);
+  outline: none;
+}
+
 /* =========================================
    Tab Content / Tabpanels
    ========================================= */
@@ -113,7 +118,11 @@
   flex: 1;
   background-color: var(--s2a-color-gray-25);
   justify-content: space-between;
-  outline-offset: -1px;
+  outline: none;
+}
+
+.product-list .tab-content [role="tabpanel"] .feds-product-card:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--s2a-color-blue-800);
 }
 
 .feds-popup .product-list .tab-content [role="tabpanel"] .feds-product-card:hover {

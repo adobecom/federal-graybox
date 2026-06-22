@@ -157,4 +157,9 @@
     right: var(--s2a-spacing-lg);
     margin-top: 0;
   }
+
+  [dir="rtl"] header.global-navigation:not(.is-compact) .feds-gnav-cards .promo-card__cta {
+    left: var(--s2a-spacing-lg);
+    right: auto;
+  }
 }

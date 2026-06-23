@@ -1,10 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import {
-  loadUnav,
-  preloadAupSdk,
-  getAupSdkInstance,
-  __resetAupSdkForTests,
-} from '../../src/PostRendering/Unav/Unav.loader';
+import { loadUnav } from '../../src/PostRendering/Unav/Unav.loader';
 import { RecoverableError } from '../../src/Error/Error';
 import { setMiloConfig } from '../../src/Utils/Utils';
 
@@ -148,10 +143,6 @@ describe('UNAV Loader Integration Tests', () => {
     delete window.alloy;
     delete window.adobeid;
     delete window.UniversalNav;
-
-    // Reset AUP SDK module-scoped promise so tests stay isolated.
-    __resetAupSdkForTests();
-    delete window.AUPSDK;
   });
 
   // ==========================================================================
@@ -563,7 +554,7 @@ describe('UNAV Loader Integration Tests', () => {
       
       expect(unavScript).to.exist;
       expect(unavScript.src).to.include('adobeccstatic.com');
-      expect(unavScript.src).to.include('1.6');
+      expect(unavScript.src).to.include('1.5');
     });
 
     it('should load UniversalNav styles from CDN', async () => {
@@ -574,20 +565,20 @@ describe('UNAV Loader Integration Tests', () => {
       
       if (unavStyles) {
         expect(unavStyles.href).to.include('adobeccstatic.com');
-        expect(unavStyles.href).to.include('1.6');
+        expect(unavStyles.href).to.include('1.5');
       }
       
       // At minimum, script should be loaded
       expect(appendedElements.some(el => el.tagName === 'SCRIPT')).to.be.true;
     });
 
-    it('should use version 1.6 by default', async () => {
+    it('should use version 1.5 by default', async () => {
       await loadUnav(navElement);
       
       const scripts = appendedElements.filter(el => el.tagName === 'SCRIPT');
       const unavScript = scripts.find(s => s.src && s.src.includes('UniversalNav'));
       
-      expect(unavScript.src).to.include('/1.6/');
+      expect(unavScript.src).to.include('/1.5/');
     });
 
     it('should handle CDN load failures gracefully', async () => {
@@ -840,55 +831,6 @@ describe('UNAV Loader Integration Tests', () => {
       // Verify UniversalNav was called
       const unavIndex = callOrder.indexOf('UniversalNav');
       expect(unavIndex).to.be.greaterThan(-1);
-    });
-  });
-
-  // ==========================================================================
-  // Test Category: AUP SDK eager preload
-  // ==========================================================================
-
-  describe('preloadAupSdk', () => {
-    it('should be a no-op when called twice — second call does not re-fetch the script', () => {
-      const aupScriptUrl = /shared-components\..*\.adobe\.com\/aup-sdk\//;
-
-      preloadAupSdk();
-      const firstPromise = getAupSdkInstance();
-      const firstCount = appendedElements.filter(
-        (el) => el.tagName === 'SCRIPT' && aupScriptUrl.test(el.src)
-      ).length;
-
-      preloadAupSdk();
-      const secondPromise = getAupSdkInstance();
-      const secondCount = appendedElements.filter(
-        (el) => el.tagName === 'SCRIPT' && aupScriptUrl.test(el.src)
-      ).length;
-
-      expect(firstPromise).to.equal(secondPromise);
-      expect(secondCount).to.equal(firstCount);
-    });
-
-    it('should bail when signed-out, then succeed when called again after sign-in', () => {
-      const aupScriptUrl = /shared-components\..*\.adobe\.com\/aup-sdk\//;
-
-      // First call: signed-out → bail, no promise, no script appended.
-      window.adobeIMS.isSignedInUser = () => false;
-      preloadAupSdk();
-      expect(getAupSdkInstance()).to.equal(undefined);
-      expect(
-        appendedElements.some(
-          (el) => el.tagName === 'SCRIPT' && aupScriptUrl.test(el.src)
-        )
-      ).to.equal(false);
-
-      // Second call: signed-in → promise is created and script is appended.
-      window.adobeIMS.isSignedInUser = () => true;
-      preloadAupSdk();
-      expect(getAupSdkInstance()).to.not.equal(undefined);
-      expect(
-        appendedElements.some(
-          (el) => el.tagName === 'SCRIPT' && aupScriptUrl.test(el.src)
-        )
-      ).to.equal(true);
     });
   });
 });

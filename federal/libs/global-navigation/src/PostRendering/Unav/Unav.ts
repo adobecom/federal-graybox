@@ -77,7 +77,7 @@ export { getUnavComponents } from './Unav.config';
 // Loader Exports
 // ============================================================================
 
-export { loadUnav, preloadAupSdk } from './Unav.loader';
+export { loadUnav } from './Unav.loader';
 export type { Unav } from './Unav.loader';
 
 

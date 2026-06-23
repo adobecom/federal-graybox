@@ -25,6 +25,8 @@ declare global {
     adobeIMS?: {
       signIn: (context: object) => void;
       isSignedInUser: () => boolean;
+      getAccessToken: () => { token?: string } | null;
+      getProfile: () => Promise<unknown>;
     };
     
     /** IMS Client Configuration */
@@ -42,6 +44,45 @@ declare global {
       (config: UnavConfig): Promise<void>;
       reload: (config: UnavConfig) => void;
       changeTheme?: (theme: 'light' | 'dark') => void;
+    };
+
+    /** ARP session token after tokenCallback */
+    adobeArp?: {
+      sessionToken?: string;
+    };
+
+    /** AUP SDK constructor loaded from CDN */
+    AUPSDK?: {
+      preloadSDK: (
+        env: string,
+        config: Record<string, unknown>,
+      ) => Promise<{
+        updateConfig: (config: Record<string, unknown>) => Promise<void>;
+      }>;
+    };
+
+    /** Initialized AUP SDK instance */
+    aupsdk?: {
+      updateConfig: (config: Record<string, unknown>) => Promise<void>;
+    };
+
+    /** Smooth-scroll controller used by manage-people modal flow */
+    lenis?: {
+      start: () => void;
+      stop: () => void;
+    };
+
+    /** Adobe Launch: Properties set for all outgoing analytics events. */
+    alloy_all?: {
+      data?: {
+        _adobe_corpnew?: {
+          digitalData?: {
+            custom?: {
+              arp_token?: string;
+            };
+          };
+        };
+      };
     };
   }
 }

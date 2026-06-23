@@ -32,6 +32,7 @@
 @import "../Components/Panels/panels.css";
 @import "../Components/FeaturedCard/featured-card.css";
 @import "../Components/Localnav/localnav.css";
+@import "../PostRendering/Unav/unav.css";
 
 /* =========================================
    Skip to Main Content Link
@@ -886,6 +887,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
       height: 100%;
       display: flex;
       align-items: center;
+      overflow: visible;
     }
   }
 

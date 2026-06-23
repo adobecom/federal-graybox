@@ -49,6 +49,14 @@ export type AlloyIdentityData = {
 // UNAV Configuration Types
 // ============================================================================
 
+export type ArpConfig = {
+  sessionId?: string;
+  tokenCallback?: (token: string) => void;
+  successCallback?: () => void;
+  errorCallback?: (error: unknown) => void;
+  metadata?: Record<string, string>;
+};
+
 export type UnavConfig = {
   target: HTMLElement;
   env: 'stage' | 'prod';
@@ -62,6 +70,9 @@ export type UnavConfig = {
   clientAppName?: string;
   mode?: string;
   showTrayExperience?: boolean;
+  isArpEnabled?: boolean;
+  arpConfig?: Promise<ArpConfig>;
+  fetchAUPSDKInstance?: () => Promise<unknown>;
 };
 
 export type UnavChildren = UnavComponent[];
@@ -91,6 +102,7 @@ export type Profile = {
         enableLocalSection: boolean;
         enableProfileSwitcher: boolean;
         miniAppContext: {
+          enableManagePeople?: boolean;
           logger: {
             trace: (_: string) => void;
             debug: (_: string) => void;
@@ -98,6 +110,11 @@ export type Profile = {
             warn: (_: string) => void;
             error: (_: string) => void;
           };
+        };
+        managePeopleConfig?: {
+          enableWorkflow?: boolean;
+          params?: Record<string, string>;
+          [key: string]: unknown;
         };
         complexConfig: Record<string, unknown> | null;
       };

@@ -76,8 +76,12 @@ export const preloadAupSdk = (): void => {
   const clientId = (window as WindowWithAdobeId)?.adobeid?.client_id;
   const beEnabled = isBEEnabled();
 
+  const aupHost = environment === 'prod'
+  ? 'shared-components.adobe.com'
+  : `shared-components.${environment}.adobe.com`;
+
   aupSdkPromise = loadScript(
-    `https://shared-components.${environment}.adobe.com/aup-sdk/${AUP_SDK_VERSION}/main.js`,
+    `https://${aupHost}/aup-sdk/${AUP_SDK_VERSION}/main.js`,
     undefined,
     { mode: 'async' },
   ).then(async (): Promise<unknown> => {

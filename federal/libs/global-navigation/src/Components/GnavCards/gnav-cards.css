@@ -12,6 +12,10 @@
   align-items: stretch;
 }
 
+.is-compact .feds-popup .feds-gnav-cards {
+  width: 100%;
+}
+
 .feds-popup .feds-gnav-cards > li {
   min-width: 0;
 }

@@ -13,6 +13,7 @@ export type GlobalNavigationData = {
   errors: Array<RecoverableError>;
   unavEnabled: boolean;
   placeholders: Map<string, string>;
+  brandConciergeEnabled: boolean;
 };
 
 export const parseNavigation = (
@@ -45,13 +46,9 @@ export const parseNavigation = (
   const components = parsedComponents.filter(
     (c) => c.type !== "ProductEntryCTA"
   );
-  // const localnav = components
-  //   .filter((component): boolean =>
-  //           component.type === "MegaMenu" &&
-  //           component.isSection).length === 1;
   const localnav = getMetadata('localnav') === 'true';
   const darkFont = getMetadata('gnav-dark-font') === 'true';
-
+  const brandConciergeEnabled = getMetadata('gnav-brand-concierge') === 'on';
   const errors = [
     breadcrumbErrors,
     componentErrors,
@@ -66,5 +63,6 @@ export const parseNavigation = (
     errors,
     unavEnabled,
     placeholders,
+    brandConciergeEnabled,
   }
 };

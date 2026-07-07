@@ -299,7 +299,7 @@ header.feds-header-scrolled nav {
 header.global-navigation nav {
   position: fixed;
   width: calc(100% - var(--s2a-spacing-xs) * 2);
-  max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
+  max-width: 1968px;
   margin: var(--s2a-spacing-xs) auto;
   border: none;
   padding: 0;

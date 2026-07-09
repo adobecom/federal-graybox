@@ -1298,7 +1298,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
   header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
     overflow-y: auto;
-    max-height: calc(100dvh - var(--s2a-spacing-64));
+    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-banner-scroll-offset));
   }
 
   .feds-gnav-items > li > .feds-link:first-child {
@@ -1782,5 +1782,113 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
 header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-nav-toggle svg {
   animation: none;
   color: var(--s2a-color-gray-1000);
+}
+
+/* =========================================
+   Language banner offset
+   Pushes the gnav below the banner while it is visible;
+   smoothly removes the offset as the banner scrolls out of the viewport.
+   ========================================= */
+
+/* --feds-language-banner-height is defined in milo/libs/c2/styles/styles.css,
+   next to the .language-banner reservation rule it sizes. */
+:root {
+  /* Expands the named view-timeline scope so sibling elements (the fixed
+     header) can reference --language-banner-view, not just descendants. */
+  timeline-scope: --language-banner-view;
+}
+
+.language-banner {
+  view-timeline: --language-banner-view block;
+}
+
+/* Opening the localnav bar suppresses the banner (see Main.ts,
+   initAriaToggleListeners) rather than trying to hand off the header's `top`
+   from the banner's scroll-linked animation to localnav.css's static
+   open-state value — animations don't transition smoothly into a static
+   value, so that hand-off always snapped. With the banner suppressed,
+   :has(.language-banner...) below stops matching entirely and the header
+   falls back to localnav.css's own already-smooth open/close transition. */
+.language-banner.feds-banner-suppressed {
+  display: none;
+}
+
+/* Single source of truth for every offset below: a scroll-linked animation
+   on ONE custom property, inherited from :root. Every consumer (header,
+   nav, popups, menu-wrapper) reads it via a plain, non-animated calc()
+   instead of running its own parallel animation — they can never drift
+   apart from each other mid-scroll the way separate `animation-name`s on
+   different elements theoretically could (each is its own animation
+   instance, even sharing the same timeline). This also sidesteps the
+   overflow-auto rendering bugs found when max-height itself was directly
+   animated (see git history) — max-height below is a plain calc(), not an
+   animation target. */
+@property --feds-banner-scroll-offset {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@keyframes feds-banner-scroll {
+  from { --feds-banner-scroll-offset: var(--feds-language-banner-height, 44px); }
+  to   { --feds-banner-scroll-offset: 0px; }
+}
+
+:root:has(.language-banner:not(.feds-banner-suppressed)) {
+  animation: feds-banner-scroll linear both;
+  animation-timeline: --language-banner-view;
+  animation-range: exit;
+}
+
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation,
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav {
+  top: var(--feds-banner-scroll-offset);
+}
+
+/* feds-popup: offset top when banner is visible. :not(.small-menu) excludes
+   the small-menu variant (Components/SmallMenu/small-menu.css), which is
+   position: absolute anchored to its own trigger <li> (top: 100%, max-height:
+   none) rather than position: fixed relative to the viewport — our
+   viewport-relative offset would otherwise override its intentional
+   dropdown-under-trigger positioning. */
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav:not(.localnav) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px);
+}
+
+/* localnav's hamburger-flow popup (bar closed) uses a plain --s2a-spacing-64
+   top with no +8-1px baseline (see localnav.css) — different from the
+   standard popup the rule above targets. When the bar is open instead, the
+   banner is already suppressed via the bar's own open/close handling in
+   Main.ts, so :has(.language-banner...) below simply won't match and
+   localnav.css's breadcrumbs-height-based top applies untouched. Same
+   :not(.small-menu) exclusion as above. */
+:root:has(.language-banner:not(.feds-banner-suppressed)) nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
+  max-height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
+}
+
+/* Disable the height transition on the backdrop while the banner is present.
+   nav::after's height is JS-measured off the open popup's rendered size
+   (see ClickListeners.ts); without this override the 0.35s height ease
+   could still cause it to lag visibly behind the popup during scroll. */
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav::after {
+  transition: all 0.48s cubic-bezier(0.42, 0, 0.2, 1), height 0s linear;
+}
+
+/* feds-menu-wrapper top/height: safe globally, no effect on position:static desktop nav item */
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
+}
+
+@media (max-width: 1023px) {
+  :root:has(.language-banner:not(.feds-banner-suppressed)) .global-navigation nav:not(.localnav) > ul > li.feds-menu-wrapper {
+    top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
+    height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
+  }
+}
+
+:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
+  height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
 }
 

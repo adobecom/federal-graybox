@@ -83,12 +83,12 @@
    Promo Card CTA
    ========================================= */
 
-.feds-gnav-cards .promo-card__cta {
+.global-navigation .feds-gnav-cards .promo-card__cta {
   display: block;
   margin-top: var(--s2a-spacing-lg);
 }
 
-.feds-gnav-cards .promo-card__cta .feds-secondary-cta {
+.global-navigation .feds-gnav-cards .promo-card__cta .feds-secondary-cta {
   letter-spacing: 0;
   border: none;
   background: var(--s2a-color-gray-25);
@@ -101,8 +101,8 @@
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.feds-gnav-cards .promo-card__cta .feds-secondary-cta:hover,
-.feds-gnav-cards .promo-card__cta .feds-secondary-cta:focus {
+.global-navigation .feds-gnav-cards .promo-card__cta .feds-secondary-cta:hover,
+.global-navigation .feds-gnav-cards .promo-card__cta .feds-secondary-cta:focus {
   background: var(--s2a-color-gray-1000);
   color: var(--s2a-color-gray-25);
 }

@@ -75,7 +75,7 @@
   color: inherit;
 }
 
-.feds-gnav-cards .promo-card-small__cta .feds-secondary-cta {
+.global-navigation .feds-gnav-cards .promo-card-small__cta .feds-secondary-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -85,8 +85,8 @@
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.feds-gnav-cards .promo-card-small__cta .feds-secondary-cta:hover,
-.feds-gnav-cards .promo-card-small__cta .feds-secondary-cta:focus {
+.global-navigation .feds-gnav-cards .promo-card-small__cta .feds-secondary-cta:hover,
+.global-navigation .feds-gnav-cards .promo-card-small__cta .feds-secondary-cta:focus {
   background: rgba(255, 255, 255, 0.15);
 }
 

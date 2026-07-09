@@ -1,0 +1,226 @@
+.global-navigation {
+  /* =========================================
+     Product Entry CTA — layout
+     ========================================= */
+
+  & .feds-product-entry-cta {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: var(--s2a-spacing-sm);
+
+    @media (max-width: 1024px) {
+      display: none;
+    }
+
+    & + .feds-utilities {
+      margin-left: 0;
+    }
+  }
+
+  [dir="rtl"] & .feds-product-entry-cta {
+    margin-left: var(--s2a-spacing-sm);
+    margin-right: auto;
+
+    & + .feds-utilities {
+      padding-right: 0;
+      padding-left: var(--s2a-spacing-md);
+      margin-left: 0;
+    }
+  }
+
+  /* =========================================
+     Gnav + product entry CTA — shared base
+     ========================================= */
+
+  & ul.feds-gnav-items > li > :is(.feds-primary-cta, .feds-secondary-cta) {
+    margin-left: var(--s2a-spacing-sm);
+  }
+
+  & :is(
+    ul.feds-gnav-items > li > .feds-primary-cta,
+    ul.feds-gnav-items > li > .feds-secondary-cta,
+    .feds-product-entry-cta .feds-primary-cta,
+    .feds-product-entry-cta .feds-secondary-cta
+  ) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: content-box;
+    padding: 10px var(--s2a-spacing-lg);
+    border-radius: var(--s2a-border-radius-round);
+    border: var(--s2a-border-width-sm) solid transparent;
+    font-family: var(--body-font-family);
+    font-weight: var(--s2a-font-weight-adobe-clean-bold);
+    font-size: var(--s2a-typography-font-size-label);
+    line-height: var(--s2a-typography-line-height-label);
+    letter-spacing: var(--s2a-typography-letter-spacing-label);
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  /* =========================================
+     Primary CTA colors
+     Default: white pill, dark text (transparent gnav over imagery)
+     ========================================= */
+
+  & :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta) {
+    background-color: var(--s2a-color-gray-25);
+    color: var(--s2a-color-gray-1000);
+    border-color: var(--s2a-color-gray-25);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.64);
+      color: var(--s2a-color-gray-1000);
+      border-color: rgba(255, 255, 255, 0.64);
+    }
+  }
+
+  /* Dark font: invert to dark pill, white text */
+  &.dark-font :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta) {
+    background-color: var(--s2a-color-gray-1000);
+    color: var(--s2a-color-gray-25);
+    border-color: var(--s2a-color-gray-1000);
+
+    &:hover {
+      background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+      color: var(--s2a-color-gray-25);
+      border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+    }
+  }
+
+  /* Scrolled: dark pill regardless of font theme */
+  &.feds-header-scrolled :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta) {
+    background-color: var(--s2a-color-gray-1000);
+    color: var(--s2a-color-gray-25);
+    border-color: var(--s2a-color-gray-1000);
+
+    &:hover {
+      background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+      color: var(--s2a-color-gray-25);
+      border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+    }
+  }
+
+  /* Menu active: invert primary to dark — desktop only, not compact */
+  @media (min-width: 1024px) {
+    &:not(.is-compact):has(.feds-menu-active):not(:has(.small-menu.is-open)) :is(
+      ul.feds-gnav-items > li > .feds-primary-cta,
+      .feds-product-entry-cta .feds-primary-cta
+    ) {
+      background-color: var(--s2a-color-gray-1000);
+      color: var(--s2a-color-gray-25);
+      border-color: var(--s2a-color-gray-1000);
+    }
+  }
+
+  /* =========================================
+     Secondary CTA colors
+     Default: outlined white, transparent fill
+     ========================================= */
+
+  & :is(ul.feds-gnav-items > li > .feds-secondary-cta, .feds-product-entry-cta .feds-secondary-cta) {
+    background-color: transparent;
+    color: var(--s2a-color-gray-25);
+    border-color: var(--s2a-color-gray-25);
+
+    /* Hover. In the non-scrolled state the resting color is white (over a
+       transparent gnav), so darken the text on hover to stay legible. */
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.64);
+      color: var(--s2a-color-gray-1000);
+    }
+  }
+
+  &.dark-font :is(ul.feds-gnav-items > li > .feds-secondary-cta, .feds-product-entry-cta .feds-secondary-cta) {
+    border-color: var(--s2a-color-gray-1000);
+    color: var(--s2a-color-gray-1000);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+      color: var(--s2a-color-gray-1000);
+    }
+  }
+
+  &.feds-header-scrolled :is(
+    ul.feds-gnav-items > li > .feds-secondary-cta,
+    .feds-product-entry-cta .feds-secondary-cta
+  ) {
+    color: var(--s2a-color-gray-1000);
+    border-color: var(--s2a-color-gray-1000);
+  }
+
+  /* Menu active: secondary also switches to dark outline */
+  &:has(.feds-menu-active) ul.feds-gnav-items > li > .feds-secondary-cta {
+    background-color: transparent;
+    color: var(--s2a-color-gray-1000);
+    border-color: var(--s2a-color-gray-1000);
+  }
+
+  /* Open popup / mobile drawer: force dark-outline on product entry CTA
+     regardless of scroll state (gnav backdrop turns light/grey). */
+  &:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta {
+    & :is(.feds-primary-cta, .feds-secondary-cta) {
+      background-color: transparent;
+      color: var(--s2a-color-gray-1000);
+      border-color: var(--s2a-color-gray-1000);
+    }
+  }
+
+  /* =========================================
+     Popup CTAs
+     ========================================= */
+
+  & .feds-popup {
+    & .feds-primary-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      padding: 11px 14px 10px;
+      border-radius: var(--s2a-border-radius-round);
+      font-weight: var(--s2a-font-weight-adobe-clean-bold);
+      font-size: var(--s2a-typography-font-size-body-sm);
+      line-height: var(--s2a-typography-line-height-body-sm);
+      letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+      color: var(--s2a-color-gray-25);
+      text-decoration: none;
+      background-color: rgba(59, 99, 251, 1);
+
+      &:hover {
+        background-color: var(--s2a-color-button-background-accent-solid-on-light-hover, #274dea);
+      }
+
+      &:active {
+        background-color: var(--s2a-color-button-background-accent-solid-on-light-active, #1e3bb8);
+      }
+    }
+
+    & .feds-secondary-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      padding: 11px 14px 10px;
+      border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
+      border-radius: var(--s2a-border-radius-round);
+      font-weight: var(--s2a-font-weight-adobe-clean-bold);
+      font-size: var(--s2a-typography-font-size-body-sm);
+      line-height: var(--s2a-typography-line-height-body-sm);
+      letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+      color: var(--s2a-color-content-default);
+      text-decoration: none;
+
+      &:hover {
+        background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
+      }
+    }
+  }
+
+  .featured-card .footer-container a {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+

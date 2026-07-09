@@ -32,6 +32,7 @@
 @import "../Components/Panels/panels.css";
 @import "../Components/FeaturedCard/featured-card.css";
 @import "../Components/Localnav/localnav.css";
+@import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
 
 /* =========================================
@@ -144,133 +145,6 @@ header.feds-header-scrolled nav {
   padding-right: var(--s2a-spacing-md);
 }
 
-/* =========================================
-   Product Entry CTA
-   ========================================= */
-
-.global-navigation .feds-product-entry-cta {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-  margin-right: var(--s2a-spacing-sm);
-  @media (max-width: 1024px) {
-    display: none;
-  }
-}
-
-[dir="rtl"] .global-navigation .feds-product-entry-cta {
-  margin-left: var(--s2a-spacing-sm);
-  margin-right: auto;
-}
-
-[dir="rtl"] .global-navigation .feds-product-entry-cta + .feds-utilities {
-  padding-right: 0;
-  padding-left: var(--s2a-spacing-md);
-  margin-left: 0;
-}
-
-.global-navigation .feds-product-entry-cta + .feds-utilities {
-  margin-left: 0;
-}
-
-.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
-.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta {
-  margin-left: var(--s2a-spacing-sm);
-}
-
-.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
-.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
-.global-navigation .feds-product-entry-cta .feds-primary-cta,
-.global-navigation .feds-product-entry-cta .feds-secondary-cta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: content-box;
-  padding: 10px var(--s2a-spacing-lg);
-  border-radius: var(--s2a-border-radius-round);
-  border: var(--s2a-border-width-sm) solid transparent;
-  font-family: var(--body-font-family);
-  font-weight: var(--s2a-font-weight-adobe-clean-bold);
-  font-size: var(--s2a-typography-font-size-label);
-  line-height: var(--s2a-typography-line-height-label);
-  letter-spacing: var(--s2a-typography-letter-spacing-label);
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-/* Default (transparent gnav over imagery):
-   - primary: filled white pill with dark text
-   - secondary: outlined in white, transparent fill */
-.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
-.global-navigation .feds-product-entry-cta .feds-primary-cta {
-  background-color: var(--s2a-color-gray-25);
-  color: var(--s2a-color-gray-1000);
-  border-color: var(--s2a-color-gray-25);
-}
-
-.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
-.global-navigation .feds-product-entry-cta .feds-secondary-cta {
-  background-color: transparent;
-  color: var(--s2a-color-gray-25);
-  border-color: var(--s2a-color-gray-25);
-}
-
-.global-navigation.dark-font ul.feds-gnav-items > li > .feds-secondary-cta,
-.global-navigation.dark-font .feds-product-entry-cta .feds-secondary-cta {
-   border-color: var(--s2a-color-gray-1000);
-   color: var(--s2a-color-gray-1000);
-}
-
-/* Scrolled (blurred whitish backdrop):
-   - primary: filled dark pill with white text (inverse of default)
-   - secondary: outlined in dark, transparent fill (matches popup secondary) */
-.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
-.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
-  background-color: var(--s2a-color-gray-1000);
-  color: var(--s2a-color-gray-25);
-  border-color: var(--s2a-color-gray-1000);
-}
-
-.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
-.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-secondary-cta {
-  color: var(--s2a-color-gray-1000);
-  border-color: var(--s2a-color-gray-1000);
-}
-
-/* Open popup / mobile drawer state: gnav gets a light/grey backdrop, so
-   force the dark-outline treatment regardless of scroll state, mirroring
-   the unav profile button at styles.css:109-113. */
-.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-primary-cta,
-.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-secondary-cta {
-  background-color: transparent;
-  color: var(--s2a-color-gray-1000);
-  border-color: var(--s2a-color-gray-1000);
-}
-
-/* Hover. In the non-scrolled state the resting color of the secondary CTA
-   is white (over a transparent gnav), so on hover we darken the text as
-   well so it remains legible against the hover fill. The primary
-   CTA already resolves to white text on hover in both states. */
-.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta:hover,
-.global-navigation .feds-product-entry-cta .feds-secondary-cta:hover {
-  background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
-  color: var(--s2a-color-gray-1000);
-}
-
-.global-navigation ul.feds-gnav-items > li > .feds-primary-cta:hover,
-.global-navigation .feds-product-entry-cta .feds-primary-cta:hover {
-  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
-  color: var(--s2a-color-gray-25);
-  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
-}
-
-.global-navigation.feds-header-scrolled ul.feds-gnav-items > li > .feds-primary-cta:hover,
-.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta:hover {
-  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
-  color: var(--s2a-color-gray-25);
-  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
-}
 
 .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
@@ -438,11 +312,14 @@ header.global-navigation.feds-header-scrolled nav::after {
    localnav, opacity fade in the off-canvas drawer). Without this the items
    would snap back to the small body-sm font mid-close. */
 .global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open, .feds-menu-wrapper.feds-menu-active) .feds-gnav-items > li > .feds-link {
-  color: var(--s2a-color-gray-1000);
   font-size: var(--s2a-typography-font-size-heading-2);
   line-height: var(--s2a-typography-line-height-heading-2);
   letter-spacing: var(--s2a-typography-letter-spacing-heading-2);
   padding: var(--s2a-spacing-xs) 0;
+}
+
+.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open, .feds-menu-wrapper.feds-menu-active):not(:has(.small-menu.feds-menu-active)) .feds-gnav-items > li > .feds-link {
+  color: var(--s2a-color-gray-1000);
 }
 
 .global-navigation:not(.dark-font) nav:has(> .feds-menu-wrapper .feds-popup.is-open.small-menu) > ul.feds-gnav-items > li > .feds-link {

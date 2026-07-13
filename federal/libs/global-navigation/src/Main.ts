@@ -1,5 +1,6 @@
 import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
 import { component } from "./Components/Component";
+import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
@@ -29,7 +30,6 @@ type GlobalNavigation = {
 
 export type Input = {
   gnavSource: URL;
-  asideSource: URL | null;
   gnavTop?: number;
   mepMartech?: string;
   isLocalNav: boolean;
@@ -102,7 +102,7 @@ export const main = async (
     lanaLog(initial.message);
     throw initial;
   }
-  const { mainNav, aside: _aside } = initial;
+  const { mainNav, promoBarEl } = initial;
   if (mainNav instanceof IrrecoverableError) {
     lanaLog(mainNav.message);
     throw mainNav;
@@ -111,14 +111,15 @@ export const main = async (
   const gnavData = parseNavigation(
     mainNav,
     unavEnabled,
-    await getPlaceholders()
+    await getPlaceholders(),
+    promoBarEl,
   );
+
   if (gnavData instanceof IrrecoverableError) {
     lanaLog(gnavData.message);
     throw gnavData;
   }
 
-  // TODO: Implement Aside
   await renderGnav(gnavData)(mountpoint);
 
   input.convertStageLinks?.({
@@ -138,6 +139,22 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
   mountpoint.innerHTML = navHTML;
+  const promoBar = await data.promoBar;
+  if (promoBar !== null) {
+    const promoWrapper = document.querySelector<HTMLElement>(
+      '.feds-promo-aside-wrapper',
+    );
+    if (promoWrapper !== null) {
+      promoWrapper.innerHTML = renderPromoBar(promoBar);
+      const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
+      promoWrapper.style.display = 'none';
+      const barBgColor = promoBarEl?.style.backgroundColor ?? '';
+      if (barBgColor !== '') {
+        promoWrapper.style.backgroundColor = barBgColor;
+      }
+      await initMerchLinks(promoWrapper);
+    }
+  }
   if (data.components.filter(c => c.type !== 'Brand').length === 0) mountpoint.classList.add('thin');
   if (data.darkFont) mountpoint.classList.add('dark-font');
   const megaMenus = [
@@ -290,6 +307,7 @@ export const postRenderingTasks = async (
   activeDropDown?.classList.add('active-element');
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
+  initPromoBarHeight(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -490,8 +508,19 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
     }
   };
 
-  const SCROLL_THRESHOLD = 20;
-  let scrolledPast = window.scrollY > SCROLL_THRESHOLD;
+  const promoBarEl = document.querySelector<HTMLElement>(
+    '.feds-promo-aside-wrapper .feds-promo-bar',
+  );
+  const promoBarElMinHeight = (): number =>
+    promoBarEl === null ? 70
+    : promoBarEl.classList.contains('feds-promo-bar--maximized-release') ? 280
+    : promoBarEl.classList.contains('feds-promo-bar--maximized') ? 182
+    : 70;
+
+  const getScrollThreshold = (): number =>
+    promoBarEl !== null ? promoBarElMinHeight() : 20;
+
+  let scrolledPast = window.scrollY > getScrollThreshold();
   let scrollRafId: number | null = null;
 
   // Set the initial state synchronously before the first paint.
@@ -501,7 +530,7 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
     if (scrollRafId !== null) return;
     scrollRafId = requestAnimationFrame(() => {
       scrollRafId = null;
-      const next = window.scrollY > SCROLL_THRESHOLD;
+      const next = window.scrollY > getScrollThreshold();
       if (next === scrolledPast) return;
       scrolledPast = next;
       updateHeaderState(scrolledPast);
@@ -636,4 +665,50 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
       focusTarget?.focus();
     });
   });
+};
+
+const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
+  const promoBar = document.querySelector<HTMLElement>(
+    '.feds-promo-aside-wrapper .feds-promo-bar',
+  );
+  if (promoBar === null) return;
+
+  const promoWrapper = promoBar.closest<HTMLElement>(
+    '.feds-promo-aside-wrapper',
+  );
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      if (promoWrapper) promoWrapper.style.display = '';
+      promoWrapper?.classList.add('feds-promo-bar--reveal');
+    }, 5000);
+  });
+
+  let naturalHeight = promoBar.offsetHeight;
+  let rafId: number | null = null;
+
+  const update = (): void => {
+    const visible = Math.max(0, naturalHeight - window.scrollY);
+    document.documentElement.style.setProperty(
+      '--feds-promo-bar-height',
+      `${visible}px`,
+    );
+  };
+
+  // Re-measure on resize in case the promo bar reflows
+  new ResizeObserver(() => {
+    naturalHeight = promoBar.offsetHeight;
+    update();
+  }).observe(promoBar);
+
+  const onScroll = (): void => {
+    if (rafId !== null) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      update();
+    });
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  update();
 };

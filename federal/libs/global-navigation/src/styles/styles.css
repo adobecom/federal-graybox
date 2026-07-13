@@ -32,6 +32,7 @@
 @import "../Components/Panels/panels.css";
 @import "../Components/FeaturedCard/featured-card.css";
 @import "../Components/Localnav/localnav.css";
+@import "../Components/PromoBar/promo-bar.css";
 @import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
 
@@ -81,6 +82,12 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   /* Height of the breadcrumbs row; consumed by both the breadcrumbs
      component and the nav::after backdrop that extends to cover it. */
   --feds-breadcrumbs-height: 52px;
+  /* Height of the promo bar; set once by ResizeObserver, consumed by
+     the scroll-driven animation that offsets the fixed header. */
+  --feds-promo-bar-height: 0px;
+  /* Hoists the promo view-timeline so the fixed <header> sibling
+     can reference it (same pattern as --language-banner-view). */
+  timeline-scope: --promo-bar-view;
 }
 
 
@@ -94,9 +101,6 @@ header.global-navigation {
   top: 0;
   left: 0;
   z-index: 10;
-  /* right: 0;
-  max-width: var(--grid-max-width-default);
-  margin: auto; */
   /* Drives the height of `nav::after` (the rounded backdrop frame).
      Default value covers the nav row; the JS in
      PostRendering/ClickListeners.ts mutates this property when a
@@ -172,6 +176,7 @@ header.feds-header-scrolled nav {
 
 header.global-navigation nav {
   position: fixed;
+  top: var(--feds-promo-bar-height);
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: 1968px;
   margin: var(--s2a-spacing-xs) auto;

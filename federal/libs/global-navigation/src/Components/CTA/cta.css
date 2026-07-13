@@ -78,15 +78,17 @@
   }
 
   /* Dark font: invert to dark pill, white text */
-  &.dark-font :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta) {
-    background-color: var(--s2a-color-gray-1000);
-    color: var(--s2a-color-gray-25);
-    border-color: var(--s2a-color-gray-1000);
-
-    &:hover {
-      background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+   @media (min-width: 1024px) {
+    &.dark-font:not(.is-compact) :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta) {
+      background-color: var(--s2a-color-gray-1000);
       color: var(--s2a-color-gray-25);
-      border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+      border-color: var(--s2a-color-gray-1000);
+
+      &:hover {
+        background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+        color: var(--s2a-color-gray-25);
+        border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+      }
     }
   }
 

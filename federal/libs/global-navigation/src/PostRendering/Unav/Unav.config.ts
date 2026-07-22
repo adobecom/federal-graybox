@@ -10,7 +10,7 @@ import type {
   HelpItem,
 } from './Unav.types';
 import { setUserProfile } from './Unav.utils';
-import { getMiloConfig, getMetadata } from '../../Utils/Utils';
+import { getMiloConfig, getMetadata, isBEEnabled } from '../../Utils/Utils';
 
 // ============================================================================
 // Helper functions
@@ -111,6 +111,7 @@ function getHelpChildren(): HelpItem[] {
  */
 export const getUnavComponents = (): UnavComponents => {
   const config = getMiloConfig();
+  const beEnabled = isBEEnabled();
   const uncAppId = config?.unav?.uncAppId;
   return {
     profile: {
@@ -121,8 +122,10 @@ export const getUnavComponents = (): UnavComponents => {
             enableLocalSection: true,
             enableProfileSwitcher: true,
             miniAppContext: {
-              enableManagePeople:
+              ...(beEnabled && {
+                enableManagePeople:
                   config?.unav?.profile?.enableManagePeople ?? true,
+              }),
               logger: {
                 trace: (): void => {},
                 debug: (): void => {},
@@ -143,13 +146,15 @@ export const getUnavComponents = (): UnavComponents => {
                 error: (): void => {},
               },
             },
-            managePeopleConfig: {
+            ...(beEnabled && {
+              managePeopleConfig: {
                 enableWorkflow: true,
                 params: {
                   enableinlineoverlay: 's2-compat',
                 },
                 ...config?.unav?.profile?.managePeopleConfig,
               },
+            }),
             complexConfig: config?.unav?.profile?.complexConfig || null,
             ...config?.unav?.profile?.config,
           },

@@ -32,8 +32,6 @@
 @import "../Components/Panels/panels.css";
 @import "../Components/FeaturedCard/featured-card.css";
 @import "../Components/Localnav/localnav.css";
-@import "../Components/PromoBar/promo-bar.css";
-@import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
 
 /* =========================================
@@ -82,12 +80,6 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   /* Height of the breadcrumbs row; consumed by both the breadcrumbs
      component and the nav::after backdrop that extends to cover it. */
   --feds-breadcrumbs-height: 52px;
-  /* Height of the promo bar; set once by ResizeObserver, consumed by
-     the scroll-driven animation that offsets the fixed header. */
-  --feds-promo-bar-height: 0px;
-  /* Hoists the promo view-timeline so the fixed <header> sibling
-     can reference it (same pattern as --language-banner-view). */
-  timeline-scope: --promo-bar-view;
 }
 
 
@@ -101,6 +93,9 @@ header.global-navigation {
   top: 0;
   left: 0;
   z-index: 10;
+  /* right: 0;
+  max-width: var(--grid-max-width-default);
+  margin: auto; */
   /* Drives the height of `nav::after` (the rounded backdrop frame).
      Default value covers the nav row; the JS in
      PostRendering/ClickListeners.ts mutates this property when a
@@ -149,6 +144,133 @@ header.feds-header-scrolled nav {
   padding-right: var(--s2a-spacing-md);
 }
 
+/* =========================================
+   Product Entry CTA
+   ========================================= */
+
+.global-navigation .feds-product-entry-cta {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: var(--s2a-spacing-sm);
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+[dir="rtl"] .global-navigation .feds-product-entry-cta {
+  margin-left: var(--s2a-spacing-sm);
+  margin-right: auto;
+}
+
+[dir="rtl"] .global-navigation .feds-product-entry-cta + .feds-utilities {
+  padding-right: 0;
+  padding-left: var(--s2a-spacing-md);
+  margin-left: 0;
+}
+
+.global-navigation .feds-product-entry-cta + .feds-utilities {
+  margin-left: 0;
+}
+
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta {
+  margin-left: var(--s2a-spacing-sm);
+}
+
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation .feds-product-entry-cta .feds-primary-cta,
+.global-navigation .feds-product-entry-cta .feds-secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: content-box;
+  padding: 10px var(--s2a-spacing-lg);
+  border-radius: var(--s2a-border-radius-round);
+  border: var(--s2a-border-width-sm) solid transparent;
+  font-family: var(--body-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Default (transparent gnav over imagery):
+   - primary: filled white pill with dark text
+   - secondary: outlined in white, transparent fill */
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation .feds-product-entry-cta .feds-primary-cta {
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-25);
+}
+
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation .feds-product-entry-cta .feds-secondary-cta {
+  background-color: transparent;
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-25);
+}
+
+.global-navigation.dark-font ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.dark-font .feds-product-entry-cta .feds-secondary-cta {
+   border-color: var(--s2a-color-gray-1000);
+   color: var(--s2a-color-gray-1000);
+}
+
+/* Scrolled (blurred whitish backdrop):
+   - primary: filled dark pill with white text (inverse of default)
+   - secondary: outlined in dark, transparent fill (matches popup secondary) */
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta,
+.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta {
+  background-color: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta,
+.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-secondary-cta {
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+/* Open popup / mobile drawer state: gnav gets a light/grey backdrop, so
+   force the dark-outline treatment regardless of scroll state, mirroring
+   the unav profile button at styles.css:109-113. */
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-primary-cta,
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-product-entry-cta .feds-secondary-cta {
+  background-color: transparent;
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+}
+
+/* Hover. In the non-scrolled state the resting color of the secondary CTA
+   is white (over a transparent gnav), so on hover we darken the text as
+   well so it remains legible against the hover fill. The primary
+   CTA already resolves to white text on hover in both states. */
+.global-navigation ul.feds-gnav-items > li > .feds-secondary-cta:hover,
+.global-navigation .feds-product-entry-cta .feds-secondary-cta:hover {
+  background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
+  color: var(--s2a-color-gray-1000);
+}
+
+.global-navigation ul.feds-gnav-items > li > .feds-primary-cta:hover,
+.global-navigation .feds-product-entry-cta .feds-primary-cta:hover {
+  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+}
+
+.global-navigation.feds-header-scrolled ul.feds-gnav-items > li > .feds-primary-cta:hover,
+.global-navigation.feds-header-scrolled .feds-product-entry-cta .feds-primary-cta:hover {
+  background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+  color: var(--s2a-color-gray-25);
+  border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+}
 
 .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
@@ -176,7 +298,6 @@ header.feds-header-scrolled nav {
 
 header.global-navigation nav {
   position: fixed;
-  top: var(--feds-promo-bar-height);
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: 1968px;
   margin: var(--s2a-spacing-xs) auto;
@@ -317,14 +438,11 @@ header.global-navigation.feds-header-scrolled nav::after {
    localnav, opacity fade in the off-canvas drawer). Without this the items
    would snap back to the small body-sm font mid-close. */
 .global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open, .feds-menu-wrapper.feds-menu-active) .feds-gnav-items > li > .feds-link {
+  color: var(--s2a-color-gray-1000);
   font-size: var(--s2a-typography-font-size-heading-2);
   line-height: var(--s2a-typography-line-height-heading-2);
   letter-spacing: var(--s2a-typography-letter-spacing-heading-2);
   padding: var(--s2a-spacing-xs) 0;
-}
-
-.global-navigation:has(.feds-popup.is-open, .feds-menu-wrapper.is-open, .feds-menu-wrapper.feds-menu-active):not(:has(.small-menu.feds-menu-active)) .feds-gnav-items > li > .feds-link {
-  color: var(--s2a-color-gray-1000);
 }
 
 .global-navigation:not(.dark-font) nav:has(> .feds-menu-wrapper .feds-popup.is-open.small-menu) > ul.feds-gnav-items > li > .feds-link {
@@ -1180,7 +1298,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
   header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
     overflow-y: auto;
-    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-banner-scroll-offset));
+    max-height: calc(100dvh - var(--s2a-spacing-64));
   }
 
   .feds-gnav-items > li > .feds-link:first-child {
@@ -1664,113 +1782,5 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
 header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-switcher-open) .feds-nav-toggle svg {
   animation: none;
   color: var(--s2a-color-gray-1000);
-}
-
-/* =========================================
-   Language banner offset
-   Pushes the gnav below the banner while it is visible;
-   smoothly removes the offset as the banner scrolls out of the viewport.
-   ========================================= */
-
-/* --feds-language-banner-height is defined in milo/libs/c2/styles/styles.css,
-   next to the .language-banner reservation rule it sizes. */
-:root {
-  /* Expands the named view-timeline scope so sibling elements (the fixed
-     header) can reference --language-banner-view, not just descendants. */
-  timeline-scope: --language-banner-view;
-}
-
-.language-banner {
-  view-timeline: --language-banner-view block;
-}
-
-/* Opening the localnav bar suppresses the banner (see Main.ts,
-   initAriaToggleListeners) rather than trying to hand off the header's `top`
-   from the banner's scroll-linked animation to localnav.css's static
-   open-state value — animations don't transition smoothly into a static
-   value, so that hand-off always snapped. With the banner suppressed,
-   :has(.language-banner...) below stops matching entirely and the header
-   falls back to localnav.css's own already-smooth open/close transition. */
-.language-banner.feds-banner-suppressed {
-  display: none;
-}
-
-/* Single source of truth for every offset below: a scroll-linked animation
-   on ONE custom property, inherited from :root. Every consumer (header,
-   nav, popups, menu-wrapper) reads it via a plain, non-animated calc()
-   instead of running its own parallel animation — they can never drift
-   apart from each other mid-scroll the way separate `animation-name`s on
-   different elements theoretically could (each is its own animation
-   instance, even sharing the same timeline). This also sidesteps the
-   overflow-auto rendering bugs found when max-height itself was directly
-   animated (see git history) — max-height below is a plain calc(), not an
-   animation target. */
-@property --feds-banner-scroll-offset {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0px;
-}
-
-@keyframes feds-banner-scroll {
-  from { --feds-banner-scroll-offset: var(--feds-language-banner-height, 44px); }
-  to   { --feds-banner-scroll-offset: 0px; }
-}
-
-:root:has(.language-banner:not(.feds-banner-suppressed)) {
-  animation: feds-banner-scroll linear both;
-  animation-timeline: --language-banner-view;
-  animation-range: exit;
-}
-
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation,
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav {
-  top: var(--feds-banner-scroll-offset);
-}
-
-/* feds-popup: offset top when banner is visible. :not(.small-menu) excludes
-   the small-menu variant (Components/SmallMenu/small-menu.css), which is
-   position: absolute anchored to its own trigger <li> (top: 100%, max-height:
-   none) rather than position: fixed relative to the viewport — our
-   viewport-relative offset would otherwise override its intentional
-   dropdown-under-trigger positioning. */
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav:not(.localnav) .feds-popup:not(.small-menu) {
-  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px);
-}
-
-/* localnav's hamburger-flow popup (bar closed) uses a plain --s2a-spacing-64
-   top with no +8-1px baseline (see localnav.css) — different from the
-   standard popup the rule above targets. When the bar is open instead, the
-   banner is already suppressed via the bar's own open/close handling in
-   Main.ts, so :has(.language-banner...) below simply won't match and
-   localnav.css's breadcrumbs-height-based top applies untouched. Same
-   :not(.small-menu) exclusion as above. */
-:root:has(.language-banner:not(.feds-banner-suppressed)) nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) {
-  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
-  max-height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
-}
-
-/* Disable the height transition on the backdrop while the banner is present.
-   nav::after's height is JS-measured off the open popup's rendered size
-   (see ClickListeners.ts); without this override the 0.35s height ease
-   could still cause it to lag visibly behind the popup during scroll. */
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav::after {
-  transition: all 0.48s cubic-bezier(0.42, 0, 0.2, 1), height 0s linear;
-}
-
-/* feds-menu-wrapper top/height: safe globally, no effect on position:static desktop nav item */
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav:not(.localnav) > ul > li.feds-menu-wrapper {
-  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
-}
-
-@media (max-width: 1023px) {
-  :root:has(.language-banner:not(.feds-banner-suppressed)) .global-navigation nav:not(.localnav) > ul > li.feds-menu-wrapper {
-    top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
-    height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
-  }
-}
-
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper {
-  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
-  height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
 }
 

@@ -65,7 +65,7 @@
   height: 8px;
 }
 
-.global-navigation .featured-card a.feds-secondary-cta {
+.featured-card a.feds-secondary-cta {
   background: var(--s2a-color-gray-1000);
   color: var(--s2a-color-gray-25);
 }
@@ -83,7 +83,7 @@
   box-sizing: border-box;
 }
 
-.global-navigation .featured-card .footer-container a.feds-secondary-cta:hover {
+.featured-card .footer-container a.feds-secondary-cta:hover {
   background: var(--s2a-color-gray-1000);
 }
 

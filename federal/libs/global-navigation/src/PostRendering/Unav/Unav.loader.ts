@@ -215,12 +215,9 @@ export const loadUnav = async (
     }
 
     // ========================================================================
-    // Step 3: Check user authentication state (at page-load time only)
+    // Step 3: Check user authentication state
     // ========================================================================
-    // signedOut / visibleComponents are intentionally NOT captured here.
-    // They are re-evaluated on every getConfiguration() call so that an
-    // external system can complete login and then call reloadUnav() to get
-    // a fully signed-in UNAV experience without re-running loadUnav().
+    const signedOut = window.adobeIMS?.isSignedInUser() !== true;
 
     // Parse component list from meta tag
     const unavComponents = trimmedValue
@@ -232,10 +229,19 @@ export const loadUnav = async (
           component === 'signup'
       );
 
-    // Pre-calculate width using the initial (signed-out) auth state for CLS
-    // prevention. The constraint is removed after UNAV initialises (Step 8).
-    const initialSignedOut = window.adobeIMS?.isSignedInUser() !== true;
-    const width = getUnavWidthCSS(unavComponents, initialSignedOut);
+    // Apply visibility rules (uc_carts cookie + signed-out icon allowlist)
+    // so the children array we pass to UniversalNav matches what gets rendered
+    // and matches the width reserved for CLS prevention.
+    const visibleComponents = getVisibleUnavComponents(
+      unavComponents,
+      signedOut
+    );
+
+    // Pre-calculate width for BOTH states to prevent layout shift while
+    // UniversalNav boots. For signed-in users the constraint is removed
+    // after init (Step 8) so the profile pill can size to the user's name;
+    // for signed-out users it stays applied to anchor the sign-in CTA layout.
+    const width = getUnavWidthCSS(unavComponents, signedOut);
     utilitiesContainer.style.setProperty('min-width', width);
 
     // ========================================================================
@@ -292,135 +298,110 @@ export const loadUnav = async (
     ]);
 
     // ========================================================================
-    // Step 6 + 7: Build component children and UNAV configuration object
-    //
-    // getConfiguration() re-evaluates auth state on every call so that
-    // reloadUnav() called by an external system after login produces a
-    // fully signed-in config rather than the stale signed-out one captured
-    // at loadUnav() time.
+    // Step 6: Build component children array
     // ========================================================================
+    
+    /**
+     * Dynamically assembles child components based on meta tag configuration
+     * Special handling for profile (always first) and signup
+     * (which modifies profile).
+     */
+    const getChildren = (): UnavChildren => {
+      const unavComponentsConfig = getUnavComponents();
+      const children: UnavChildren = [unavComponentsConfig.profile];
 
-    const getConfiguration = (): UnavConfig => {
-      // Re-read auth state live so reload after external login works correctly.
-      const currentSignedOut = window.adobeIMS?.isSignedInUser() !== true;
+      // Reset isSignUpRequired flag
+      setProfileSignUpRequired(children, false);
 
-      // If the user is now signed-in (e.g. post external login reload),
-      // remove the signed-out min-width so the profile pill can size
-      // naturally to the user's name.
-      if (!currentSignedOut) {
-        utilitiesContainer.style.removeProperty('min-width');
-      }
+      // Process each visible component (already filtered for uc_carts cookie
+      // and, when signed-out, restricted to SIGNED_OUT_ICONS + signup modifier)
+      visibleComponents.forEach((component: string) => {
+        if (component === 'profile') return; // Already added
 
-      // Re-evaluate visible components against the current auth state so the
-      // profile pill and other signed-in icons are included after login.
-      const currentVisibleComponents = getVisibleUnavComponents(
-        unavComponents,
-        currentSignedOut
-      );
+        if (component === 'signup') {
+          // 'signup' modifies profile component instead of adding new one
+          setProfileSignUpRequired(children, true);
+          return;
+        }
 
-      /**
-       * Dynamically assembles child components based on meta tag configuration.
-       * Special handling for profile (always first) and signup
-       * (which modifies profile).
-       */
-      const getChildren = (): UnavChildren => {
-        const unavComponentsConfig = getUnavComponents();
-        const children: UnavChildren = [unavComponentsConfig.profile];
+        // Add component if it exists in configuration
+        const unavComponent = unavComponentsConfig[component];
+        if (unavComponent !== undefined) {
+          children.push(unavComponent);
+        }
+      });
 
-        // Reset isSignUpRequired flag
-        setProfileSignUpRequired(children, false);
+      return children;
+    };
 
-        // Process each visible component (already filtered for uc_carts cookie
-        // and, when signed-out, restricted to SIGNED_OUT_ICONS + signup)
-        currentVisibleComponents.forEach((component: string) => {
-          if (component === 'profile') return; // Already added
-
-          if (component === 'signup') {
-            // 'signup' modifies profile component instead of adding new one
-            setProfileSignUpRequired(children, true);
-            return;
-          }
-
-          // Add component if it exists in configuration
-          const unavComponent = unavComponentsConfig[component];
-          if (unavComponent !== undefined) {
-            children.push(unavComponent);
-          }
-        });
-
-        return children;
-      };
-
-      return {
-        target: utilitiesContainer,
-        env: environment,
-        locale,
-        countryCode: getMiloLocaleSettings(config?.locale)?.country || 'US',
-        imsClientId: (window as WindowWithAdobeId)?.adobeid?.client_id,
-        theme: 'light', // TODO: Add toggle based on site theme
-        analyticsContext: {
-          consumer: {
-            name: 'adobecom',
-            version: '1.0',
-            platform: 'Web',
-            device: getDevice(),
-            os_version: navigator.platform,
-          },
-          event: { visitor_guid: visitorGuid },
+    // ========================================================================
+    // Step 7: Build UNAV configuration object
+    // ========================================================================
+    
+    const getConfiguration = (): UnavConfig => ({
+      target: utilitiesContainer,
+      env: environment,
+      locale,
+      countryCode: getMiloLocaleSettings(config?.locale)?.country || 'US',
+      imsClientId: (window as WindowWithAdobeId)?.adobeid?.client_id,
+      theme: 'light', // TODO: Add toggle based on site theme
+      analyticsContext: {
+        consumer: {
+          name: 'adobecom',
+          version: '1.0',
+          platform: 'Web',
+          device: getDevice(),
+          os_version: navigator.platform,
         },
-        children: getChildren(),
-        isSectionDividerRequired: config?.unav?.showSectionDivider === true,
-        showTrayExperience: !isDesktop.matches,
-        isArpEnabled,
-        ...(isArpEnabled && {
-          arpConfig: Promise.resolve({
-            sessionId: visitorGuid,
-            tokenCallback: (token: string): void => {
-              window.adobeArp = window.adobeArp ?? {};
-              window.adobeArp.sessionToken = token;
-              window.dispatchEvent(new CustomEvent('arp:tokenReady', { detail: { token } }));
-              const existingCustom =
-                window.alloy_all?.data?._adobe_corpnew?.digitalData?.custom;
-              window.alloy_all = {
-                ...window.alloy_all,
-                data: {
-                  ...window.alloy_all?.data,
-                  _adobe_corpnew: {
-                    ...window.alloy_all?.data?._adobe_corpnew,
-                    digitalData: {
-                      ...window.alloy_all?.data?._adobe_corpnew?.digitalData,
-                      custom: {
-                        ...existingCustom,
-                        arp_token: token,
-                      },
+        event: { visitor_guid: visitorGuid },
+      },
+      children: getChildren(),
+      isSectionDividerRequired: config?.unav?.showSectionDivider === true,
+      showTrayExperience: !isDesktop.matches,
+      isArpEnabled,
+      ...(isArpEnabled && {
+        arpConfig: Promise.resolve({
+          sessionId: visitorGuid,
+          tokenCallback: (token: string): void => {
+            window.adobeArp = window.adobeArp ?? {};
+            window.adobeArp.sessionToken = token;
+            window.dispatchEvent(new CustomEvent('arp:tokenReady', { detail: { token } }));
+            const existingCustom =
+              window.alloy_all?.data?._adobe_corpnew?.digitalData?.custom;
+            window.alloy_all = {
+              ...window.alloy_all,
+              data: {
+                ...window.alloy_all?.data,
+                _adobe_corpnew: {
+                  ...window.alloy_all?.data?._adobe_corpnew,
+                  digitalData: {
+                    ...window.alloy_all?.data?._adobe_corpnew?.digitalData,
+                    custom: {
+                      ...existingCustom,
+                      arp_token: token,
                     },
                   },
                 },
-              };
-            },
-            successCallback: (): void => {},
-            errorCallback: (error: unknown): void => {
-              lanaLog(`ARP error: ${String(error)}`, 'universalnav');
-            },
-            ...config?.unav?.arpConfig,
-            metadata: {
-              source: 'universal-navigation',
-              version: unavVersion ?? '1.6',
-              ...config?.unav?.arpConfig?.metadata,
-            },
-          }),
-          ...(!currentSignedOut && {
-            fetchAUPSDKInstance: (): Promise<unknown> => {
-              // If the user was signed-out at init time, preloadAupSdk() was a
-              // no-op. Trigger it now so the AUP SDK is available for the
-              // signed-in reload initiated by an external login system.
-              preloadAupSdk();
-              return getAupSdkInstance() ?? Promise.resolve(undefined);
-            },
-          }),
+              },
+            };
+          },
+          successCallback: (): void => {},
+          errorCallback: (error: unknown): void => {
+            lanaLog(`ARP error: ${String(error)}`, 'universalnav');
+          },
+          ...config?.unav?.arpConfig,
+          metadata: {
+            source: 'universal-navigation',
+            version: unavVersion ?? '1.6',
+            ...config?.unav?.arpConfig?.metadata,
+          },
         }),
-      };
-    };
+        ...(!signedOut && {
+          fetchAUPSDKInstance: (): Promise<unknown> =>
+            getAupSdkInstance() ?? Promise.resolve(undefined),
+        }),
+      }),
+    });
 
     // ========================================================================
     // Step 8: Initialize UNAV
@@ -428,7 +409,7 @@ export const loadUnav = async (
     
     await window?.UniversalNav?.(getConfiguration());
 
-    if (!initialSignedOut) {
+    if (!signedOut) {
       // Remove min-width constraint for signed-in users (allow natural sizing)
       utilitiesContainer?.style.removeProperty('min-width');
     } else {

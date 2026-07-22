@@ -62,7 +62,7 @@ const maximizedSlot = (
         ${iconHTML(col.icon, col.iconAlt)}
         ${col.productName !== null ? `<p class="feds-promo-bar-product">${col.productName}</p>` : ''}
       </div>
-      ${col.headline !== null ? `<p class="feds-promo-bar-headline">${col.headline}</p>` : ''}
+      ${col.headline !== null ? `<h2 class="feds-promo-bar-headline">${col.headline}</h2>` : ''}
     </div>
    <div class="feds-promo-bar-right">
       ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
@@ -95,7 +95,7 @@ const maximizedReleaseSlot = (
       ${iconHTML(col.icon, col.iconAlt)}
       ${col.productName !== null ? `<p class="feds-promo-bar-product">${col.productName}</p>` : ''}
     </div>
-    ${col.headline !== null ? `<p class="feds-promo-bar-headline">${col.headline}</p>` : ''}
+    ${col.headline !== null ? `<h2 class="feds-promo-bar-headline">${col.headline}</h2>` : ''}
     ${col.body !== null ? `<p class="feds-promo-bar-body">${col.body}</p>` : ''}
     ${ctasHTML(col.primaryCta, col.secondaryCta)}
     </div>

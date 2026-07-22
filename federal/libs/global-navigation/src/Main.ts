@@ -146,12 +146,12 @@ mountpoint: HTMLElement
     );
     if (promoWrapper !== null) {
       promoWrapper.innerHTML = renderPromoBar(promoBar);
-      const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
       promoWrapper.style.display = 'none';
+      promoWrapper.classList.add(`feds-promo-bar--${promoBar.theme}`);
+
+      const promoBarEl = promoWrapper.querySelector<HTMLElement>('.feds-promo-bar');
       const barBgColor = promoBarEl?.style.backgroundColor ?? '';
-      if (barBgColor !== '') {
-        promoWrapper.style.backgroundColor = barBgColor;
-      }
+      if (barBgColor !== '') promoWrapper.style.backgroundColor = barBgColor;
       await initMerchLinks(promoWrapper);
     }
   }
@@ -308,6 +308,7 @@ export const postRenderingTasks = async (
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initPromoBarHeight(input.mountpoint);
+  initLanguageBannerOffset(input.mountpoint);
   initClickListeners(input.mountpoint);
   wirePopups(input.mountpoint);
   initLightDismiss(input.mountpoint);
@@ -398,16 +399,6 @@ const initAriaToggleListeners = (mountpoint: HTMLElement): void => {
     }
     if (isOpen) menuWrapper.classList.add('feds-menu-active');
 
-    // Opening the localnav bar slides the header up via a plain static `top`
-    // (see localnav.css). Suppressing the banner for the duration removes it
-    // from :has(.language-banner) matching entirely, so the header falls
-    // back to localnav.css's own open/close rule instead of fighting the
-    // banner's scroll-linked offset animation.
-    if (mountpoint.querySelector('nav.localnav')) {
-      document.querySelector('.language-banner')
-        ?.classList.toggle('feds-banner-suppressed', isOpen);
-    }
-
     updateNavLenisPrevent();
   });
 
@@ -482,27 +473,24 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
       return;
     }
     header.classList.add("feds-header-scrolled");
-    // Closing the localnav bar in scrolled state: the header's `top` animates
-    // from -64px back to 0 over 0.3s. The `feds-header-scrolled` class is
-    // needed immediately for color (the bar title would otherwise flash from
-    // dark back to its default light shade during the slide-down). But the
-    // same class pulls `inset: xs xs 0 xs` onto `nav` via
-    // `header.feds-header-scrolled nav`, which would instantly pin nav to
-    // `top: xs` and kill the slide (nav holds the visible content). The
-    // `feds-localnav-closing` marker class is added in tandem and consumed by
-    // a CSS rule that suppresses that inset for the duration of the
-    // transition; we remove the marker on `transitionend`.
-    if (fromToggle && isLocalnav()) {
+    // Closing the localnav bar in scrolled state: nav's `margin-top` animates
+    // from -64px back to 0 over 0.3s (see localnav.css). The
+    // `feds-header-scrolled` class is needed immediately for color (the bar
+    // title would otherwise flash from dark back to its default light shade
+    // during the slide-down). The `feds-localnav-closing` marker class is
+    // added in tandem for the duration of the transition and removed on
+    // `transitionend`.
+    if (fromToggle && isLocalnav() && nav !== null) {
       header.classList.add("feds-localnav-closing");
       const onTransitionEnd = (event: TransitionEvent): void => {
-        if (event.target !== header || event.propertyName !== "top") return;
-        header.removeEventListener("transitionend", onTransitionEnd);
+        if (event.target !== nav || event.propertyName !== "margin-top") return;
+        nav.removeEventListener("transitionend", onTransitionEnd);
         pendingAddCleanup = null;
         header.classList.remove("feds-localnav-closing");
       };
-      header.addEventListener("transitionend", onTransitionEnd);
+      nav.addEventListener("transitionend", onTransitionEnd);
       pendingAddCleanup = (): void => {
-        header.removeEventListener("transitionend", onTransitionEnd);
+        nav.removeEventListener("transitionend", onTransitionEnd);
         header.classList.remove("feds-localnav-closing");
       };
     }
@@ -511,11 +499,10 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   const promoBarEl = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
   );
+  // Measured live (rather than hardcoded per state) since the promo bar's
+  // actual height differs across mobile, tablet, and desktop breakpoints.
   const promoBarElMinHeight = (): number =>
-    promoBarEl === null ? 70
-    : promoBarEl.classList.contains('feds-promo-bar--maximized-release') ? 280
-    : promoBarEl.classList.contains('feds-promo-bar--maximized') ? 182
-    : 70;
+    promoBarEl === null ? 70 : promoBarEl.getBoundingClientRect().height;
 
   const getScrollThreshold = (): number =>
     promoBarEl !== null ? promoBarElMinHeight() : 20;
@@ -667,7 +654,25 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
   });
 };
 
-const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
+// Polls (rather than listening for a `transitionend`) since the host page
+// may set body opacity via a CSS transition, an instant class toggle, or an
+// inline style — a poll catches all three without coupling to whichever
+// mechanism the host happens to use.
+const waitUntilVisible = (callback: () => void): void => {
+  const isBodyVisible = (): boolean =>
+    window.getComputedStyle(document.body).opacity === '1';
+
+  const check = (): void => {
+    if (isBodyVisible()) {
+      setTimeout(callback, 1000);
+    } else {
+      requestAnimationFrame(check);
+    }
+  };
+  check();
+};
+
+const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   const promoBar = document.querySelector<HTMLElement>(
     '.feds-promo-aside-wrapper .feds-promo-bar',
   );
@@ -676,39 +681,72 @@ const initPromoBarHeight = (_mountpoint: HTMLElement): void => {
   const promoWrapper = promoBar.closest<HTMLElement>(
     '.feds-promo-aside-wrapper',
   );
+  if (promoWrapper === null) return;
 
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      if (promoWrapper) promoWrapper.style.display = '';
-      promoWrapper?.classList.add('feds-promo-bar--reveal');
-    }, 5000);
+  waitUntilVisible(() => {
+    promoWrapper.style.display = '';
+    promoWrapper.classList.add('feds-promo-bar--reveal');
   });
 
-  let naturalHeight = promoBar.offsetHeight;
-  let rafId: number | null = null;
-
-  const update = (): void => {
-    const visible = Math.max(0, naturalHeight - window.scrollY);
+  // header.global-navigation is `position: sticky`, so it renders below the
+  // promo bar and scrolls with the page natively — no JS or CSS animation
+  // needed for that part. --feds-promo-bar-height only feeds the extra
+  // offset that popups/the mobile drawer need while the promo is still
+  // showing (see styles.css); re-measured on resize in case the promo
+  // reflows.
+  //
+  // Measure the wrapper, not the inner .feds-promo-bar: the wrapper is
+  // what the reveal animation clips via max-height, so its offsetHeight
+  // ramps up in step with the visible box. The inner bar is never
+  // height-constrained, so it reports its full natural height the instant
+  // display flips from `none` — which would snap --feds-promo-bar-height
+  // (and the body padding-top it drives) to its final value a full
+  // animation ahead of what's actually visible on screen.
+  const updateHeight = (): void => {
     document.documentElement.style.setProperty(
       '--feds-promo-bar-height',
-      `${visible}px`,
+      `${promoWrapper.offsetHeight}px`,
     );
   };
+  new ResizeObserver(updateHeight).observe(promoWrapper);
+  updateHeight();
 
-  // Re-measure on resize in case the promo bar reflows
-  new ResizeObserver(() => {
-    naturalHeight = promoBar.offsetHeight;
-    update();
+  // Toggles `.feds-promo-showing` on <header> so the popup/drawer offset
+  // overrides only apply while the promo is actually on screen. Fires only
+  // when the promo bar enters/exits the viewport — not per scroll frame —
+  // avoiding the layout-thrashing a continuous scroll listener caused here
+  // previously.
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (header === null) return;
+  new IntersectionObserver(([entry]) => {
+    header.classList.toggle('feds-promo-showing', entry.isIntersecting);
   }).observe(promoBar);
+};
 
-  const onScroll = (): void => {
-    if (rafId !== null) return;
-    rafId = requestAnimationFrame(() => {
-      rafId = null;
-      update();
-    });
+// header.global-navigation is `position: sticky`, so it renders below
+// .language-banner and scrolls with the page natively —
+// This toggles `.feds-banner-showing` on <header> so the
+// popup/drawer offset overrides in styles.css apply while the banner is
+// active. Fires only on enter/exit, not per scroll frame.
+const initLanguageBannerOffset = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  if (header === null) return;
+
+  const observe = (banner: HTMLElement): void => {
+    new IntersectionObserver(([entry]) => {
+      header.classList.toggle('feds-banner-showing', entry.isIntersecting);
+    }).observe(banner);
   };
 
-  window.addEventListener('scroll', onScroll, { passive: true });
-  update();
+  const banner = document.querySelector<HTMLElement>('.language-banner');
+  if (banner) { observe(banner); return; }
+
+  // Banner is added asynchronously after geo/language detection.
+  const mo = new MutationObserver((_, observer) => {
+    const el = document.querySelector<HTMLElement>('.language-banner');
+    if (!el) return;
+    observer.disconnect();
+    observe(el);
+  });
+  mo.observe(document.body, { childList: true });
 };

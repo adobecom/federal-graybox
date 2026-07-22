@@ -82,14 +82,84 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   /* Height of the breadcrumbs row; consumed by both the breadcrumbs
      component and the nav::after backdrop that extends to cover it. */
   --feds-breadcrumbs-height: 52px;
-  /* Height of the promo bar; set once by ResizeObserver, consumed by
-     the scroll-driven animation that offsets the fixed header. */
+  /* Height of the promo bar; set once by ResizeObserver (Main.ts,
+     initPromoBarHeight). Consumed below as the extra offset popups/drawers
+     need while the promo hasn't scrolled past yet. */
   --feds-promo-bar-height: 0px;
-  /* Hoists the promo view-timeline so the fixed <header> sibling
-     can reference it (same pattern as --language-banner-view). */
-  timeline-scope: --promo-bar-view;
+  --feds-nav-total-height: 80px;
 }
 
+body:has(.global-navigation) main {
+   margin-top: calc(-1 * var(--feds-nav-total-height));
+}
+
+/* =========================================
+   Promo bar offset
+   header.global-navigation is `position: sticky` (not `fixed`) so it
+   renders in normal flow directly after .feds-promo-aside-wrapper (its DOM
+   sibling): below the promo initially, scrolling with the page, then
+   sticking to the viewport top once it reaches it — all native browser
+   behavior, no animated `top`/`transform` involved.
+
+   An earlier version of this drove nav's `top` with a scroll-linked
+   `animation-timeline` (view()) to fake this same effect while header
+   stayed `fixed`. That still animated `top` every frame, which forces
+   layout on each frame and was the actual source of the flicker — a
+   scroll-timeline-driven animation is not exempt from that cost just
+   because it's not JS. `position: sticky` needs no animation at all.
+
+   The one thing that still needs promo-awareness is every `position:
+   fixed` descendant of nav that assumes nav sits at a fixed viewport
+   offset (.feds-popup inset/max-height, the mobile .feds-menu-wrapper
+   drawer's top/height) — while the promo hasn't been scrolled past yet,
+   nav sits lower than that. .feds-backdrop is unaffected: its `inset: 0`
+   already covers the full viewport regardless of nav's position.
+
+   --feds-promo-extra-offset carries the extra amount those descendants
+   need to add (0 once the promo has cleared); PostRendering/
+   ClickListeners.ts toggles `.feds-promo-showing` on <header> via a single
+   IntersectionObserver on the promo bar (fires only on enter/exit, not
+   per scroll frame). */
+:root {
+  --feds-promo-extra-offset: 0px;
+}
+
+header.global-navigation.feds-promo-showing {
+  --feds-promo-extra-offset: var(--feds-promo-bar-height, 0px);
+}
+
+/* .feds-popup: offset top/max-height while the promo is still showing.
+   :not(.small-menu) excludes the small-menu variant (Components/SmallMenu/
+   small-menu.css), which is position: absolute anchored to its own trigger
+   <li> rather than position: fixed relative to the viewport. */
+header.global-navigation.feds-promo-showing nav:not(.localnav) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px);
+}
+
+/* localnav's hamburger-flow popup (bar closed) uses a plain --s2a-spacing-64
+   top with no +8-1px baseline (see localnav.css) — same distinction the
+   language-banner override block makes below. */
+header.global-navigation.feds-promo-showing nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
+  max-height: calc(100dvh - var(--feds-promo-extra-offset) - var(--s2a-spacing-64));
+}
+
+/* Mobile drawer top/height */
+header.global-navigation.feds-promo-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
+}
+
+@media (max-width: 1023px) {
+  header.global-navigation.feds-promo-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
+    top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
+    height: calc(100dvh - var(--feds-promo-extra-offset) - var(--s2a-spacing-64));
+  }
+}
+
+header.global-navigation.feds-promo-showing.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
+  height: calc(100dvh - var(--feds-promo-extra-offset) - var(--s2a-spacing-64));
+}
 
 header.global-navigation {
   width: 100%;
@@ -97,7 +167,7 @@ header.global-navigation {
   visibility: visible;
   display: flex;
   justify-content: center;
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   z-index: 10;
@@ -110,11 +180,19 @@ header.global-navigation {
   --feds-popup-bg-height: 100%;
 }
 
+body:has(.feds-promo-aside-wrapper .feds-promo-bar) {
+  padding-top: var(--feds-promo-bar-height, 0px);
+}
+
+body:has(.feds-promo-aside-wrapper .feds-promo-bar):not(:has(.feds-menu-active)) header.global-navigation {
+  transition: padding-top 500ms cubic-bezier(0.42, 0, 0, 1) 1s;
+}
+
 header.feds-header-scrolled .feds-link {
   color: var(--s2a-color-gray-1000);
 }
 
-header.feds-header-scrolled nav {
+header.feds-header-scrolled:not(:has(.feds-breadcrumbs)):not(:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)) nav {
   color: var(--s2a-color-gray-1000);
   box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
 }
@@ -175,8 +253,7 @@ header.feds-header-scrolled nav {
 }
 
 header.global-navigation nav {
-  position: fixed;
-  top: var(--feds-promo-bar-height);
+  position: relative;
   width: calc(100% - var(--s2a-spacing-xs) * 2);
   max-width: 1968px;
   margin: var(--s2a-spacing-xs) auto;
@@ -1180,7 +1257,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
   header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
     overflow-y: auto;
-    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-banner-scroll-offset));
+    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-banner-extra-offset));
   }
 
   .feds-gnav-items > li > .feds-link:first-child {
@@ -1472,6 +1549,10 @@ header.global-navigation.is-compact .feds-popup {
   inset: calc(var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px) 0 0 0;
 }
 
+header.global-navigation.is-compact.feds-promo-showing .feds-popup {
+  inset: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px) 0 0 0;
+}
+
 header.global-navigation.is-compact .feds-popup.is-open {
   position: fixed;
   z-index: 3;
@@ -1668,109 +1749,59 @@ header.global-navigation.is-compact.feds-header-scrolled:has(.unav-comp-app-swit
 
 /* =========================================
    Language banner offset
-   Pushes the gnav below the banner while it is visible;
-   smoothly removes the offset as the banner scrolls out of the viewport.
-   ========================================= */
+   header.global-navigation is `position: sticky`, so it renders below
+   .language-banner and sticks to the viewport top once scrolled past.
+   This mirrors the Promo bar offset section above.
+   The banner and promo bar can never both be showing at once — reserving
+   space for the banner removes the promo wrapper from the DOM entirely
+   (see reserveBannerSpace) — so --feds-banner-extra-offset and
+   --feds-promo-extra-offset never need to combine; they're independent.
 
-/* --feds-language-banner-height is defined in milo/libs/c2/styles/styles.css,
-   next to the .language-banner reservation rule it sizes. */
+   --feds-banner-extra-offset carries the extra amount .feds-popup/
+   .feds-menu-wrapper need while the banner hasn't been scrolled past yet.
+   Main.ts (initLanguageBannerOffset) toggles `.feds-banner-showing` on
+   <header> via a single IntersectionObserver on the banner (fires only on
+   enter/exit, not per scroll frame).*/
 :root {
-  /* Expands the named view-timeline scope so sibling elements (the fixed
-     header) can reference --language-banner-view, not just descendants. */
-  timeline-scope: --language-banner-view;
+  --feds-banner-extra-offset: 0px;
 }
 
-.language-banner {
-  view-timeline: --language-banner-view block;
+header.global-navigation.feds-banner-showing {
+  --feds-banner-extra-offset: var(--feds-language-banner-height, 44px);
 }
 
-/* Opening the localnav bar suppresses the banner (see Main.ts,
-   initAriaToggleListeners) rather than trying to hand off the header's `top`
-   from the banner's scroll-linked animation to localnav.css's static
-   open-state value — animations don't transition smoothly into a static
-   value, so that hand-off always snapped. With the banner suppressed,
-   :has(.language-banner...) below stops matching entirely and the header
-   falls back to localnav.css's own already-smooth open/close transition. */
-.language-banner.feds-banner-suppressed {
-  display: none;
-}
-
-/* Single source of truth for every offset below: a scroll-linked animation
-   on ONE custom property, inherited from :root. Every consumer (header,
-   nav, popups, menu-wrapper) reads it via a plain, non-animated calc()
-   instead of running its own parallel animation — they can never drift
-   apart from each other mid-scroll the way separate `animation-name`s on
-   different elements theoretically could (each is its own animation
-   instance, even sharing the same timeline). This also sidesteps the
-   overflow-auto rendering bugs found when max-height itself was directly
-   animated (see git history) — max-height below is a plain calc(), not an
-   animation target. */
-@property --feds-banner-scroll-offset {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0px;
-}
-
-@keyframes feds-banner-scroll {
-  from { --feds-banner-scroll-offset: var(--feds-language-banner-height, 44px); }
-  to   { --feds-banner-scroll-offset: 0px; }
-}
-
-:root:has(.language-banner:not(.feds-banner-suppressed)) {
-  animation: feds-banner-scroll linear both;
-  animation-timeline: --language-banner-view;
-  animation-range: exit;
-}
-
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation,
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav {
-  top: var(--feds-banner-scroll-offset);
-}
-
-/* feds-popup: offset top when banner is visible. :not(.small-menu) excludes
-   the small-menu variant (Components/SmallMenu/small-menu.css), which is
-   position: absolute anchored to its own trigger <li> (top: 100%, max-height:
-   none) rather than position: fixed relative to the viewport — our
-   viewport-relative offset would otherwise override its intentional
-   dropdown-under-trigger positioning. */
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav:not(.localnav) .feds-popup:not(.small-menu) {
-  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px);
+/* feds-popup: offset top while the banner is still showing. :not(.small-menu)
+   excludes the small-menu variant (Components/SmallMenu/small-menu.css),
+   which is position: absolute anchored to its own trigger <li> (top: 100%,
+   max-height: none) rather than position: fixed relative to the viewport —
+   our offset would otherwise override its intentional dropdown-under-trigger
+   positioning. */
+header.global-navigation.feds-banner-showing nav:not(.localnav) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-banner-extra-offset) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px);
 }
 
 /* localnav's hamburger-flow popup (bar closed) uses a plain --s2a-spacing-64
-   top with no +8-1px baseline (see localnav.css) — different from the
-   standard popup the rule above targets. When the bar is open instead, the
-   banner is already suppressed via the bar's own open/close handling in
-   Main.ts, so :has(.language-banner...) below simply won't match and
-   localnav.css's breadcrumbs-height-based top applies untouched. Same
-   :not(.small-menu) exclusion as above. */
-:root:has(.language-banner:not(.feds-banner-suppressed)) nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) {
-  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
-  max-height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
+   top with no +8-1px baseline (see localnav.css) — different from the standard
+   popup the rule above targets. When the bar is open instead, this rule is 
+   excluded so localnav's own breadcrumbs-height-based positioning applies untouched. */
+header.global-navigation.feds-banner-showing nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-banner-extra-offset) + var(--s2a-spacing-64));
+  max-height: calc(100dvh - var(--feds-banner-extra-offset) - var(--s2a-spacing-64));
 }
 
-/* Disable the height transition on the backdrop while the banner is present.
-   nav::after's height is JS-measured off the open popup's rendered size
-   (see ClickListeners.ts); without this override the 0.35s height ease
-   could still cause it to lag visibly behind the popup during scroll. */
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav::after {
-  transition: all 0.48s cubic-bezier(0.42, 0, 0.2, 1), height 0s linear;
-}
-
-/* feds-menu-wrapper top/height: safe globally, no effect on position:static desktop nav item */
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation nav:not(.localnav) > ul > li.feds-menu-wrapper {
-  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
+/* Mobile drawer top/height */
+header.global-navigation.feds-banner-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-banner-extra-offset) + var(--s2a-spacing-64));
 }
 
 @media (max-width: 1023px) {
-  :root:has(.language-banner:not(.feds-banner-suppressed)) .global-navigation nav:not(.localnav) > ul > li.feds-menu-wrapper {
-    top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
-    height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
+  header.global-navigation.feds-banner-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
+    top: calc(var(--feds-banner-extra-offset) + var(--s2a-spacing-64));
+    height: calc(100dvh - var(--feds-banner-extra-offset) - var(--s2a-spacing-64));
   }
 }
 
-:root:has(.language-banner:not(.feds-banner-suppressed)) header.global-navigation.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper {
-  top: calc(var(--feds-banner-scroll-offset) + var(--s2a-spacing-64));
-  height: calc(100dvh - var(--feds-banner-scroll-offset) - var(--s2a-spacing-64));
+header.global-navigation.feds-banner-showing.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-banner-extra-offset) + var(--s2a-spacing-64));
+  height: calc(100dvh - var(--feds-banner-extra-offset) - var(--s2a-spacing-64));
 }
-

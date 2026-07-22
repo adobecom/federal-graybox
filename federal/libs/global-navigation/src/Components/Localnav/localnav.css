@@ -111,27 +111,30 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
     z-index: 2;
   }
 
-  /* Slide the whole header up by the nav's height when the localnav bar is
-     expanded, so the bar (positioned at top:100% of the nav) ends up flush
-     with the viewport top. BOTH directions transition symmetrically:
-     opening slides up (top: 0 -> -64px), closing slides back down.
+  /* Slide nav up by its own height when the localnav bar is expanded, so the
+     bar (positioned at top:100% of nav) ends up flush with the viewport top.
+     BOTH directions transition symmetrically: opening slides up
+     (margin-top: xs -> -64px), closing slides back down.
 
-     We animate `top` (not `transform`) because `transform` — even
+     This used to animate `top` on <header>, back when header was
+     `position: fixed` (so header's `top` directly controlled its screen
+     position and nav — a fixed descendant with its own `top` — moved along
+     with it via the static-position fallback). header is now
+     `position: sticky` and nav is `position: relative`, in normal flow (see
+     styles.css) — animating header's `top` no longer moves anything, so we
+     move nav itself instead.
+
+     We animate `margin-top` (not `transform`) because `transform` — even
      `translateY(0)` — establishes a new containing block for
      `position: fixed` descendants. The mega-menu popups (`.feds-popup`) are
-     fixed-position descendants of <header>; if <header> created a containing
-     block they'd be re-anchored to it AND would lose their ability to
-     escape the `overflow: hidden` clip on `.feds-gnav-items` (which is
-     `max-height: 0` when the bar is closed), so they'd be invisible.
-     Animating `top` is not GPU-compositable, but it leaves the containing
-     block hierarchy intact so popups continue to be positioned relative to
-     the viewport. */
-  header.global-navigation:has(nav.localnav) {
-    transition: top 0.3s ease;
-  }
-
-  header.global-navigation:has(nav.localnav > ul > li.feds-menu-wrapper.is-open) {
-    top: calc(0px - var(--s2a-spacing-64));
+     fixed-position descendants of nav; if nav created a containing block
+     they'd be re-anchored to it AND would lose their ability to escape the
+     `overflow: hidden` clip on `.feds-gnav-items` (which is `max-height: 0`
+     when the bar is closed), so they'd be invisible. `margin-top` doesn't
+     establish a containing block, so popups stay positioned against the
+     viewport. */
+  header.global-navigation nav.localnav {
+    transition: margin-top 0.3s ease;
   }
 
   .global-navigation nav.localnav .feds-localnav-bar {
@@ -174,7 +177,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
   }
 
   .global-navigation nav.localnav:has(.feds-localnav-bar[aria-expanded="true"]) {
-    margin-top: 0;
+    margin-top: calc(0px - var(--s2a-spacing-64));
   }
 
   .global-navigation.feds-header-scrolled nav.localnav .feds-localnav-bar,
@@ -347,7 +350,7 @@ header.global-navigation.is-compact nav.localnav .feds-gnav-items > li > .feds-p
 }
 
 header.global-navigation.is-compact nav.localnav:has(.feds-localnav-bar[aria-expanded="true"]) {
-  margin-top: 0;
+  margin-top: calc(0px - var(--s2a-spacing-64));
 }
 
 header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper:has(.feds-popup.is-open) {
@@ -376,12 +379,8 @@ header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper {
   flex-direction: column;
 }
 
-header.global-navigation.is-compact:has(nav.localnav) {
-  transition: top 0.3s ease;
-}
-
-header.global-navigation.is-compact:has(nav.localnav > ul > li.feds-menu-wrapper.is-open) {
-  top: calc(0px - var(--s2a-spacing-64));
+header.global-navigation.is-compact nav.localnav {
+  transition: margin-top 0.3s ease;
 }
 
 header.global-navigation.is-compact nav.localnav .feds-localnav-bar {

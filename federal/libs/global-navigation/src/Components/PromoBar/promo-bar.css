@@ -2,16 +2,32 @@
    Promo Bar — shared base
    ========================================= */
 
-body:has(.feds-menu-active) .feds-promo-bar,
-body:has(.feds-popup.is-open) .feds-promo-bar {
+body:has(.feds-menu-active:not(.small-menu)) .feds-promo-bar,
+body:has(.feds-popup.is-open:not(.small-menu)) .feds-promo-bar {
   display: none;
 }
 
-body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) main  {
-  clip-path: inset(0 round var(--s2a-border-radius-lg));
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) {
+  main,
+  .rm-slide.is-active {
+    clip-path: inset(0 round var(--s2a-border-radius-lg));
+  }
+}
+
+body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--reveal {
+  visibility: hidden;
 }
 
 .feds-promo-aside-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  &.feds-promo-bar--dark {
+    background-color: var(--s2a-color-gray-1000);
+  }
+
   .feds-primary-cta {
     color: var(--s2a-color-gray-25);
     background-color: var(--s2a-color-blue-900);
@@ -39,14 +55,13 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--s2a-color-gray-25);
   color: var(--s2a-color-gray-1000);
   max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
   margin: auto;
 }
 
 .feds-promo-aside-wrapper.feds-promo-bar--reveal {
-  animation: feds-promo-bar-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: feds-promo-bar-reveal 500ms cubic-bezier(0.42, 0, 0, 1) forwards;
 }
 
 @keyframes feds-promo-bar-reveal {
@@ -208,6 +223,12 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
     padding: var(--s2a-spacing-lg);
     border-radius: var(--s2a-border-radius-round);
     text-align: center;
+  }
+
+  @media (min-width: 1024px) {
+    .feds-promo-bar-right {
+      text-align: left;
+    }
   }
 
   &.feds-promo-bar--dark {

@@ -1,4 +1,4 @@
-import { getAnalyticsAttrs, getAriaAttrs, localizeHref } from "../../Utils/Utils";
+import { getAnalyticsAttrs, getAriaAttrs, getTargetAttrs, localizeHref } from "../../Utils/Utils";
 import { PrimaryCTA, ProductEntryCTA, SecondaryCTA } from "./Parse";
 
 export const primaryCTA = ({
@@ -7,14 +7,18 @@ export const primaryCTA = ({
   daaLl,
   ariaLabel,
   ariaAttrs,
-}: PrimaryCTA): HTML => `
-<a href="${localizeHref(href)}"
+}: PrimaryCTA): HTML => {
+  const { href: strippedHref, target } = getTargetAttrs(href);
+  return `
+<a href="${localizeHref(strippedHref)}"
   class="feds-primary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
+  ${target !== '' ? ` target="${target}"` : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
 >
   ${text}
 </a>
 `;
+};
 
 export const secondaryCTA = ({
   text,
@@ -22,14 +26,18 @@ export const secondaryCTA = ({
   daaLl,
   ariaLabel,
   ariaAttrs,
-}: SecondaryCTA): HTML => `
-<a href="${localizeHref(href)}" 
+}: SecondaryCTA): HTML => {
+  const { href: strippedHref, target } = getTargetAttrs(href);
+  return `
+<a href="${localizeHref(strippedHref)}"
   class="feds-secondary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
+  ${target !== '' ? ` target="${target}"` : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
 >
   ${text}
 </a>
 `;
+};
 
 export const productEntryCTA = (
   { cta }: ProductEntryCTA

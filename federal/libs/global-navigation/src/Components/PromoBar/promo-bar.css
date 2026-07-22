@@ -1,0 +1,458 @@
+/* =========================================
+   Promo Bar — shared base
+   ========================================= */
+
+body:has(.feds-menu-active) .feds-promo-bar,
+body:has(.feds-popup.is-open) .feds-promo-bar {
+  display: none;
+}
+
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) main  {
+  clip-path: inset(0 round var(--s2a-border-radius-lg));
+}
+
+.feds-promo-aside-wrapper {
+  .feds-primary-cta {
+    color: var(--s2a-color-gray-25);
+    background-color: var(--s2a-color-blue-900);
+  }
+
+  .feds-secondary-cta {
+    color: var(--s2a-color-button-content-primary-outlined-default);
+    background-color: transparent;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+    z-index: -1;
+  }
+}
+
+.feds-promo-bar {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  max-width: calc(1920px - var(--s2a-spacing-xs) * 2);
+  margin: auto;
+}
+
+.feds-promo-aside-wrapper.feds-promo-bar--reveal {
+  animation: feds-promo-bar-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes feds-promo-bar-reveal {
+  from { max-height: 0; overflow: hidden; }
+  to   { max-height: 1000px; overflow: visible; }
+}
+
+.feds-promo-bar--dark {
+  background-color: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+}
+
+.feds-promo-bar-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.feds-promo-bar-ctas {
+  display: flex;
+  gap: var(--s2a-spacing-xs);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* =========================================
+   CTA link — shared
+   ========================================= */
+
+.feds-promo-bar-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 var(--s2a-spacing-md);
+  border-radius: var(--s2a-border-radius-round);
+  border: var(--s2a-border-width-sm) solid currentColor;
+  background: transparent;
+  color: inherit;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.feds-promo-bar-cta:hover {
+  background-color: var(--s2a-color-transparent-black-08);
+}
+
+.feds-promo-bar--dark .feds-promo-bar-cta:hover {
+  background-color: var(--s2a-color-transparent-white-16);
+}
+
+.feds-promo-aside-wrapper {
+  .feds-primary-cta,
+  .feds-secondary-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    padding: 9px var(--s2a-spacing-lg);
+    border-radius: var(--s2a-border-radius-round);
+    font-size: var(--s2a-typography-font-size-label);
+    line-height: var(--s2a-typography-line-height-label);
+    font-weight: var(--s2a-font-weight-adobe-clean-bold);
+    letter-spacing: var(--s2a-typography-letter-spacing-label);
+    text-decoration: none;
+    white-space: nowrap;
+    border: var(--s2a-border-width-md) solid currentColor;
+  }
+
+  .feds-secondary-cta:hover {
+    background-color: var(--s2a-color-transparent-black-08);
+  }
+
+  .feds-primary-cta:hover {
+    background-color: var(--s2a-color-blue-1000);
+  }
+
+  .feds-promo-bar--dark {
+    .feds-primary-cta {
+      border-color: var(--s2a-color-blue-900);
+    }
+
+    .feds-secondary-cta {
+      color: var(--s2a-color-gray-25);
+
+       &:hover {
+        background-color: var(--s2a-color-transparent-white-64);
+        color: var(--s2a-color-gray-1000);
+        border-color: var(--s2a-color-gray-25);
+      }
+    }
+  }
+ }
+
+/* =========================================
+   Minimized
+   Single-line: icon + text (with optional inline link) + CTA
+   ========================================= */
+
+.feds-promo-bar--minimized {
+  min-height: 48px;
+  padding: var(--s2a-spacing-md);
+}
+
+.feds-promo-bar--minimized .feds-promo-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2a-spacing-md);
+  width: 100%;
+  max-width: 1312px;
+  flex-wrap: wrap;
+}
+
+.feds-promo-bar--minimized .feds-promo-bar-text {
+  margin: 0;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  color: inherit;
+  text-align: center;
+}
+
+.feds-promo-bar--minimized .feds-promo-bar-text a {
+  color: inherit;
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+}
+
+/* =========================================
+   Maximized
+   Stacked: icon + product name + headline + body + CTA
+   ========================================= */
+
+.feds-promo-bar--maximized {
+  padding: var(--s2a-spacing-3xl) var(--s2a-spacing-4xl);
+}
+
+.feds-promo-product-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--s2a-spacing-xs);
+}
+
+.feds-promo-bar--maximized {
+  .feds-promo-bar-right {
+    display: flex;
+    gap: var(--s2a-spacing-2xl);
+    align-items: center;
+    padding: var(--s2a-spacing-lg);
+    border-radius: var(--s2a-border-radius-round);
+    text-align: center;
+  }
+
+  &.feds-promo-bar--dark {
+    .feds-promo-bar-right {
+      background-color: var(--s2a-color-gray-900);
+    }
+  }
+
+  &.feds-promo-bar--light {
+    .feds-promo-bar-right {
+      background-color: var(--s2a-color-background-subtle);
+    }
+
+    .feds-promo-bar-product {
+      color: var(--s2a-color-transparent-black-64);
+    }
+  }
+
+  .feds-promo-bar-left  {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s2a-spacing-xs);
+  }
+
+  .feds-promo-bar-inner {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .feds-promo-bar-product {
+    color: var(--s2a-color-transparent-white-64);
+    font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+    font-size: var(--s2a-typography-font-size-eyebrow);
+    line-height: var(--s2a-typography-line-height-eyebrow);
+    font-weight: var(--s2a-font-weight-adobe-clean-bold);
+    letter-spacing: var(--s2a-typography-letter-spacing-eyebrow);
+  }
+
+  .feds-promo-bar-headline {
+    margin: 0;
+    letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
+    font-family: var(--heading-font-family, "Adobe Clean Display", sans-serif);
+    font-size: var(--s2a-typography-font-size-heading-4);
+    line-height: var(--s2a-typography-line-height-heading-4);
+    font-weight: var(--s2a-font-weight-adobe-clean-black);
+  }
+
+  .feds-promo-bar-body {
+    margin: 0;
+    font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+    font-size: var(--s2a-typography-font-size-body-sm);
+    line-height: var(--s2a-typography-line-height-body-sm);
+    letter-spacing: var(--s2a-typography-letter-spacing-body-sm);
+    color: inherit;
+    opacity: 0.8;
+    max-width: 355px;
+  }
+
+  .feds-promo-bar-body a {
+    color: inherit;
+  }
+
+  .feds-promo-bar-cta {
+    margin-top: var(--s2a-spacing-sm);
+  }
+}
+
+/* =========================================
+   Maximized-release
+   Two columns on desktop, each with image background
+   ========================================= */
+
+.feds-promo-bar--maximized-release {
+  padding: 0;
+  overflow: hidden;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-inner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  width: 100%;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-bg {
+  display: block;
+  overflow: hidden;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  max-height: 344px;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: var(--s2a-spacing-4xl);
+  padding-right: var(--s2a-spacing-2xl);
+  max-width: calc(480px + var(--s2a-spacing-4xl) + var(--s2a-spacing-2xl));
+
+  .feds-primary-cta,
+  .feds-secondary-cta {
+    margin-top: var(--s2a-spacing-md);
+  }
+
+  .feds-promo-product-container {
+    margin-bottom: var(--s2a-spacing-md);
+  }
+
+  .feds-promo-bar-headline {
+    margin-bottom: var(--s2a-spacing-xs);
+  }
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-product {
+  margin: 0;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-eyebrow);
+  line-height: var(--s2a-typography-line-height-eyebrow);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  color: inherit;
+  opacity: 0.8;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-headline {
+  margin: 0;
+  font-family: var(--heading-font-family, "Adobe Clean Display", sans-serif);
+  font-size: var(--s2a-typography-font-size-heading-4);
+  line-height: var(--s2a-typography-line-height-heading-4);
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
+  color: inherit;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-body {
+  margin: 0;
+  font-family: var(--body-font-family, "Adobe Clean", sans-serif);
+  font-size: var(--s2a-typography-font-size-body-lg);
+  line-height: var(--s2a-typography-line-height-body-lg);
+  color: inherit;
+  opacity: 0.8;
+  max-width: 355px;
+}
+
+.feds-promo-bar--maximized-release .feds-promo-bar-body a {
+  color: inherit;
+}
+
+.feds-promo-bar--maximized-release .fedsg-promo-bar-cta {
+  margin-top: var(--s2a-spacing-sm);
+}
+
+
+/* =========================================
+   Responsive slots
+   Each slot carries the viewport classes it serves.
+   All slots start hidden; media queries reveal the
+   correct one for each breakpoint.
+   ========================================= */
+
+.feds-promo-bar-slot {
+  display: none;
+  width: 100%;
+}
+
+/* Mobile (< 768px): show slots that include --mobile */
+@media (max-width: 767px) {
+  .feds-promo-bar-slot--mobile {
+    display: contents;
+  }
+
+  .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
+    max-height: 171px;
+  }
+}
+
+/* Tablet (768px – 1023px): show slots that include --tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .feds-promo-bar-slot--tablet {
+    display: contents;
+  }
+}
+
+/* Desktop (≥ 1024px): show slots that include --desktop */
+@media (min-width: 1024px) {
+  .feds-promo-bar-slot--desktop {
+    display: contents;
+  }
+}
+
+/* =========================================
+   Mobile (< 1024px)
+   ========================================= */
+
+@media (max-width: 1023px) {
+  .feds-promo-bar--minimized {
+    padding: var(--s2a-spacing-md);
+    padding-bottom: var(--s2a-spacing-3xl);
+
+    .feds-promo-bar-inner {
+      flex-direction: column;
+    }
+  }
+
+  .feds-promo-bar--maximized {
+    .feds-promo-bar-inner {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--s2a-spacing-xs);
+    }
+
+    .feds-promo-bar-left {
+      align-items: center;
+      text-align: center;
+    }
+
+    &.feds-promo-bar--light .feds-promo-bar-right,
+    &.feds-promo-bar--dark .feds-promo-bar-right {
+      background-color: transparent;
+      flex-direction: column;
+      padding: 0;
+      align-items: center;
+      gap: var(--s2a-spacing-md);
+    }
+  }
+
+  .feds-promo-bar--maximized-release .feds-promo-bar-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .feds-promo-bar--maximized-release .feds-promo-bar-bg {
+    order: -1;
+  }
+
+  .feds-promo-bar--maximized-release .feds-promo-bar-column {
+    align-items: center;
+    text-align: center;
+  }
+}
+

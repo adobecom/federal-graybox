@@ -146,6 +146,23 @@
       display: flex;
       position: static;
       padding: 0 var(--s2a-spacing-lg);
+      /* Long trails scroll horizontally inside the row instead of being
+         clipped by the popup's overflow-x:hidden (see localnav.css).
+         Native scrollbar is left visible to match prod scroll affordance. */
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+
+      > li {
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+
+      > li:last-child {
+        padding-inline-end: var(--s2a-spacing-sm);
+      }
     }
   }
 }
@@ -162,4 +179,18 @@ header.global-navigation.is-compact nav .feds-popup.is-open:not(.small-menu) > u
   display: flex;
   position: static;
   padding: 0 var(--s2a-spacing-lg);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+
+  > li {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  > li:last-child {
+    padding-inline-end: var(--s2a-spacing-sm);
+  }
 }

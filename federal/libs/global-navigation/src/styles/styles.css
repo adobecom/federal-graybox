@@ -227,6 +227,15 @@ header.feds-header-scrolled:not(:has(.feds-breadcrumbs)):not(:has(.feds-popup.is
   padding-right: var(--s2a-spacing-md);
 }
 
+[dir="rtl"] .global-navigation .feds-utilities {
+  padding-left: var(--s2a-spacing-md);
+  padding-right: 0;
+
+  & .universal-nav-container .profile-signed-out {
+    padding-left: 0;
+    padding-right: 0.25rem;
+  }
+}
 
 .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
@@ -1782,7 +1791,7 @@ header.global-navigation.feds-banner-showing nav:not(.localnav) .feds-popup:not(
 
 /* localnav's hamburger-flow popup (bar closed) uses a plain --s2a-spacing-64
    top with no +8-1px baseline (see localnav.css) — different from the standard
-   popup the rule above targets. When the bar is open instead, this rule is 
+   popup the rule above targets. When the bar is open instead, this rule is
    excluded so localnav's own breadcrumbs-height-based positioning applies untouched. */
 header.global-navigation.feds-banner-showing nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) {
   top: calc(var(--feds-banner-extra-offset) + var(--s2a-spacing-64));

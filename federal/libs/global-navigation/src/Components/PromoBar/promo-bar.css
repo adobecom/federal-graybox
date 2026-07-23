@@ -146,10 +146,11 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     background-color: var(--s2a-color-blue-1000);
   }
 
+  .feds-primary-cta {
+    border-color: var(--s2a-color-blue-900);
+  }
+
   .feds-promo-bar--dark {
-    .feds-primary-cta {
-      border-color: var(--s2a-color-blue-900);
-    }
 
     .feds-secondary-cta {
       color: var(--s2a-color-gray-25);

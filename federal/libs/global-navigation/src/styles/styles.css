@@ -171,6 +171,9 @@ header.global-navigation {
   top: 0;
   left: 0;
   z-index: 10;
+  /* right: 0;
+  max-width: var(--grid-max-width-default);
+  margin: auto; */
   /* Drives the height of `nav::after` (the rounded backdrop frame).
      Default value covers the nav row; the JS in
      PostRendering/ClickListeners.ts mutates this property when a

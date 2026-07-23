@@ -50,7 +50,7 @@
   gap: 6px;
 }
 
-.featured-card span {
+.featured-card .featured-link {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -58,7 +58,7 @@
   gap: 6px;
 }
 
-.featured-card span svg {
+.featured-card .featured-link svg {
   margin-top: 2px;
   color: var(--s2a-color-gray-1000);
   width: 3px;

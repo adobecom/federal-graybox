@@ -230,6 +230,18 @@ export const localizeHref = (href: string): string => {
 };
 
 /**
+ * Authored links can end with `#_blank` to request opening in a new tab,
+ * matching the convention used across milo (see decorateLinkElement).
+ */
+export const getTargetAttrs = (
+  href: string,
+): { href: string; target: string } => {
+  if (href.includes('#_blank'))
+    return { href: href.replace('#_blank', ''), target: '_blank' };
+  return { href, target: '' };
+};
+
+/**
  * Lingo locale config — federal-specific locale data (currently just `ietf`,
  * e.g. `'fr-LU'`) that may override the milo config locale for downstream
  * consumers (AUP SDK, UNav). Optional; consumers must fall back to

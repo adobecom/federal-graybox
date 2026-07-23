@@ -1,6 +1,7 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { Link, parseLink } from "../Link/Parse";
 import { parseSecondaryCTA, SecondaryCTA } from "../CTA/Parse";
+import { isMerchLink } from "../../Utils/Utils";
 
 export type FeaturedCard = {
   type: "FeaturedCard";
@@ -41,6 +42,15 @@ const parseCard = (
     throw new IrrecoverableError("Expected title");
   if (!subtitleElement)
     throw new IrrecoverableError("Expected subtitle");
+
+  // The OST/M@S price link is authored inline as part of the description.
+  // Tag it with the `merch` class so it is resolved into a live price in place;
+  // subtitle HTML is preserved so the price blends into description styling.
+  subtitleElement.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((anchor) => {
+    if (isMerchLink(anchor.getAttribute('href') ?? '')) anchor.classList.add('merch');
+  });
+  const subtitle = subtitleElement.innerHTML.trim();
+
   const linkElement
     = subtitleElement.nextElementSibling?.firstElementChild || null;
   if (!linkElement) {
@@ -58,7 +68,7 @@ const parseCard = (
     {
       type: "Card",
       title: titleElement.textContent ?? '',
-      subtitle: subtitleElement.textContent ?? '',
+      subtitle,
       bodyLink: cardLink,
       footerCTA,
       eyeBrow: eyeBrowElement.textContent ?? '',

@@ -1,6 +1,7 @@
 import { Breadcrumbs, parseBreadcrumbs } from "../Components/Breadcrumbs/Parse";
 import { Component, parseComponent } from "../Components/Component";
 import { ProductEntryCTA } from "../Components/CTA/Parse";
+import { PromoBar, parsePromoBar } from "../Components/PromoBar/Parse";
 import { IrrecoverableError, RecoverableError } from "../Error/Error";
 import { getMetadata, parseListAndAccumulateErrors } from "../Utils/Utils";
 
@@ -8,6 +9,7 @@ export type GlobalNavigationData = {
   breadcrumbs: Breadcrumbs | null;
   components: Array<Component>;
   productCTA: ProductEntryCTA | null;
+  promoBar: Promise<PromoBar | null>;
   localnav: boolean;
   darkFont: boolean;
   errors: Array<RecoverableError>;
@@ -20,6 +22,7 @@ export const parseNavigation = (
   mainNav: HTMLElement,
   unavEnabled: boolean,
   placeholders: Map<string, string> = new Map(),
+  promoBarEl: Promise<HTMLElement | null> = Promise.resolve(null),
 ): GlobalNavigationData | IrrecoverableError => {
   // Breadcrumbs are authored in the page body, not in the gnav source,
   // and they're optional. If the block is missing we silently skip
@@ -31,6 +34,13 @@ export const parseNavigation = (
   ] = breadcrumbsEl === null
     ? [null, []]
     : parseBreadcrumbs(breadcrumbsEl);
+
+  const promoBar: Promise<PromoBar | null> = promoBarEl.then(el => {
+    if (el === null) return null;
+    const [parsed] = parsePromoBar(el);
+    return parsed;
+  });
+
   const [parsedComponents, componentErrors]
     = parseListAndAccumulateErrors(
       [...mainNav.children],
@@ -58,6 +68,7 @@ export const parseNavigation = (
     breadcrumbs,
     components,
     productCTA,
+    promoBar,
     localnav,
     darkFont,
     errors,

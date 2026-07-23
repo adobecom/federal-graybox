@@ -50,7 +50,7 @@
   gap: 6px;
 }
 
-.featured-card span {
+.featured-card .featured-link {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -58,14 +58,14 @@
   gap: 6px;
 }
 
-.featured-card span svg {
+.featured-card .featured-link svg {
   margin-top: 2px;
   color: var(--s2a-color-gray-1000);
   width: 3px;
   height: 8px;
 }
 
-.featured-card a.feds-secondary-cta {
+.global-navigation .featured-card a.feds-secondary-cta {
   background: var(--s2a-color-gray-1000);
   color: var(--s2a-color-gray-25);
 }
@@ -83,7 +83,7 @@
   box-sizing: border-box;
 }
 
-.featured-card .footer-container a.feds-secondary-cta:hover {
+.global-navigation .featured-card .footer-container a.feds-secondary-cta:hover {
   background: var(--s2a-color-gray-1000);
 }
 

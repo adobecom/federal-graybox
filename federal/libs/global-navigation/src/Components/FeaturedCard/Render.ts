@@ -16,7 +16,7 @@ const renderCard = ({
   bodyLink,
 }: Card, megaMenuTitle: string): HTML => {
   const eyeBrowId = `featured-eyebrow-${sanitize(eyeBrow)}`;
-  
+
   return `
   <article class="featured-card" ${getAnalyticsAttrs(eyeBrow, '')}>
     <div>
@@ -25,7 +25,7 @@ const renderCard = ({
       </div>
       <h2>${title}</h2>
       <div class="featured-subtitle">${subtitle}</div>
-      <span>${link({ ...bodyLink, ariaAttrs: { 'aria-describedby': eyeBrowId }, svgIcon: icons.chevronRight })}</span>
+      <span class="featured-link">${link({ ...bodyLink, ariaAttrs: { 'aria-describedby': eyeBrowId }, svgIcon: icons.chevronRight })}</span>
     </div>
     <div class="footer-container">
       ${secondaryCTA({ ...footerCTA, ariaAttrs: { 'aria-describedby': eyeBrowId } })}

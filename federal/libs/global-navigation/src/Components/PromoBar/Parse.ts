@@ -5,7 +5,7 @@ import {
   parsePrimaryCTA,
   parseSecondaryCTA,
 } from "../CTA/Parse";
-import { isMerchLink } from "../../Utils/Utils";
+import { getTargetAttrs, isMerchLink, localizeHref } from "../../Utils/Utils";
 
 export type PromoBarVariant = 'minimized' | 'maximized' | 'maximized-release';
 
@@ -97,12 +97,16 @@ const parseContent = (cell: Element): PromoBarContent => {
     return (p.textContent?.trim() ?? '').length > 0;
   }) ?? null;
 
-  // Decorate merch links within headline and body before serializing innerHTML.
+  // Decorate merch, #_blank, and localize links within headline/body before serializing.
   [headlineEl, bodyEl].forEach((el) => {
     if (el === null) return;
     el.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
       const href = a.getAttribute('href') ?? '';
       if (isMerchLink(href)) a.classList.add('merch');
+
+      const { href: strippedHref, target } = getTargetAttrs(href);
+      if (target !== '') a.setAttribute('target', target);
+      a.setAttribute('href', localizeHref(strippedHref));
     });
   });
 

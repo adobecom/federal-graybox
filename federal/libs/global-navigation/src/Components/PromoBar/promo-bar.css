@@ -8,9 +8,14 @@ body:has(.feds-popup.is-open:not(.small-menu)) .feds-promo-bar {
 }
 
 body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) {
-  main,
-  .rm-slide.is-active {
-    clip-path: inset(0 round var(--s2a-border-radius-lg));
+  main {
+    clip-path: inset(0 round var(--s2a-border-radius-lg) var(--s2a-border-radius-lg) 0 0);
+  }
+
+  header:not(:has(.feds-menu-active)),
+  .router-marquee {
+    border-top-left-radius: var(--s2a-border-radius-lg);
+    border-top-right-radius: var(--s2a-border-radius-lg);
   }
 }
 

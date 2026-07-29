@@ -47,6 +47,17 @@ export const isMerchLink = (href: string): boolean => {
   return MERCH_LINK_PATHS.some((path) => href.includes(path));
 };
 
+// mas.adobe.com studio links are resolved by Milo's `merch-card-autoblock`
+const MAS_LINK_PATH = 'mas.adobe.com/studio.html';
+
+/**
+ * Checks if a URL is a Mas studio link handled by merch-card-autoblock.
+ * @param href - The URL to check
+ * @returns true if the URL is a mas.adobe.com studio link
+ */
+export const isMasLink = (href: string): boolean =>
+  href.includes(MAS_LINK_PATH);
+
 // split arrays based on a predicate
 // unlike string.prototype.split, it works on
 // all arrays.

@@ -12,7 +12,6 @@ import {
   getMiloConfig,
   getMiloLocaleSettings,
   getLingoLocaleConfig,
-  isBEEnabled,
   MiloConfig
 } from '../../Utils/Utils';
 import type {
@@ -74,7 +73,6 @@ export const preloadAupSdk = (): void => {
 
   const environment = config.env.name === 'prod' ? 'prod' : 'stage';
   const clientId = (window as WindowWithAdobeId)?.adobeid?.client_id;
-  const beEnabled = isBEEnabled();
 
   const aupHost = environment === 'prod'
   ? 'shared-components.adobe.com'
@@ -99,11 +97,9 @@ export const preloadAupSdk = (): void => {
       appName: 'adobecom',
       appVersion: '1.0',
       colorScheme: 'light',
-      ...(beEnabled && { showDialog: showAupDialog }),
+      showDialog: showAupDialog,
     });
-    if (beEnabled) {
-      await window.aupsdk?.updateConfig({ miniAppContext: { features: ['useToasts'] } });
-    }
+    await window.aupsdk?.updateConfig({ miniAppContext: { features: ['useToasts'] } });
     return window.aupsdk;
   });
 

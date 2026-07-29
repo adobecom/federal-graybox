@@ -97,7 +97,8 @@ const parseContent = (cell: Element): PromoBarContent => {
     return (p.textContent?.trim() ?? '').length > 0;
   }) ?? null;
 
-  // Decorate merch, #_blank, and localize links within headline/body before serializing.
+  // Decorate merch, #_blank, and localize links within
+  // headline/body before serializing.
   [headlineEl, bodyEl].forEach((el) => {
     if (el === null) return;
     el.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {

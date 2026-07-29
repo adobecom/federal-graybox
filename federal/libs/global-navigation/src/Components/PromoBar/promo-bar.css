@@ -50,6 +50,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     height: 100%;
     background-color: inherit;
     z-index: -1;
+    border-radius: var(--s2a-border-radius-lg) var(--s2a-border-radius-lg) 0 0;
   }
 }
 

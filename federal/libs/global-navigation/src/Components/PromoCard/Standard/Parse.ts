@@ -1,6 +1,6 @@
 import { IrrecoverableError, RecoverableError } from "../../../Error/Error";
 import { parseSecondaryCTA, SecondaryCTA } from "../../CTA/Parse";
-import { isMerchLink } from "../../../Utils/Utils";
+import { isMerchLink, isMasLink } from "../../../Utils/Utils";
 
 export type PromoCard = {
   type: "PromoCard";
@@ -17,6 +17,7 @@ export type PromoCardData = {
   priceText: string;
   priceHref: string;
   isPriceMerchLink: boolean;
+  isPriceMasLink: boolean;
 };
 
 const ERRORS = {
@@ -72,7 +73,8 @@ export const parsePromoCard = (
     const priceText = priceLink?.textContent?.trim() ?? "";
     const priceHref = priceLink?.getAttribute('href') ?? "";
     const isPriceMerchLink = priceHref ? isMerchLink(priceHref) : false;
-    
+    const isPriceMasLink = priceHref ? isMasLink(priceHref) : false;
+
     if (priceLink === null)
       errors.add(new RecoverableError(ERRORS.MissingPriceLink));
 
@@ -117,6 +119,7 @@ export const parsePromoCard = (
           priceText,
           priceHref,
           isPriceMerchLink,
+          isPriceMasLink,
         },
       },
       [...errors]

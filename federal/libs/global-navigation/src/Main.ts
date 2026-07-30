@@ -10,7 +10,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
@@ -50,6 +50,9 @@ export type Input = {
   // later date.
   personalization: PersonalizationConfig;
   localizeLink?: LocalizeLink;
+  // Async companion to localizeLink — runs milo's decorateLinksAsync over the
+  // raw fetched body pre-parse (lingo regionalization + mep-lingo prefix).
+  decorateBody?: DecorateBody;
   convertStageLinks?: (args: {
     anchors: HTMLAnchorElement[];
     hostname: string;
@@ -85,6 +88,7 @@ export const main = async (
 
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
+  setDecorateBody(input.decorateBody ?? (async (): Promise<void> => {}));
   // Normalize null → undefined so the stored state matches the
   // `LingoLocaleConfig | undefined` invariant even if a JS caller passes null.
   setLingoLocaleConfig(input.lingoRegion ?? undefined);

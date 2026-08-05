@@ -9,7 +9,11 @@ body:has(.feds-popup.is-open:not(.small-menu)) .feds-promo-bar {
 
 body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) {
   main {
-    clip-path: inset(0 round var(--s2a-border-radius-lg) var(--s2a-border-radius-lg) 0 0);
+    border-radius: var(--s2a-border-radius-lg) var(--s2a-border-radius-lg) 0 0;
+    > .section:first-child {
+      border-top-left-radius: var(--s2a-border-radius-lg);
+      border-top-right-radius: var(--s2a-border-radius-lg);
+    }
   }
 
   header:not(:has(.feds-menu-active)),
@@ -50,7 +54,6 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     height: 100%;
     background-color: inherit;
     z-index: -1;
-    border-radius: var(--s2a-border-radius-lg) var(--s2a-border-radius-lg) 0 0;
   }
 }
 

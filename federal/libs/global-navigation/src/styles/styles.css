@@ -1293,12 +1293,14 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   header.global-navigation:not(.is-compact) nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-backdrop {
     background-color: rgba(0, 0, 0, 0.60);
     backdrop-filter: blur(32px);
+    pointer-events: auto;
   }
 }
 
 header.global-navigation nav:has(.feds-menu-wrapper.is-open) .feds-backdrop {
   background-color: rgba(0, 0, 0, 0.60);
   backdrop-filter: blur(32px);
+  pointer-events: auto;
 }
 
 @media (max-width: 768px) {
@@ -1397,8 +1399,8 @@ header.global-navigation:has(.unav-comp-app-switcher-open) nav {
 }
 
 header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-overlay {
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100dvw;
 }
 
 /* =========================================

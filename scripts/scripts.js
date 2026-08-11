@@ -31,6 +31,7 @@ const CONFIG = {
     africa: ['ke', 'mu', 'ng', 'za'],
     la: ['bo', 'cr', 'do', 'ec', 'gt', 'pa', 'pr', 'py', 'sv', 'uy', 've'],
     mena_en: ['bh', 'dz', 'iq', 'ir', 'jo', 'lb', 'ly', 'om', 'ps', 'sy', 'tn', 'ye'],
+    cis_en: ['am', 'az', 'ge', 'kz', 'kg', 'md', 'tj', 'tm', 'uz'],
   },
   prodDomains: ['www', 'business', 'blog', 'helpx', 'stock'].map(
     (sub) => `${sub}.adobe.com`

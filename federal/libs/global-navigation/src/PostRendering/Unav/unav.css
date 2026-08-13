@@ -17,3 +17,11 @@
 .manage-people-disable-scroll {
     overflow: hidden;
 }
+
+.global-navigation .unc-overlay-container {
+  max-width: 100%;
+}
+
+.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-app-switcher-tray {
+  max-height: calc(100svh - 100px);
+}

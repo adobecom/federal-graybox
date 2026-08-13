@@ -49,13 +49,13 @@ const VARIANTS: readonly PromoBarVariant[] = ['maximized-release', 'maximized'];
 const parseVariant = (classList: DOMTokenList): PromoBarVariant =>
   VARIANTS.find((v) => classList.contains(v)) ?? 'minimized';
 
-const parseIconLink = (cell: Element): PromoBarIcon => {
-  // Icon is authored as <p><a href="...svg">https://...svg | Alt Text</a></p>
+// Icon authored as <p><a href="...svg">https://...svg | Alt Text</a></p>
+const parseIconAnchor = (cell: Element): PromoBarIcon | null => {
   const iconAnchor = [...cell.querySelectorAll(':scope > p > a')].find((a) => {
     const href = a.getAttribute('href') ?? '';
     return /\.(svg|png|jpg|jpeg|webp)(\?.*)?$/i.test(href);
   }) ?? null;
-  if (iconAnchor === null) return { icon: null, iconAlt: null };
+  if (iconAnchor === null) return null;
 
   const href = iconAnchor.getAttribute('href') ?? null;
   const linkText = iconAnchor.textContent ?? '';
@@ -64,12 +64,30 @@ const parseIconLink = (cell: Element): PromoBarIcon => {
   return { icon: href, iconAlt };
 };
 
+// Icon authored directly as <p><picture><img src="..." alt="..."></picture></p>
+const parseIconPicture = (picture: Element | null): PromoBarIcon | null => {
+  const img = picture?.querySelector('img') ?? null;
+  if (img === null) return null;
+  const alt = img.getAttribute('alt')?.trim() ?? '';
+  return { icon: img.getAttribute('src'), iconAlt: alt.length > 0 ? alt : null };
+};
+
 const parseContent = (cell: Element): PromoBarContent => {
-  const { icon, iconAlt } = parseIconLink(cell);
   const pictures = [...cell.querySelectorAll('picture')];
-  // Last <picture> is a bg image only when there are 2+ pictures;
-  // with just one it is the icon.
-  const bgPicture = pictures[0] ?? null;
+
+  // Icon is either a link to an image, or — when no such link is authored —
+  // the first <picture> in the cell. Any picture(s) left over (e.g. the
+  // maximized-release promo image) are bg-image candidates; the last of
+  // those is the bg image.
+  const linkIcon = parseIconAnchor(cell);
+  const iconPicture = linkIcon === null ? pictures[0] ?? null : null;
+  const pictureIcon = linkIcon === null ? parseIconPicture(iconPicture) : null;
+  const { icon, iconAlt } = linkIcon
+    ?? pictureIcon
+    ?? { icon: null, iconAlt: null };
+
+  const bgPictures = pictures.filter((p) => p !== iconPicture);
+  const bgPicture = bgPictures[bgPictures.length - 1] ?? null;
   const bgImg = bgPicture?.querySelector('img') ?? null;
   const bgImage = bgImg?.getAttribute('src') ?? bgImg?.getAttribute('srcset')?.split('?')[0] ?? null;
   const productName = cell.querySelector('h5')?.textContent?.trim() ?? null;

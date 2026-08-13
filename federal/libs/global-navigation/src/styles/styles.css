@@ -242,6 +242,7 @@ header.feds-header-scrolled:not(:has(.feds-breadcrumbs)):not(:has(.feds-popup.is
 
 .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
+  white-space: normal;
 }
 
 /* Scrolled OR any popup/drawer open → backdrop is light/gray, so
@@ -960,6 +961,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     text-align: left;
   }
 
+  [dir="rtl"] .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
+    text-align: right;
+  }
+
   .global-navigation .feds-gnav-items > li > .feds-link {
     font-family: var( --heading-font-family);
     font-weight: var(--s2a-font-weight-adobe-clean-black);
@@ -1064,6 +1069,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     align-items: flex-start;
     padding: 0;
     margin-top: 0;
+    overflow-y: auto;
   }
 
   /* Match `.feds-menu-active` in addition to `.is-open` for the same reason
@@ -1287,12 +1293,14 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   header.global-navigation:not(.is-compact) nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) .feds-backdrop {
     background-color: rgba(0, 0, 0, 0.60);
     backdrop-filter: blur(32px);
+    pointer-events: auto;
   }
 }
 
 header.global-navigation nav:has(.feds-menu-wrapper.is-open) .feds-backdrop {
   background-color: rgba(0, 0, 0, 0.60);
   backdrop-filter: blur(32px);
+  pointer-events: auto;
 }
 
 @media (max-width: 768px) {
@@ -1391,8 +1399,8 @@ header.global-navigation:has(.unav-comp-app-switcher-open) nav {
 }
 
 header.global-navigation .universal-nav-container .universal-nav-tray .unav-comp-overlay {
-  height: 100vh;
-  width: 100vw;
+  height: 100dvh;
+  width: 100dvw;
 }
 
 /* =========================================

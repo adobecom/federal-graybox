@@ -1,6 +1,7 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
 import { alternative } from "../../Utils/Utils";
 import { Link, parseLink } from "../Link/Parse";
+import { parseSvgIcons } from "../SvgIcon/Parse";
 
 export type ProductCardHeader = {
   type: "ProductCardHeader";
@@ -134,13 +135,9 @@ const parseProductCardLink = (
     };
   });
 
-  const iconAnchors = element.querySelectorAll('a[href$=".svg"]');
-  const icons: ProductCardIcons[] = Array.from(iconAnchors).map((a) => {
-    const [iconHref = null, iconAlt = null] = (a.textContent ?? "")
-      .split("|")
-      .map((x) => x.trim());
-    return { iconHref, iconAlt };
-  });
+  const icons: ProductCardIcons[] = parseSvgIcons(element).map(
+    ({ src, alt }) => ({ iconHref: src, iconAlt: alt }),
+  );
 
   return [
     {

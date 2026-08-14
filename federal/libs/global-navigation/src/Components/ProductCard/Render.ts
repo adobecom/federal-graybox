@@ -1,5 +1,6 @@
 import { ProductCard, ProductCardBlue, ProductCardHeader, ProductCardLink } from "./Parse";
-import { getAnalyticsAttrs, localizeHref, federateUrl } from "../../Utils/Utils";
+import { getAnalyticsAttrs, localizeHref } from "../../Utils/Utils";
+import { svgIcon } from "../SvgIcon/Render";
 
 export const productCard = (card: ProductCard): HTML => {
   switch (card.type) {
@@ -48,15 +49,10 @@ const productCardLink = ({
     ? ""
     : `
       <div class="feds-product-card__icons">
-        ${visibleIcons.map(({ iconHref }) => `
-          <picture class="feds-product-card__icon">
-            <img
-              loading="lazy"
-              src="${federateUrl(iconHref as string)}"
-              class="feds-product-card__icon-img"
-            >
-          </picture>
-        `).join("")}
+        ${visibleIcons.map(({ iconHref, iconAlt }) => svgIcon(
+          { src: iconHref, alt: iconAlt },
+          { imgClass: 'feds-product-card__icon-img', pictureClass: 'feds-product-card__icon' },
+        )).join("")}
       </div>
     `;
   const badgesMarkup = badges.length === 0

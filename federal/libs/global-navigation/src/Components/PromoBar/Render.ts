@@ -2,13 +2,12 @@ import { primaryCTA, secondaryCTA } from "../CTA/Render";
 import { PrimaryCTA, SecondaryCTA } from "../CTA/Parse";
 import { PromoBar, PromoBarContent, PromoBarViewport } from "./Parse";
 import { federateUrl } from "../../Utils/Utils";
+import { svgIcon } from "../SvgIcon/Render";
 
 const iconHTML = (
   src: string | null,
   alt: string | null,
-): HTML => src !== null
-  ? `<img class="feds-promo-bar-icon" src="${federateUrl(src)}" alt="${alt ?? ''}" width="40" height="40" loading="lazy">`
-  : '';
+): HTML => svgIcon({ src, alt }, { imgClass: 'feds-promo-bar-icon', width: 40, height: 40 });
 
 const ctasHTML = (
   p: PrimaryCTA | null,

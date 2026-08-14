@@ -1,6 +1,7 @@
 import { PromoCard, PromoCardData } from "./Parse";
 import { secondaryCTA } from "../../CTA/Render";
 import { localizeHref, sanitize, federateUrl } from "../../../Utils/Utils";
+import { svgIcon } from "../../SvgIcon/Render";
 
 export const promoCard = ({ card }: PromoCard): HTML => renderCard(card);
 
@@ -31,18 +32,10 @@ const renderCard = ({
     }
 
     <div class="promo-card__content">
-      ${
-        iconSrc
-          ? `<picture class="promo-card__icon">
-               <img
-                loading="lazy"
-                src="${federateUrl(iconSrc)}"
-                alt="${iconAlt}"
-                class="promo-card__icon-image"
-              >
-             </picture>`
-          : ""
-      }
+      ${svgIcon(
+        { src: iconSrc, alt: iconAlt },
+        { imgClass: 'promo-card__icon-image', pictureClass: 'promo-card__icon' },
+      )}
       <div class="promo-card__text-content">
         ${priceHref && (isPriceMerchLink || isPriceMasLink) ? `<p id="price-${sanitize(title)}" class="promo-card__price">
           <a href="${localizeHref(priceHref)}"${isPriceMerchLink ? ' class="merch"' : ''}>${priceText}</a>

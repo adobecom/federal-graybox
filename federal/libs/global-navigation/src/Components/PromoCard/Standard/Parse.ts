@@ -1,6 +1,7 @@
 import { IrrecoverableError, RecoverableError } from "../../../Error/Error";
 import { parseSecondaryCTA, SecondaryCTA } from "../../CTA/Parse";
 import { isMerchLink, isMasLink } from "../../../Utils/Utils";
+import { parseSvgIcon } from "../../SvgIcon/Parse";
 
 export type PromoCard = {
   type: "PromoCard";
@@ -43,7 +44,10 @@ export const parsePromoCard = (
     if (bgImageSection === undefined)
       throw new IrrecoverableError(ERRORS.MissingBackgroundImageSection);
 
-    const bgImageElement: HTMLImageElement | null = bgImageSection.querySelector(':scope picture:not(:scope p picture) img') ?? null;
+    // A section may contain more than one <picture> (e.g. a decorative one
+    // alongside the actual background image); the last is the bg image.
+    const bgPictures = [...bgImageSection.querySelectorAll(':scope picture:not(:scope p picture)')];
+    const bgImageElement: HTMLImageElement | null = bgPictures[bgPictures.length - 1]?.querySelector('img') ?? null;
     if (bgImageElement === null)
       errors.add(new RecoverableError(ERRORS.MissingBackgroundImage));
 
@@ -58,18 +62,21 @@ export const parsePromoCard = (
     if (contentSection === undefined)
       throw new IrrecoverableError(ERRORS.MissingContentSection);
 
-    const icon: HTMLAnchorElement | null = contentSection.querySelector('a[href$=".svg"]') ?? null;
-    if (icon === null)
+    const iconMatch = parseSvgIcon(contentSection);
+    if (iconMatch === null)
       errors.add(new RecoverableError(ERRORS.MissingIcon));
 
-    const [iconSrc, iconAlt] = (icon?.textContent?.split("|") ?? ["", ""]).map(s => s.trim());
+    const iconSrc = iconMatch?.src ?? "";
     if (iconSrc === "")
       errors.add(new RecoverableError(ERRORS.MissingIconSrc));
 
+    const iconAlt = iconMatch?.alt ?? "";
     if (iconAlt === "")
       errors.add(new RecoverableError(ERRORS.MissingIconAlt));
 
-    const priceLink = contentSection.querySelector('p > a:not([href$=".svg"])') ?? null;
+    const priceLink = contentSection.querySelector(
+      'p > a:not([href$=".svg"]):not([href$=".png"]):not([href$=".jpg"]):not([href$=".jpeg"]):not([href$=".webp"])',
+    ) ?? null;
     const priceText = priceLink?.textContent?.trim() ?? "";
     const priceHref = priceLink?.getAttribute('href') ?? "";
     const isPriceMerchLink = priceHref ? isMerchLink(priceHref) : false;

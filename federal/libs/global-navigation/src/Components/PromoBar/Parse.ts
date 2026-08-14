@@ -6,6 +6,7 @@ import {
   parseSecondaryCTA,
 } from "../CTA/Parse";
 import { getTargetAttrs, isMerchLink, localizeHref } from "../../Utils/Utils";
+import { parseSvgIcon } from "../SvgIcon/Parse";
 
 export type PromoBarVariant = 'minimized' | 'maximized' | 'maximized-release';
 
@@ -35,11 +36,6 @@ export type PromoBar = {
   slots: PromoBarSlot[];
 };
 
-type PromoBarIcon = {
-  icon: string | null;
-  iconAlt: string | null;
-};
-
 const ERRORS = {
   elementNull: "Error when parsing PromoBar. Element is null",
 };
@@ -49,44 +45,16 @@ const VARIANTS: readonly PromoBarVariant[] = ['maximized-release', 'maximized'];
 const parseVariant = (classList: DOMTokenList): PromoBarVariant =>
   VARIANTS.find((v) => classList.contains(v)) ?? 'minimized';
 
-// Icon authored as <p><a href="...svg">https://...svg | Alt Text</a></p>
-const parseIconAnchor = (cell: Element): PromoBarIcon | null => {
-  const iconAnchor = [...cell.querySelectorAll(':scope > p > a')].find((a) => {
-    const href = a.getAttribute('href') ?? '';
-    return /\.(svg|png|jpg|jpeg|webp)(\?.*)?$/i.test(href);
-  }) ?? null;
-  if (iconAnchor === null) return null;
-
-  const href = iconAnchor.getAttribute('href') ?? null;
-  const linkText = iconAnchor.textContent ?? '';
-  const pipeIdx = linkText.indexOf(' | ');
-  const iconAlt = pipeIdx !== -1 ? linkText.slice(pipeIdx + 3).trim() : null;
-  return { icon: href, iconAlt };
-};
-
-// Icon authored directly as <p><picture><img src="..." alt="..."></picture></p>
-const parseIconPicture = (picture: Element | null): PromoBarIcon | null => {
-  const img = picture?.querySelector('img') ?? null;
-  if (img === null) return null;
-  const alt = img.getAttribute('alt')?.trim() ?? '';
-  return { icon: img.getAttribute('src'), iconAlt: alt.length > 0 ? alt : null };
-};
-
 const parseContent = (cell: Element): PromoBarContent => {
   const pictures = [...cell.querySelectorAll('picture')];
 
-  // Icon is either a link to an image, or — when no such link is authored —
-  // the first <picture> in the cell. Any picture(s) left over (e.g. the
-  // maximized-release promo image) are bg-image candidates; the last of
-  // those is the bg image.
-  const linkIcon = parseIconAnchor(cell);
-  const iconPicture = linkIcon === null ? pictures[0] ?? null : null;
-  const pictureIcon = linkIcon === null ? parseIconPicture(iconPicture) : null;
-  const { icon, iconAlt } = linkIcon
-    ?? pictureIcon
-    ?? { icon: null, iconAlt: null };
+  // Any picture(s) left over after the icon (e.g. the maximized-release
+  // promo image) are bg-image candidates; the last of those is the bg image.
+  const iconMatch = parseSvgIcon(cell);
+  const icon = iconMatch?.src ?? null;
+  const iconAlt = iconMatch?.alt ?? null;
 
-  const bgPictures = pictures.filter((p) => p !== iconPicture);
+  const bgPictures = pictures.filter((p) => p !== iconMatch?.element);
   const bgPicture = bgPictures[bgPictures.length - 1] ?? null;
   const bgImg = bgPicture?.querySelector('img') ?? null;
   const bgImage = bgImg?.getAttribute('src') ?? bgImg?.getAttribute('srcset')?.split('?')[0] ?? null;

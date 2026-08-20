@@ -37,6 +37,9 @@ export type Input = {
   unavEnabled: boolean;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
+  // Geo-validated market for the unav and drives the cart. String or a
+  // promise the host resolves in parallel; 
+  countryCode?: string | Promise<string | undefined>;
   lingoRegion?: LingoLocaleConfig;
   // for now we only support inBlock commands.
   // Since MEP on gnav is relatively rare we'll
@@ -298,7 +301,9 @@ export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
-  const unav = await loadUnav(input.mountpoint);
+  const unav = await loadUnav(input.mountpoint, {
+    countryCode: input.countryCode,
+  });
   if (unav instanceof RecoverableError) {
     errors.add(unav);
     lanaLog(unav.message);

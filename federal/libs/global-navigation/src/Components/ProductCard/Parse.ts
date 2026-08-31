@@ -1,5 +1,5 @@
 import { IrrecoverableError, RecoverableError } from "../../Error/Error";
-import { alternative } from "../../Utils/Utils";
+import { alternative, isMerchLink, isMasLink } from "../../Utils/Utils";
 import { Link, parseLink } from "../Link/Parse";
 import { parseSvgIcons } from "../SvgIcon/Parse";
 
@@ -122,7 +122,27 @@ const parseProductCardLink = (
   if (!subtitleElement)
     errors.add(new RecoverableError(ERRORS.noSubtitleP));
 
-  const subtitle = subtitleElement?.textContent ?? '';
+  let subtitle = subtitleElement?.textContent ?? '';
+  // Prices/discounts are authored as OST/M@S links inside the description.
+  // The product card is a single <a>, so these links cannot stay as anchors
+  // (a nested <a> would break the card). Swap them for non-anchor placeholders
+  // that PostRendering/MerchLinks resolves in place.
+  const commerceAnchors = [...(subtitleElement?.querySelectorAll('a') ?? [])]
+    .filter((anchor) => {
+      const href = anchor.getAttribute('href') ?? '';
+      return isMerchLink(href) || isMasLink(href);
+    });
+  if (subtitleElement && commerceAnchors.length > 0) {
+    commerceAnchors.forEach((anchor) => {
+      const href = anchor.getAttribute('href') ?? '';
+      const placeholder = document.createElement('span');
+      placeholder.className = 'feds-commerce-placeholder';
+      placeholder.setAttribute('data-commerce-href', href);
+      placeholder.innerHTML = anchor.innerHTML;
+      anchor.replaceWith(placeholder);
+    });
+    subtitle = subtitleElement.innerHTML;
+  }
   if (subtitle === '')
     errors.add(new RecoverableError(ERRORS.noSubtitle));
 

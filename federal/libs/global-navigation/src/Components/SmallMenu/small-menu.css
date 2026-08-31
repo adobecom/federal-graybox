@@ -2,7 +2,7 @@
    Small Menu — Desktop only (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   /* Anchor the li so top:100% works */
   header.global-navigation:not(.is-compact) .feds-gnav-items > li:has(.feds-popup.small-menu) {
     position: relative;

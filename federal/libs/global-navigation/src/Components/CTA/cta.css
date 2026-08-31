@@ -9,7 +9,7 @@
     margin-left: auto;
     margin-right: var(--s2a-spacing-sm);
 
-    @media (max-width: 1024px) {
+    @media (width < 1025px) {
       display: none;
     }
 
@@ -78,7 +78,7 @@
   }
 
   /* Dark font: invert to dark pill, white text */
-   @media (min-width: 1024px) {
+   @media (width >= 1024px) {
     &.dark-font:not(.is-compact) :is(ul.feds-gnav-items > li > .feds-primary-cta, .feds-product-entry-cta .feds-primary-cta) {
       background-color: var(--s2a-color-gray-1000);
       color: var(--s2a-color-gray-25);
@@ -106,7 +106,7 @@
   }
 
   /* Menu active: invert primary to dark — desktop only, not compact */
-  @media (min-width: 1024px) {
+  @media (width >= 1024px) {
     &:not(.is-compact):has(.feds-menu-active):not(:has(.small-menu.is-open)) :is(
       ul.feds-gnav-items > li > .feds-primary-cta,
       .feds-product-entry-cta .feds-primary-cta

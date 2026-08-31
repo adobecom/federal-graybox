@@ -24,7 +24,7 @@
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards {
     display: flex;
     flex-wrap: nowrap;

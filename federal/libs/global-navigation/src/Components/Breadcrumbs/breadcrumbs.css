@@ -137,7 +137,7 @@
 
 /* breadcrumbs in mobile mega menu */
 
-@media (max-width: 1023px) {
+@media (width < 1024px) {
   header.global-navigation nav {
     &:has(.feds-menu-wrapper.is-open) > .feds-breadcrumbs {
       display: none;

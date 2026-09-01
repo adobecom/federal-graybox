@@ -1,0 +1,41 @@
+/* =========================================
+   Promo Bar — Countdown Timer (CDT)
+   Appears only inside .feds-promo-bar--minimized
+   Rendered as a single "DD:HH:MM:SS" text node,
+   displayed as a flex item in .feds-promo-bar-inner
+   ========================================= */
+
+/* Groups the product icon and the countdown timer side-by-side */
+.feds-promo-bar-icon-cdt {
+  display: flex;
+  align-items: center;
+  gap: var(--s2a-spacing-xs);
+  padding-inline: var(--s2a-spacing-2xs) var(--s2a-spacing-xs);
+  padding-block: var(--s2a-spacing-2xs);
+  background-color: var(--s2a-color-background-subtle);
+  border-radius: var(--s2a-border-radius-sm);
+}
+
+.feds-promo-bar--dark .feds-promo-bar-icon-cdt {
+  background-color: var(--s2a-color-gray-900);
+}
+
+.feds-cdt {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: inherit;
+}
+
+/* Visually-hidden screen-reader label (e.g. "7 days, … remaining"). The
+   visible "DD:HH:MM:SS" text is aria-hidden, so this is what AT announces. */
+.feds-cdt-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

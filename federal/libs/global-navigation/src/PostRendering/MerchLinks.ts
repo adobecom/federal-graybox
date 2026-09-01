@@ -1,4 +1,4 @@
-import { getMiloConfig, isMasLink } from '../Utils/Utils';
+import { getMiloConfig, isMerchLink, isMasLink } from '../Utils/Utils';
 import { RecoverableError } from '../Error/Error';
 
 type MerchModule = {
@@ -16,6 +16,22 @@ export const initMerchLinks = async (
   mountpoint: HTMLElement
 ): Promise<Set<RecoverableError>> => {
   const errors = new Set<RecoverableError>();
+
+  // Product-card commerce links (price/discount) are authored inside the card's
+  // single <a>, where a nested <a> is invalid. Parse leaves them as non-anchor
+  // placeholders; convert them back to anchors so the resolution below handles
+  // them in place.
+  mountpoint.querySelectorAll<HTMLElement>('.feds-commerce-placeholder')
+    .forEach((placeholder) => {
+      const href = placeholder.getAttribute('data-commerce-href') ?? '';
+      if (href === '') return;
+      const link = document.createElement('a');
+      link.href = href;
+      link.innerHTML = placeholder.innerHTML;
+      if (isMerchLink(href)) link.classList.add('merch');
+      placeholder.replaceWith(link);
+    });
+
   const merchLinks = mountpoint.querySelectorAll<HTMLAnchorElement>('a.merch');
   const masLinks = [...mountpoint.querySelectorAll<HTMLAnchorElement>('a[href]')]
     .filter((link) => isMasLink(link.href));

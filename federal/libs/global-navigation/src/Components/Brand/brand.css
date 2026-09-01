@@ -106,7 +106,7 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
    Animations
    ========================================= */
 
-@media (max-width: 1023px) {
+@media (width < 1024px) {
   @keyframes brand-fade {
     from {
       opacity: 1;
@@ -175,7 +175,7 @@ header.global-navigation.is-compact:has(.feds-popup.is-open:not(.small-menu), .f
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   header.global-navigation:not(.is-compact) li.feds-brand-wrapper {
     display: flex;
     flex-direction: row;

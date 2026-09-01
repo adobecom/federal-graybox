@@ -18,6 +18,8 @@ export type PromoBarContent = {
   body: string | null;
   primaryCta: PrimaryCTA | null;
   secondaryCta: SecondaryCTA | null;
+  // outerHTML of the <picture> element (source variants + fallback img),
+  // not a bare URL.
   bgImage: string | null;
 };
 
@@ -56,8 +58,13 @@ const parseContent = (cell: Element): PromoBarContent => {
 
   const bgPictures = pictures.filter((p) => p !== iconMatch?.element);
   const bgPicture = bgPictures[bgPictures.length - 1] ?? null;
-  const bgImg = bgPicture?.querySelector('img') ?? null;
-  const bgImage = bgImg?.getAttribute('src') ?? bgImg?.getAttribute('srcset')?.split('?')[0] ?? null;
+  // Keep the full <picture> markup (all <source> variants + fallback <img>)
+  // so responsive/format switching survives into the rendered output. By
+  // this point replaceDotMedia has already rewritten src/srcset to absolute
+  // federated URLs, so no further URL processing is needed here. The class
+  // is added directly to the <picture> so Render doesn't need a wrapper div.
+  bgPicture?.classList.add('feds-promo-bar-bg');
+  const bgImage = bgPicture?.outerHTML ?? null;
   const productName = cell.querySelector('h5')?.textContent?.trim() ?? null;
 
   // Headline: first <p> with a <strong> that isn't a pure CTA row.

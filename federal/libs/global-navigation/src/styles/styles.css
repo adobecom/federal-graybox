@@ -33,6 +33,7 @@
 @import "../Components/FeaturedCard/featured-card.css";
 @import "../Components/Localnav/localnav.css";
 @import "../Components/PromoBar/promo-bar.css";
+@import "../Components/CountdownTimer/cdt.css";
 @import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
 
@@ -149,7 +150,7 @@ header.global-navigation.feds-promo-showing nav:not(.localnav) > ul > li.feds-me
   top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
 }
 
-@media (max-width: 1023px) {
+@media (width < 1024px) {
   header.global-navigation.feds-promo-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
     top: calc(var(--feds-promo-extra-offset) + var(--s2a-spacing-64));
     height: calc(100dvh - var(--feds-promo-extra-offset) - var(--s2a-spacing-64));
@@ -376,7 +377,7 @@ header.global-navigation.feds-header-scrolled nav::after {
   white-space: nowrap;
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   header.global-navigation:not(.is-compact) ul.feds-gnav-items {
     display: flex;
     gap: var(--s2a-spacing-lg);
@@ -816,7 +817,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   header.global-navigation:not(.is-compact) nav .feds-nav-toggle {
     display: none;
   }
@@ -942,7 +943,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
    Responsive: Mobile (max-width: 1023px)
    ========================================= */
 
-@media (max-width: 1023px) {
+@media (width < 1024px) {
   header.global-navigation nav:has(.feds-popup.is-open)::after {
     height: calc(100dvh + var(--s2a-spacing-xs));
   }
@@ -1218,7 +1219,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
    Scroll Animations
    ========================================= */
 
-@media (min-width: 1920px) {
+@media (width >= 1920px) {
   header.global-navigation:not(.is-compact) nav:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)::after {
     left: calc(0px - var(--s2a-spacing-xs) - (100vw - 1920px) / 2);
   }
@@ -1244,7 +1245,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     backdrop-filter 0.3s ease;
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   header.global-navigation:not(.is-compact) .feds-popup {
     border-bottom-left-radius: 18px;
     border-bottom-right-radius: 18px;
@@ -1303,7 +1304,7 @@ header.global-navigation nav:has(.feds-menu-wrapper.is-open) .feds-backdrop {
   pointer-events: auto;
 }
 
-@media (max-width: 768px) {
+@media (width < 769px) {
   .global-navigation .feds-menu-wrapper:not(.feds-menu-active) .feds-primary-cta {
     box-sizing: border-box;
     width: 100%;
@@ -1350,7 +1351,7 @@ header.global-navigation nav:has(.feds-menu-wrapper.is-open) .feds-backdrop {
   animation: feds-slide-up var(--feds-anim-duration) ease-out forwards;
 }
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
 
   /* 1. Pane Content (Base Slide & Fade) */
   header.global-navigation:not(.is-compact) .feds-popup.is-open > div {
@@ -1814,7 +1815,7 @@ header.global-navigation.feds-banner-showing nav:not(.localnav) > ul > li.feds-m
   top: calc(var(--feds-banner-extra-offset) + var(--s2a-spacing-64));
 }
 
-@media (max-width: 1023px) {
+@media (width < 1024px) {
   header.global-navigation.feds-banner-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
     top: calc(var(--feds-banner-extra-offset) + var(--s2a-spacing-64));
     height: calc(100dvh - var(--feds-banner-extra-offset) - var(--s2a-spacing-64));

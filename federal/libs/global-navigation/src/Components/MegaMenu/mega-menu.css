@@ -42,7 +42,7 @@ ul.tabs .product-links {
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
 
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   /* Responsive: fit all columns within width (no promo-card) */
   header.global-navigation:not(.is-compact) .feds-gnav-cards:not(:has(.promo-card)) > li:has(> :nth-child(2)) {
     gap: var(--s2a-spacing-xs);
@@ -90,7 +90,7 @@ ul.tabs .product-links {
    Large Desktop (min-width: 1280px) — promo-card layout only
    ========================================= */
 
-@media (min-width: 1280px) {
+@media (width >= 1280px) {
   header.global-navigation:not(.is-compact) .feds-gnav-cards:has(.promo-card) > li:has(.promo-card, .links-card) {
     width: calc(25% - 6px);
   }

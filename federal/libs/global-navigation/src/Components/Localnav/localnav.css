@@ -40,7 +40,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
    Houses every nav.localnav rule that mirrors mobile behavior. Wrapped in a
    single (max-width: 1023px) media query so the rules apply at the standard
    mobile breakpoint (same as non-localnav mobile UX). */
-@media (max-width: 1023px) {
+@media (width < 1024px) {
 
   /* The hamburger toggle's aria-controls points directly at the first mega-menu's
      popup (see Main.ts). In localnav we hide the FIRST mega-menu's trigger (it's
@@ -515,7 +515,7 @@ header.global-navigation.is-compact nav.localnav > .feds-breadcrumbs {
    menu/popup is open and the backdrop turns light/gray. See
    Components/Breadcrumbs/breadcrumbs.css for the source separator the
    styling mirrors. */
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
   /* Make the tagged li lay out its own children inline-centered (matches the
      breadcrumb pattern at Components/Breadcrumbs/breadcrumbs.css:35-40), so
      the ::before pipe and the .feds-link sit on the same baseline rather
@@ -550,7 +550,7 @@ header.global-navigation.is-compact nav.localnav > .feds-breadcrumbs {
    full container width. From 768-1315px they keep their default
    content-sized width (see the .feds-primary-cta / .feds-secondary-cta
    rules in the mobile block above). */
-@media (max-width: 768px) {
+@media (width < 769px) {
   .global-navigation nav.localnav .feds-gnav-items > li > .feds-primary-cta,
   .global-navigation nav.localnav .feds-gnav-items > li > .feds-secondary-cta {
     width: 100%;

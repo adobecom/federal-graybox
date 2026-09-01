@@ -10,6 +10,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
+import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
 import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
@@ -328,6 +329,7 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
+  initPromoCountdownInMinimizedBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -679,6 +681,28 @@ const waitUntilVisible = (callback: () => void): void => {
     }
   };
   check();
+};
+
+/**
+ * Injects a countdown timer into every `.feds-promo-bar-inner` slot of a
+ * `minimized` PromoBar.  Reads the `gnav-promo-countdown` meta tag for the
+ * start/end window; no-ops silently when the tag is absent, malformed, or
+ * the current time is outside the window.
+ */
+const initPromoCountdownInMinimizedBar = (): void => {
+  const promoBar = document.querySelector<HTMLElement>(
+    '.feds-promo-aside-wrapper .feds-promo-bar--minimized',
+  );
+  if (promoBar === null) return;
+
+  const isDark = promoBar.classList.contains('feds-promo-bar--dark');
+  const inners = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-inner');
+
+  inners.forEach((inner) => {
+    const textEl = inner.querySelector<HTMLElement>('.feds-promo-bar-text');
+    if (textEl === null) return;
+    initPromoCountdown(inner, textEl, isDark);
+  });
 };
 
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {

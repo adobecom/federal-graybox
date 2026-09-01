@@ -33,6 +33,7 @@
 @import "../Components/FeaturedCard/featured-card.css";
 @import "../Components/Localnav/localnav.css";
 @import "../Components/PromoBar/promo-bar.css";
+@import "../Components/CountdownTimer/cdt.css";
 @import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
 

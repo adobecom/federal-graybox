@@ -263,14 +263,17 @@ export const getTargetAttrs = (
 };
 
 /**
- * Lingo locale config — federal-specific locale data (currently just `ietf`,
- * e.g. `'fr-LU'`) that may override the milo config locale for downstream
- * consumers (AUP SDK, UNav). Optional; consumers must fall back to
- * `getMiloConfig().locale.ietf` when `getLingoLocaleConfig()` returns
- * `undefined`.
+ * Lingo locale config — federal-specific locale data derived from the milo
+ * lingo region that may override the milo config locale for downstream
+ * consumers (AUP SDK, UNav). `ietf` (e.g. `'fr-LU'`) is the language tag used
+ * by the AUP SDK; `prefix` (e.g. `'/ie'`) is the region path used to build the
+ * UNav locale so routing follows the region, not the language tag. Optional;
+ * consumers must fall back to the milo config locale when
+ * `getLingoLocaleConfig()` returns `undefined`.
  */
 export type LingoLocaleConfig = {
   ietf: string;
+  prefix: string;
 };
 
 type LingoLocaleConfigStateFunctions = [

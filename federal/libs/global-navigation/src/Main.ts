@@ -42,16 +42,12 @@ export type Input = {
   // promise the host resolves in parallel;
   countryCode?: string | Promise<string | undefined>;
   lingoRegion?: LingoLocaleConfig;
-  // for now we only support inBlock commands.
-  // Since MEP on gnav is relatively rare we'll
-  // keep it at this and see if any problems crop up.
-  // The Milo gnav MEP implementation is a little
-  // more entangled than what we have here.
-  // For example we're not dealing with adding manifestId to the body
-  // and so on. But the whole idea behind this refactor is
-  // that we want to reduce coupling.
-  // So we'll keep it at this for now and re-evaluate at a
-  // later date.
+  // We deliberately stay less entangled with MEP than milo's own gnav
+  // implementation (e.g. we don't add manifestId to the body). The host is
+  // expected to supply `handleCommands` (applied to each freshly-fetched,
+  // detached fragment body) and, if fragment-swap manifests targeting
+  // content nested inside the gnav are needed (e.g. a product-card
+  // fragment), `resolveFragmentHref` — see PersonalizationConfig in Utils.ts.
   personalization: PersonalizationConfig;
   localizeLink?: LocalizeLink;
   // Async companion to localizeLink — runs milo's decorateLinksAsync over the

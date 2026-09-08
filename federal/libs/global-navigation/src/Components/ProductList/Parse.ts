@@ -54,7 +54,17 @@ const parseProductCategory = (
 
   const name = h2.textContent ?? '';
   const daaLl = h2.textContent ?? '';
-  const linkGroups = getNextSiblings(h2);
+  // Authors can link to a fragment (href ending in `#_inline`) in place of a
+  // product-card div; MegaMenu/Parse.ts already fetches and splices that
+  // fragment's markup in before we get here. Franklin/EDS fragments wrap
+  // their block content in a section <div>, so the spliced-in element is
+  // often that wrapper rather than the `.product-card` div itself — resolve
+  // to the nested product-card when present.
+  const linkGroups = getNextSiblings(h2).map((sibling) =>
+    sibling.classList.contains('product-card')
+      ? sibling
+      : sibling.querySelector('.product-card') ?? sibling
+  );
   const [
     links,
     errors

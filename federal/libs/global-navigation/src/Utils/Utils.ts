@@ -162,8 +162,21 @@ export type PersonalizationConfig = {
   commands: unknown[];
   handleCommands: (
     commands: unknown[],
-    rootEl: Document | HTMLElement
+    rootEl: Document | HTMLElement,
+    forceInline?: boolean,
+    forceRootEl?: boolean
   ) => unknown;
+  /**
+   * Resolves a nested fragment href (e.g. a `#_inline` product-card link) to
+   * a MEP-swapped href, if the host's manifest overrides it. Milo's own
+   * fragment loader consults `config.mep.fragments` (a page-wide map, not the
+   * `in-block:`-scoped one) via `handleFragmentCommand`, which also carries
+   * the `#_inline` marker over to the replacement — mirror that here. Falls
+   * back to the original href when omitted or when there's no override. May
+   * be async since a real implementation typically lazy-imports milo's
+   * personalization module.
+   */
+  resolveFragmentHref?: (href: string) => string | Promise<string>;
 };
 
 export type LocalizeLink = (link: string) => string;
@@ -312,10 +325,14 @@ export const fetchAndProcessPlainHTML = async (
     const processedHtml = replacePlaceholders(htmlText, resolvedPlaceholders);
     const { body } = new DOMParser().parseFromString(processedHtml, "text/html");
 
-    // Apply personalization to the fetched HTML
+    // Apply personalization to the fetched HTML. forceRootEl=true scopes
+    // selector matching to this freshly-fetched, detached `body` instead of
+    // the live `document` (which wouldn't contain it); forceInline=true
+    // mirrors milo's own nested-fragment fetch (see gnav utilities.js) so a
+    // fragment-type replacement's content keeps the `#_inline` marker.
     try {
       const { handleCommands, commands } = getPersonalizationConfig();
-      await handleCommands(commands, body);
+      await handleCommands(commands, body, true, true);
       // Milo-provided async link decoration (lingo regionalization + QI +
       // mep-lingo prefix). Runs pre-parse on the raw body so localizeLinkAsync
       // resolves before parseNavigation reads hrefs. Non-fatal — shares this
@@ -451,7 +468,9 @@ export const inlineNestedFragments = async (
         .map(async (anchorElement: HTMLAnchorElement) => {
           try {
             if (visitedUrls.has(anchorElement.href)) return;
-            const federatedUrl = federateUrl(anchorElement.href);
+            const resolvedHref = await (getPersonalizationConfig()
+              .resolveFragmentHref?.(anchorElement.href) ?? anchorElement.href);
+            const federatedUrl = federateUrl(resolvedHref);
             const fragmentUrl = new URL(federatedUrl);
             const fragmentBody = await fetchAndProcessPlainHTML(fragmentUrl);
             visitedUrls.add(anchorElement.href);

@@ -64,7 +64,7 @@ version="1.0" encoding="UTF-8"?>
       </div>
       <ul class="links-card-links" aria-labelledby="links-card-${_(e)}">
         ${a.map(o=>o.description!==void 0&&o.description!==""?`<li class="links-card-links__item--has-description">
-               <a class="feds-link links-card-links__item-link ${o.highlight??!1?"feds-link--highlight":""}" href="${A(o.href)}">
+               <a class="feds-link links-card-links__item-link ${o.highlight??!1?"feds-link--highlight":""}" href="${A(o.href)}" daa-ll="${o.text}">
                  <span class="links-card-links__item-title">${o.text}</span>
                  <span class="links-card-links__item-description">${o.description}</span>
                </a>

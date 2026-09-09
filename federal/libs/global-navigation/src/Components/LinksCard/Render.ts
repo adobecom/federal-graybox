@@ -21,7 +21,7 @@ const renderCard = ({
       <ul class="links-card-links" aria-labelledby="links-card-${sanitize(title)}">
         ${links.map(item => item.description !== undefined && item.description !== ''
           ? `<li class="links-card-links__item--has-description">
-               <a class="feds-link links-card-links__item-link ${item.highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(item.href)}">
+               <a class="feds-link links-card-links__item-link ${item.highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(item.href)}" daa-ll="${item.text}">
                  <span class="links-card-links__item-title">${item.text}</span>
                  <span class="links-card-links__item-description">${item.description}</span>
                </a>

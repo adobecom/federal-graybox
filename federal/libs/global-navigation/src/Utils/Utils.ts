@@ -162,8 +162,21 @@ export type PersonalizationConfig = {
   commands: unknown[];
   handleCommands: (
     commands: unknown[],
-    rootEl: Document | HTMLElement
+    rootEl: Document | HTMLElement,
+    forceInline?: boolean,
+    forceRootEl?: boolean
   ) => unknown;
+  /**
+   * Resolves a nested fragment href (e.g. a `#_inline` product-card link) to
+   * a MEP-swapped href, if the host's manifest overrides it. Milo's own
+   * fragment loader consults `config.mep.fragments` (a page-wide map, not the
+   * `in-block:`-scoped one) via `handleFragmentCommand`, which also carries
+   * the `#_inline` marker over to the replacement — mirror that here. Falls
+   * back to the original href when omitted or when there's no override. May
+   * be async since a real implementation typically lazy-imports milo's
+   * personalization module.
+   */
+  resolveFragmentHref?: (href: string) => string | Promise<string>;
 };
 
 export type LocalizeLink = (link: string) => string;
@@ -263,14 +276,17 @@ export const getTargetAttrs = (
 };
 
 /**
- * Lingo locale config — federal-specific locale data (currently just `ietf`,
- * e.g. `'fr-LU'`) that may override the milo config locale for downstream
- * consumers (AUP SDK, UNav). Optional; consumers must fall back to
- * `getMiloConfig().locale.ietf` when `getLingoLocaleConfig()` returns
- * `undefined`.
+ * Lingo locale config — federal-specific locale data derived from the milo
+ * lingo region that may override the milo config locale for downstream
+ * consumers (AUP SDK, UNav). `ietf` (e.g. `'fr-LU'`) is the language tag used
+ * by the AUP SDK; `prefix` (e.g. `'/ie'`) is the region path used to build the
+ * UNav locale so routing follows the region, not the language tag. Optional;
+ * consumers must fall back to the milo config locale when
+ * `getLingoLocaleConfig()` returns `undefined`.
  */
 export type LingoLocaleConfig = {
   ietf: string;
+  prefix: string;
 };
 
 type LingoLocaleConfigStateFunctions = [
@@ -309,10 +325,14 @@ export const fetchAndProcessPlainHTML = async (
     const processedHtml = replacePlaceholders(htmlText, resolvedPlaceholders);
     const { body } = new DOMParser().parseFromString(processedHtml, "text/html");
 
-    // Apply personalization to the fetched HTML
+    // Apply personalization to the fetched HTML. forceRootEl=true scopes
+    // selector matching to this freshly-fetched, detached `body` instead of
+    // the live `document` (which wouldn't contain it); forceInline=true
+    // mirrors milo's own nested-fragment fetch (see gnav utilities.js) so a
+    // fragment-type replacement's content keeps the `#_inline` marker.
     try {
       const { handleCommands, commands } = getPersonalizationConfig();
-      await handleCommands(commands, body);
+      await handleCommands(commands, body, true, true);
       // Milo-provided async link decoration (lingo regionalization + QI +
       // mep-lingo prefix). Runs pre-parse on the raw body so localizeLinkAsync
       // resolves before parseNavigation reads hrefs. Non-fatal — shares this
@@ -448,7 +468,9 @@ export const inlineNestedFragments = async (
         .map(async (anchorElement: HTMLAnchorElement) => {
           try {
             if (visitedUrls.has(anchorElement.href)) return;
-            const federatedUrl = federateUrl(anchorElement.href);
+            const resolvedHref = await (getPersonalizationConfig()
+              .resolveFragmentHref?.(anchorElement.href) ?? anchorElement.href);
+            const federatedUrl = federateUrl(resolvedHref);
             const fragmentUrl = new URL(federatedUrl);
             const fragmentBody = await fetchAndProcessPlainHTML(fragmentUrl);
             visitedUrls.add(anchorElement.href);

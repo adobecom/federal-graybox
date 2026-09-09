@@ -254,10 +254,8 @@ export const loadUnav = async (
     const overrideCountryCode = await Promise.resolve(options?.countryCode)
       .catch(() => undefined);
 
-    // Lingo ietf (e.g. 'fr-LU') overrides milo locale when provided.
-    // UNav expects underscore form ('fr_LU'), so convert hyphens.
-    const locale = getLingoLocaleConfig()?.ietf?.replace('-', '_')
-      ?? getUniversalNavLocale(config.locale);
+    const lingoLocale = getLingoLocaleConfig();
+    const locale = getUniversalNavLocale(lingoLocale ?? config.locale);
     const environment = config.env.name === 'prod' ? 'prod' : 'stage';
 
     // Fetch visitor GUID for analytics

@@ -39,19 +39,15 @@ export type Input = {
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
   // Geo-validated market for the unav and drives the cart. String or a
-  // promise the host resolves in parallel; 
+  // promise the host resolves in parallel;
   countryCode?: string | Promise<string | undefined>;
   lingoRegion?: LingoLocaleConfig;
-  // for now we only support inBlock commands.
-  // Since MEP on gnav is relatively rare we'll
-  // keep it at this and see if any problems crop up.
-  // The Milo gnav MEP implementation is a little
-  // more entangled than what we have here.
-  // For example we're not dealing with adding manifestId to the body
-  // and so on. But the whole idea behind this refactor is
-  // that we want to reduce coupling.
-  // So we'll keep it at this for now and re-evaluate at a
-  // later date.
+  // We deliberately stay less entangled with MEP than milo's own gnav
+  // implementation (e.g. we don't add manifestId to the body). The host is
+  // expected to supply `handleCommands` (applied to each freshly-fetched,
+  // detached fragment body) and, if fragment-swap manifests targeting
+  // content nested inside the gnav are needed (e.g. a product-card
+  // fragment), `resolveFragmentHref` — see PersonalizationConfig in Utils.ts.
   personalization: PersonalizationConfig;
   localizeLink?: LocalizeLink;
   // Async companion to localizeLink — runs milo's decorateLinksAsync over the
@@ -302,15 +298,6 @@ export const postRenderingTasks = async (
   input: Input,
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
-  const unav = await loadUnav(input.mountpoint, {
-    countryCode: input.countryCode,
-  });
-  if (unav instanceof RecoverableError) {
-    errors.add(unav);
-    lanaLog(unav.message);
-  }
-  else
-    unav.errors.forEach((error: RecoverableError) => errors.add(error));
 
   const activeLink = findActiveLink(input.mountpoint);
   const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
@@ -325,7 +312,6 @@ export const postRenderingTasks = async (
   initKeyboardNav(input.mountpoint);
   initAriaToggleListeners(input.mountpoint);
   initPopoverCloseOnResize(input.mountpoint);
-  initPopoverCloseOnUnavInteraction(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
@@ -335,6 +321,17 @@ export const postRenderingTasks = async (
     errors.add(error);
     lanaLog(error.message);
   });
+
+  const unav = await loadUnav(input.mountpoint, {
+    countryCode: input.countryCode,
+  });
+  if (unav instanceof RecoverableError) {
+    errors.add(unav);
+    lanaLog(unav.message);
+  }
+  else
+    unav.errors.forEach((error: RecoverableError) => errors.add(error));
+  initPopoverCloseOnUnavInteraction(input.mountpoint);
 
   const reloadUnav
     = unav instanceof RecoverableError

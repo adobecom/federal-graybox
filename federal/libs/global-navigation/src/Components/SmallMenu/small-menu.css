@@ -29,9 +29,14 @@
 
   header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open {
     border-radius: var(--s2a-spacing-xs);
-    overflow-y: hidden;
+    overflow: visible;
     left: -24px;
     margin-top: -8px;
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open > :not(.feds-popup-header) {
+    overflow: visible;
+    max-height: none;
   }
 
   /* Gnav cards layout */

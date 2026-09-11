@@ -1,4 +1,8 @@
 .global-navigation {
+  & [data-feds-registration-pending] {
+    visibility: hidden;
+  }
+
   /* =========================================
      Product Entry CTA — layout
      ========================================= */
@@ -167,6 +171,37 @@
       background-color: transparent;
       color: var(--s2a-color-gray-1000);
       border-color: var(--s2a-color-gray-1000);
+    }
+  }
+
+  /* CTA nav item in the open hamburger drawer: black fill (primary) / dark
+     outline (secondary) for contrast on the light drawer, left-aligned.
+     Applies to every gnav consumer's drawer CTA, not just MAX. */
+  &:has(.feds-menu-wrapper.is-open) ul.feds-gnav-items > li > :is(.feds-primary-cta, .feds-secondary-cta) {
+    margin-left: 0;
+    /* Drawer nav links get their spacing from a large line-height; a CTA
+       doesn't, so add top spacing so it doesn't hug the last link. */
+    margin-top: var(--s2a-spacing-sm);
+  }
+
+  &:has(.feds-menu-wrapper.is-open) ul.feds-gnav-items > li > .feds-primary-cta {
+    background-color: var(--s2a-color-gray-1000);
+    color: var(--s2a-color-gray-25);
+    border-color: var(--s2a-color-gray-1000);
+  }
+
+  &:has(.feds-menu-wrapper.is-open) ul.feds-gnav-items > li > .feds-secondary-cta {
+    background-color: transparent;
+    color: var(--s2a-color-gray-1000);
+    border-color: var(--s2a-color-gray-1000);
+  }
+
+  /* Full-width only on small screens; stays a natural-width pill from 769px up. */
+  @media (max-width: 768px) {
+    &:has(.feds-menu-wrapper.is-open) ul.feds-gnav-items > li > :is(.feds-primary-cta, .feds-secondary-cta) {
+      display: flex;
+      width: 100%;
+      box-sizing: border-box;
     }
   }
 

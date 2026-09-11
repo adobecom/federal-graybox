@@ -1,4 +1,4 @@
-import { getAnalyticsAttrs, getAriaAttrs, getTargetAttrs, localizeHref } from "../../Utils/Utils";
+import { getAnalyticsAttrs, getAriaAttrs, getTargetAttrs, getRegistrationGateAttrs, localizeHref } from "../../Utils/Utils";
 import { PrimaryCTA, ProductEntryCTA, SecondaryCTA } from "./Parse";
 
 export const primaryCTA = ({
@@ -8,11 +8,14 @@ export const primaryCTA = ({
   ariaLabel,
   ariaAttrs,
 }: PrimaryCTA): HTML => {
-  const { href: strippedHref, target } = getTargetAttrs(href);
+  const { href: unblankedHref, target } = getTargetAttrs(href);
+  const { href: strippedHref, hideWhenRegistered } =
+    getRegistrationGateAttrs(unblankedHref);
   return `
 <a href="${localizeHref(strippedHref)}"
   class="feds-primary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
+  ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
 >
   ${text}
@@ -27,11 +30,14 @@ export const secondaryCTA = ({
   ariaLabel,
   ariaAttrs,
 }: SecondaryCTA): HTML => {
-  const { href: strippedHref, target } = getTargetAttrs(href);
+  const { href: unblankedHref, target } = getTargetAttrs(href);
+  const { href: strippedHref, hideWhenRegistered } =
+    getRegistrationGateAttrs(unblankedHref);
   return `
 <a href="${localizeHref(strippedHref)}"
   class="feds-secondary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
+  ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
 >
   ${text}

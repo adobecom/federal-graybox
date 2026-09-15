@@ -11,6 +11,7 @@ const renderCard = ({
   title,
   links,
   footerCTA,
+  footerLink,
 }: LinksCardItem): HTML => `
   <article class="links-card" ${getAnalyticsAttrs(title, '')}>
     <div>
@@ -33,7 +34,8 @@ const renderCard = ({
     ${footerCTA === null
       ? ""
       : `
-    <div class="links-card-footer">
+    <div class="links-card-footer${footerLink !== null ? ' links-card-footer--has-link' : ''}">
+      ${footerLink === null ? '' : `<div class="links-card-footer-link">${link({ ...footerLink, highlight: true})}</div>`}
       ${footerCTA.type === 'PrimaryCTA'
         ? primaryCTA({ ...footerCTA, ariaAttrs: { 'aria-describedby': `links-card-${sanitize(title)}` } })
         : secondaryCTA({ ...footerCTA, ariaAttrs: { 'aria-describedby': `links-card-${sanitize(title)}` } })}

@@ -101,13 +101,6 @@
     color: var(--s2a-color-gray-1000);
     border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-1000);
   }
-
-  header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards:has(.featured-card) {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    flex-wrap: unset;
-    overflow-x: unset;
-  }
 }
 
 /* =========================================

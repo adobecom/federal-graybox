@@ -179,6 +179,48 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
   line-height: 120%;
 }
 
+/* Long link lists split into two balanced columns (multicol's default
+   column-fill: balance evens the counts, e.g. 10 links → 5 + 5).
+
+   The threshold for splitting depends on whether any link carries a
+   description: plain links split when there are more than six, but when a
+   description is present anywhere the rows are taller, so the split is deferred
+   to more than nine. The two triggers are mutually exclusive via the
+   :not()/:has() description guards.
+
+   Desktop-only: on mobile/is-compact the card is narrow enough that a second
+   column would cramp the labels, so the list stays single-column there. */
+@media (width >= 1024px) {
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-links:is(
+      :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
+      :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
+    ) {
+    columns: 2;
+    column-gap: var(--s2a-spacing-2xl);
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-links:is(
+      :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
+      :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
+    ) > li {
+    break-inside: avoid;
+    min-width: 0;
+  }
+
+  /* In the narrow two-column layout, let long labels wrap to the next line
+     inside their column instead of overflowing into the adjacent one. The
+     min-width: 0 releases the default flex min-content floor so the link can
+     shrink below its single-line width. */
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-links:is(
+      :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
+      :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
+    ) .feds-link {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
 .feds-popup .links-card .links-card-links li {
   display: flex;
   padding: var(--s2a-spacing-xs) 0;
@@ -207,7 +249,7 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
   white-space: break-spaces;
 }
 
-.feds-popup .links-card .links-card-links .feds-link--highlight {
+.feds-popup .links-card .feds-link.feds-link--highlight {
   color: var(--s2a-color-button-background-primary-solid-default, #3b63fb);
   font-weight: 700;
 }
@@ -233,6 +275,45 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
     background-color: rgba(0, 0, 0, 0);
     justify-content: center;
     width: 100%;
+}
+
+.feds-popup .links-card .links-card-footer .feds-primary-cta {
+  box-sizing: border-box;
+  justify-content: center;
+  width: 100%;
+}
+
+/* In localnav the footer CTA hugs its content instead of filling the row. */
+nav.localnav .feds-popup .links-card .links-card-footer .feds-secondary-cta,
+nav.localnav .feds-popup .links-card .links-card-footer .feds-primary-cta {
+  width: auto;
+}
+
+.feds-popup .links-card .links-card-footer--has-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2a-spacing-sm);
+}
+
+.feds-popup .links-card .links-card-footer--has-link .feds-secondary-cta,
+.feds-popup .links-card .links-card-footer--has-link .feds-primary-cta {
+  width: auto;
+  flex-shrink: 0;
+}
+
+.feds-popup .links-card .links-card-footer-link {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.feds-popup .links-card .links-card-footer-link .feds-link {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
 }
 
 /* =========================================

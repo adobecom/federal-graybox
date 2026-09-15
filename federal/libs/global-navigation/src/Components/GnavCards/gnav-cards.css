@@ -20,6 +20,14 @@
   min-width: 0;
 }
 
+/* A run of links-only columns is merged into a single grid group. On small
+   screens its cards simply stack. */
+.feds-popup .feds-gnav-cards > li.feds-gnav-column--links-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s2a-spacing-2xs);
+}
+
 /* =========================================
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
@@ -41,5 +49,14 @@
 
   header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards:has(.promo-card) > li {
     flex: 0 0 auto;
+  }
+
+  /* The links-grid group spans the row. Its column count is set per-instance
+     by --links-grid-columns: the full card count (single row) for five or
+     fewer cards, or half (rounded up) so more than five wrap into two rows. */
+  header.global-navigation:not(.is-compact) .feds-popup .feds-gnav-cards > li.feds-gnav-column--links-grid {
+    flex: 1 1 auto;
+    gap: var(--s2a-spacing-xs);
+    grid-template-columns: repeat(var(--links-grid-columns, 1), minmax(0, 1fr));
   }
 }

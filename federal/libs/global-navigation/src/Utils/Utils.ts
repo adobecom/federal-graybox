@@ -392,9 +392,10 @@ export const getFederatedContentRoot = (): string => {
   });
 
   federatedContentRoot = isAllowedOrigin ? origin : 'https://www.adobe.com';
+  const isStandaloneTestApp = window.location.hostname === 'adobecom.github.io';
 
   const SLD = window.location.hostname.includes('.aem.') ? 'aem' : 'hlx';
-  if (origin.includes('localhost') || origin.includes(`.${SLD}.`)) {
+  if (origin.includes('localhost') || origin.includes(`.${SLD}.`) || isStandaloneTestApp) {
     federatedContentRoot = `https://main--federal--adobecom.aem.${origin.endsWith('.live') ? 'live' : 'page'}`;
   }
 
@@ -405,13 +406,6 @@ export const getFederatedContentRoot = (): string => {
 // at the start of the url
 // and make the check more strict.
 export const federateUrl = (url = ''): string => {
-  // TEMPORARY REMOVE LATER
-  if (url.includes('stage.adobe.com')) {
-    return url.replace('c2-poc--milo--adobecom', 'main--federal--adobecom');
-  }
-  if (url.includes('c2-poc-feds-gnav--milo--adobecom')) {
-    return url.replace('c2-poc-feds-gnav--milo--adobecom', 'main--federal--adobecom');
-  }
   if (url.includes('localhost:3000')) {
     return url.replace('localhost:3000', 'main--federal--adobecom.aem.page');
   }

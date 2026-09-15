@@ -36,7 +36,18 @@
 
   header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open > :not(.feds-popup-header) {
     overflow: visible;
-    max-height: none;
+    overflow-x: hidden;
+    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-banner-extra-offset));
+  }
+
+  header.global-navigation.feds-promo-showing:not(.is-compact) .feds-popup.small-menu.is-open > :not(.feds-popup-header) {
+    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-promo-extra-offset));
+  }
+
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open > div,
+  header.global-navigation:not(.is-compact) .feds-popup.small-menu.is-open .feds-gnav-cards > li {
+    transform: none;
+    animation: none;
   }
 
   /* Gnav cards layout */
@@ -48,6 +59,7 @@
     border-radius: var(--s2a-spacing-xs);
     padding: 0;
     border-color: var(--s2a-color-transparent-black-12);
+    width: max-content;
   }
 
   header.global-navigation:not(.is-compact) .feds-popup.small-menu .feds-gnav-cards > li {

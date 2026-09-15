@@ -27,11 +27,13 @@ header.feds-header-scrolled.feds-localnav-closing nav.localnav {
   inset: auto;
 }
 
-/* In localnav the popup is reached via either the hamburger (first mega-menu)
-   or a sibling button in the expanded bar — there's no back stack to step
-   through inside the popup, so hide the back-button SVG. */
-nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
+nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) .feds-popup-back-button svg {
   display: none;
+}
+
+nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup .feds-popup-header {
+  padding: var(--s2a-spacing-lg);
+  padding-bottom: 0;
 }
 
 /* =========================================
@@ -76,6 +78,10 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
   .global-navigation nav.localnav > ul > li.feds-menu-wrapper:has(.feds-popup.is-open) {
     opacity: 1;
     visibility: visible;
+  }
+
+  .global-navigation nav.localnav:not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) {
+    --feds-popup-bg-height: calc(100% + var(--feds-breadcrumbs-height));
   }
 
   /* =========================================
@@ -146,7 +152,7 @@ nav.localnav .feds-popup:not(.small-menu) .feds-popup-back-button svg {
        overflow to <button>. */
     display: flex;
     position: relative;
-    overflow: visible;
+    overflow: hidden;
     align-items: center;
     justify-content: space-between;
     width: 100%;
@@ -356,6 +362,13 @@ header.global-navigation.is-compact nav.localnav:has(.feds-localnav-bar[aria-exp
 header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper:has(.feds-popup.is-open) {
   opacity: 1;
   visibility: visible;
+}
+
+/* Mirrors the mobile-media-query rule above: the localnav bar stands in for
+   breadcrumbs and needs the same --feds-breadcrumbs-height bump on
+   --feds-popup-bg-height so the rounded backdrop covers it too. */
+header.global-navigation.is-compact nav.localnav:not(:has(.feds-popup.is-open, .feds-menu-wrapper.is-open)) {
+  --feds-popup-bg-height: calc(100% + var(--feds-breadcrumbs-height));
 }
 
 header.global-navigation.is-compact nav.localnav > ul > li.feds-menu-wrapper {

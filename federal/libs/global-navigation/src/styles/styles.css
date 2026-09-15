@@ -37,6 +37,12 @@
 @import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
 
+:root {
+  --body-font-family-base: var(--s2a-font-family-default), adobe-clean, "Trebuchet MS", sans-serif;
+  --body-font-family: var(--body-font-family-base);
+  --heading-font-family: "Adobe Clean Display Black", var(--s2a-font-family-heading), adobe-clean-display, "Arial Bold Adjusted", sans-serif;
+  --feds-language-banner-height: 44px;
+}
 /* =========================================
    Skip to Main Content Link
    ========================================= */
@@ -90,8 +96,12 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
   --feds-nav-total-height: 80px;
 }
 
-body:has(.global-navigation) main {
+body:has(.global-navigation):not(:has(.c2-gnav-c1-host)) main {
    margin-top: calc(-1 * var(--feds-nav-total-height));
+}
+
+.global-navigation.c2-gnav-c1-host.feds-header-scrolled {
+  background: transparent;
 }
 
 /* =========================================
@@ -196,7 +206,7 @@ header.feds-header-scrolled .feds-link {
   color: var(--s2a-color-gray-1000);
 }
 
-header.feds-header-scrolled:not(:has(.feds-breadcrumbs)):not(:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)) nav {
+header.feds-header-scrolled:not(:has(.localnav)):not(:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)) nav {
   color: var(--s2a-color-gray-1000);
   box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08);
 }
@@ -1276,7 +1286,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
 
   header.global-navigation:not(.is-compact) .feds-popup.is-open > :not(.feds-popup-header) {
     overflow-y: auto;
-    max-height: calc(100dvh - var(--s2a-spacing-64) - var(--feds-banner-extra-offset));
+    max-height: calc(100dvh - var(--feds-nav-total-height) - var(--feds-banner-extra-offset));
   }
 
   .feds-gnav-items > li > .feds-link:first-child {
@@ -1825,4 +1835,62 @@ header.global-navigation.feds-banner-showing nav:not(.localnav) > ul > li.feds-m
 header.global-navigation.feds-banner-showing.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper {
   top: calc(var(--feds-banner-extra-offset) + var(--s2a-spacing-64));
   height: calc(100dvh - var(--feds-banner-extra-offset) - var(--s2a-spacing-64));
+}
+
+/* =========================================
+   Branch banner offset
+   #branch-banner-iframe is injected by the branch/PR preview overlay
+   (unrelated to gnav's own render) and can be added or removed at any
+   point. It's either `position: fixed` (must stay on screen permanently,
+   e.g. "now previewing branch X") or in normal flow — pushes header down,
+   then scrolls away once header's `position: sticky` takes over, same as
+   the promo bar / language banner above.
+
+   Main.ts (initBranchBannerOffset) measures the banner's live height via
+   ResizeObserver into --feds-branch-banner-height. For the fixed case it
+   adds `.feds-branch-banner-fixed` to <header> permanently (the banner
+   never leaves the viewport, so no scroll-based toggle is needed); for the
+   in-flow case it toggles `.feds-branch-banner-showing` via a single
+   IntersectionObserver on the banner, exactly like the sections above.
+
+   These rules are declared last on purpose: unlike the promo bar and
+   language banner (mutually exclusive with each other), the branch banner
+   can show up alongside either of them. Rather than stacking all three
+   offsets together, the branch banner simply wins the cascade tie (same
+   selector specificity, later source order) when more than one is present
+   — branch previews are a developer/QA-only surface where the popup
+   rendering correctly relative to the branch banner matters more than
+   exact multi-banner stacking. */
+header.global-navigation.feds-branch-banner-fixed {
+  top: var(--feds-branch-banner-height, 0px);
+}
+
+header.global-navigation.feds-branch-banner-fixed nav:not(.localnav) .feds-popup:not(.small-menu),
+header.global-navigation.feds-branch-banner-showing nav:not(.localnav) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-branch-banner-height, 0px) + var(--s2a-spacing-64) + var(--s2a-spacing-8) - 1px);
+}
+
+header.global-navigation.feds-branch-banner-fixed nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu),
+header.global-navigation.feds-branch-banner-showing nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup:not(.small-menu) {
+  top: calc(var(--feds-branch-banner-height, 0px) + var(--s2a-spacing-64));
+  max-height: calc(100dvh - var(--feds-branch-banner-height, 0px) - var(--s2a-spacing-64));
+}
+
+header.global-navigation.feds-branch-banner-fixed nav:not(.localnav) > ul > li.feds-menu-wrapper,
+header.global-navigation.feds-branch-banner-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-branch-banner-height, 0px) + var(--s2a-spacing-64));
+}
+
+@media (max-width: 1023px) {
+  header.global-navigation.feds-branch-banner-fixed nav:not(.localnav) > ul > li.feds-menu-wrapper,
+  header.global-navigation.feds-branch-banner-showing nav:not(.localnav) > ul > li.feds-menu-wrapper {
+    top: calc(var(--feds-branch-banner-height, 0px) + var(--s2a-spacing-64));
+    height: calc(100dvh - var(--feds-branch-banner-height, 0px) - var(--s2a-spacing-64));
+  }
+}
+
+header.global-navigation.feds-branch-banner-fixed.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper,
+header.global-navigation.feds-branch-banner-showing.is-compact nav:not(.localnav) > ul > li.feds-menu-wrapper {
+  top: calc(var(--feds-branch-banner-height, 0px) + var(--s2a-spacing-64));
+  height: calc(100dvh - var(--feds-branch-banner-height, 0px) - var(--s2a-spacing-64));
 }

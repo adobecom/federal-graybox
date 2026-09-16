@@ -490,6 +490,10 @@ header.global-navigation.is-compact nav.localnav .feds-popup {
   overflow-x: hidden;
 }
 
+header.global-navigation.feds-banner-showing nav.localnav .feds-popup {
+  top: calc(var(--feds-breadcrumbs-height) - 1px + var(--feds-language-banner-height));
+}
+
 header.global-navigation.is-compact nav.localnav:not(:has(.feds-menu-wrapper.is-open)) .feds-popup {
   top: var(--s2a-spacing-64);
   max-height: calc(100dvh - var(--s2a-spacing-64));

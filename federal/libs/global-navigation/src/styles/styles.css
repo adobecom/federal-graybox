@@ -1552,6 +1552,12 @@ header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link
   stroke-width: 0.5;
 }
 
+[dir="rtl"] header.global-navigation.is-compact .feds-gnav-items > li > .mega-menu.feds-link .chevron-down {
+  margin-left: 0;
+  margin-right: var(--s2a-spacing-xs);
+  transform: rotate(90deg) scale(2.5);
+}
+
 /* feds-product-card gap & border-radius (mirrors lines 983-985) */
 header.global-navigation.is-compact .feds-popup .feds-product-card {
   gap: var(--s2a-spacing-2xl);

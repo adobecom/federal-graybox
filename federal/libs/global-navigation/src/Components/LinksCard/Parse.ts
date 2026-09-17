@@ -13,6 +13,7 @@ export type LinksCardItem = {
   title: string;
   links: Array<Link & { highlight?: boolean; description?: string }>;
   footerCTA: PrimaryCTA | SecondaryCTA | null;
+  footerLink: Link | null;
 };
 
 export const parseLinksCard = (
@@ -35,8 +36,14 @@ const parseCard = (
   const footerCtaAnchor = element.querySelector('em > a')
     || element.querySelector(':not(h6) > strong > a')
     || null;
+  const footerCtaParentP = footerCtaAnchor?.closest('p') ?? null;
+  const footerLinkAnchor = footerCtaParentP
+    ? [...footerCtaParentP.querySelectorAll('a')]
+      .find((anchor) => anchor !== footerCtaAnchor) ?? null
+    : null;
   const linkElements = [...element.querySelectorAll('a')]
-    .filter((anchor) => anchor !== footerCtaAnchor);
+    .filter((anchor) =>
+      anchor !== footerCtaAnchor && anchor !== footerLinkAnchor);
   if (linkElements.length === 0) {
     throw new IrrecoverableError("Expected at least one link");
   }
@@ -73,14 +80,17 @@ const parseCard = (
   if (footerCTA) {
     footerCTA.daaLl = `${titleElement?.textContent ?? ''} - ${footerCTA?.daaLl}`;
   }
+  const [footerLink, footerLinkErrors]: Parsed<Link | null, RecoverableError>
+    = footerLinkAnchor ? parseLink(footerLinkAnchor) : [null, []];
   return [
     {
       type: "LinksCardItem",
       title: titleElement?.textContent ?? "",
       links,
       footerCTA,
+      footerLink,
     },
-    [...linkErrors, ...ctaErrors]
+    [...linkErrors, ...ctaErrors, ...footerLinkErrors]
   ];
 };
 

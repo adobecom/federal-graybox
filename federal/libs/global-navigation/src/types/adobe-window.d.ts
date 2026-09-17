@@ -84,6 +84,20 @@ declare global {
         };
       };
     };
+
+    /** Event registration API exposed by da-events on `event-code` pages */
+    events?: {
+      getRegistrationStatus: () => Promise<{
+        isRegistered: boolean;
+        inPersonAttendee: boolean;
+      }>;
+      getRegistrationDetails?: () => Promise<{
+        isRegistered: boolean;
+        inPersonAttendee: boolean;
+        authToken?: string;
+        userKey?: string;
+      }>;
+    };
   }
 }
 

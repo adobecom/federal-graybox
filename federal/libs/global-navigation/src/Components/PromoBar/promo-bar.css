@@ -7,7 +7,7 @@ body:has(.feds-popup.is-open:not(.small-menu)) .feds-promo-bar {
   display: none;
 }
 
-body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) {
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled, .c2-gnav-c1-host)) {
   main {
     border-radius: var(--s2a-border-radius-lg) var(--s2a-border-radius-lg) 0 0;
     > .section:first-child {
@@ -15,8 +15,10 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
       border-top-right-radius: var(--s2a-border-radius-lg);
     }
   }
+}
 
-  header:not(:has(.feds-menu-active)),
+body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-header-scrolled)) {
+  header:not(:has(.feds-menu-active:not(.small-menu))),
   .router-marquee {
     border-top-left-radius: var(--s2a-border-radius-lg);
     border-top-right-radius: var(--s2a-border-radius-lg);

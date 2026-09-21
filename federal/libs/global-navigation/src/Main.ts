@@ -215,7 +215,20 @@ export const renderGnavString = ({
   const firstMegaMenu = localnav
     ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
     : null;
-  const localnavBarLabel = firstMegaMenu?.title ?? '';
+  const localnavBarSibling = firstMegaMenu !== null
+    ? menuComponents[menuComponents.indexOf(firstMegaMenu) + 1] ?? null
+    : null;
+  // The sibling's label lives in a different field per component type:
+  // MegaMenu/SmallMenu use `title`, Link/CTAs use `text`, Text uses `content`.
+  const localnavBarLabel = localnavBarSibling === null
+    ? ''
+    : 'title' in localnavBarSibling
+      ? localnavBarSibling.title
+      : 'text' in localnavBarSibling
+        ? localnavBarSibling.text
+        : 'content' in localnavBarSibling
+          ? localnavBarSibling.content
+          : '';
   return `
 <nav class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>

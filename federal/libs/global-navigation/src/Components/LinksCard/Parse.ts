@@ -69,8 +69,11 @@ const parseCard = (
     = (() : Parsed<PrimaryCTA | SecondaryCTA | null, RecoverableError> => {
       try {
         return isPrimary
-          ? parsePrimaryCTA(element) as Parsed<PrimaryCTA, RecoverableError>
-          : parseSecondaryCTA(element) as Parsed<
+          ? parsePrimaryCTA(footerCtaParentP) as Parsed<
+              PrimaryCTA,
+              RecoverableError
+            >
+          : parseSecondaryCTA(footerCtaParentP) as Parsed<
               SecondaryCTA, RecoverableError
             >;
       } catch (_error) {

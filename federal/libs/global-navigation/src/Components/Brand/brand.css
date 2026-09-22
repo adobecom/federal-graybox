@@ -83,6 +83,7 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 .feds-brand-image {
   & img:nth-child(1) { display: inherit; }
   & img:nth-child(2) { display: none; }
+  & img:nth-child(3) { display: none; }
 }
 
 /* For dark background */
@@ -98,8 +99,9 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 /* same behavior for both "scrolled" and "popup open" states (considering for transparent-white/light background only)*/
 :is(.feds-header-scrolled, .global-navigation:has(.feds-popup.is-open:not(.small-menu))) {
   & .feds-brand-wrapper .feds-brand-image {
-    & img:nth-child(1) { display: inherit; }
+    & img:nth-child(1) { display: none; }
     & img:nth-child(2) { display: none; }
+    & img:nth-child(3) { display: inherit; }
   }
 }
 

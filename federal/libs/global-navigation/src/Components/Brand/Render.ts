@@ -38,10 +38,24 @@ const { href, label, isDarkBg, imageData } = data;
   const mobileLightAlt = imageData.mobileLightThemeImageAlt || imageData.mobileDarkThemeImageAlt || '';
   const mobileDarkAlt = imageData.mobileDarkThemeImageAlt || imageData.mobileLightThemeImageAlt || '';
 
+  // Scroll-theme logo: shown when the header is scrolled (or a popup is open),
+  // regardless of the page's light/dark theme. Falls back to the light logo
+  // when not authored, matching prior behavior for existing content.
+  const desktopScrollSrc =
+    imageData.scrollThemeImageSrc?.trim() || desktopLightSrc;
+  const mobileScrollSrc =
+    imageData.mobileScrollThemeImageSrc?.trim() || mobileLightSrc;
+  const desktopScrollAlt =
+    imageData.scrollThemeImageAlt || desktopLightAlt;
+  const mobileScrollAlt =
+    imageData.mobileScrollThemeImageAlt || mobileLightAlt;
+
   const hasDesktopLight = !!desktopLightSrc;
   const hasDesktopDark = !!desktopDarkSrc;
   const hasMobileLight = !!mobileLightSrc;
   const hasMobileDark = !!mobileDarkSrc;
+  const hasDesktopScroll = !!desktopScrollSrc;
+  const hasMobileScroll = !!mobileScrollSrc;
 
   const desktopLightImg = hasDesktopLight
     ? `<img src="${federateUrl(desktopLightSrc)}" alt="${desktopLightAlt}" />`
@@ -49,12 +63,18 @@ const { href, label, isDarkBg, imageData } = data;
   const desktopDarkImg = hasDesktopDark
     ? `<img src="${federateUrl(desktopDarkSrc)}" alt="${desktopDarkAlt}" />`
     : '';
+  const desktopScrollImg = hasDesktopScroll
+    ? `<img src="${federateUrl(desktopScrollSrc)}" alt="${desktopScrollAlt}" />`
+    : '';
 
   const mobileLightImg = hasMobileLight
     ? `<img src="${federateUrl(mobileLightSrc)}" alt="${mobileLightAlt}" />`
     : '';
   const mobileDarkImg = hasMobileDark
     ? `<img src="${federateUrl(mobileDarkSrc)}" alt="${mobileDarkAlt}" />`
+    : '';
+  const mobileScrollImg = hasMobileScroll
+    ? `<img src="${federateUrl(mobileScrollSrc)}" alt="${mobileScrollAlt}" />`
     : '';
 
   const desktopSvg = hasDesktopLight && hasDesktopDark ? '' : DESKTOP_SVG;
@@ -65,11 +85,13 @@ const { href, label, isDarkBg, imageData } = data;
       <span class="feds-brand-image desktop-brand">
         ${desktopLightImg}
         ${desktopDarkImg}
+        ${desktopScrollImg}
         ${desktopSvg}
       </span>
       <span class="feds-brand-image mobile-brand">
         ${mobileLightImg}
         ${mobileDarkImg}
+        ${mobileScrollImg}
         ${mobileSvg}
       </span>
     </a>

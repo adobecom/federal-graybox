@@ -10,6 +10,10 @@ export type ImageData = {
   mobileLightThemeImageAlt: string;
   mobileDarkThemeImageSrc: string;
   mobileDarkThemeImageAlt: string;
+  scrollThemeImageSrc: string;
+  scrollThemeImageAlt: string;
+  mobileScrollThemeImageSrc: string;
+  mobileScrollThemeImageAlt: string;
 };
 
 export type Brand = {
@@ -87,6 +91,14 @@ export const parseBrand = (
     desktopImages?.[1]?.getAttribute('href') ?? '';
   const darkThemeDesktopImageAlt =
     desktopImages?.[1]?.textContent?.split('|')[1]?.trim() ?? '';
+  const scrollThemeMobileImageSrc =
+    mobileImages?.[2]?.getAttribute('href') ?? '';
+  const scrollThemeMobileImageAlt =
+    mobileImages?.[2]?.textContent?.split('|')[1]?.trim() ?? '';
+  const scrollThemeDesktopImageSrc =
+    desktopImages?.[2]?.getAttribute('href') ?? '';
+  const scrollThemeDesktopImageAlt =
+    desktopImages?.[2]?.textContent?.split('|')[1]?.trim() ?? '';
 
     if (
       !lightThemeMobileImageSrc
@@ -113,6 +125,10 @@ export const parseBrand = (
         mobileLightThemeImageAlt: lightThemeMobileImageAlt,
         mobileDarkThemeImageSrc: darkThemeMobileImageSrc,
         mobileDarkThemeImageAlt: darkThemeMobileImageAlt,
+        scrollThemeImageSrc: scrollThemeDesktopImageSrc,
+        scrollThemeImageAlt: scrollThemeDesktopImageAlt,
+        mobileScrollThemeImageSrc: scrollThemeMobileImageSrc,
+        mobileScrollThemeImageAlt: scrollThemeMobileImageAlt,
       },
     },
   }, [...errors]]

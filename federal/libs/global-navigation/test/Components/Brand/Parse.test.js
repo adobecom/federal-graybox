@@ -53,6 +53,56 @@ describe('Brand Parse', () => {
     expect(result.data.imageData.mobileDarkThemeImageSrc).to.equal('https://example.com/mobile-dark.svg');
   });
 
+  it('should parse an optional 3rd scroll-theme image when present', () => {
+    const container = document.createElement('div');
+    container.innerHTML = `
+      <div class="gnav-brand">
+        <div><a href="https://example.com/">Adobe</a></div>
+        <div>
+          <div>
+            <a href="https://example.com/mobile-light.svg">mobile-light.svg | Mobile Light</a>
+            <a href="https://example.com/mobile-dark.svg">mobile-dark.svg | Mobile Dark</a>
+            <a href="https://example.com/mobile-scroll.svg">mobile-scroll.svg | Mobile Scroll</a>
+          </div>
+          <div>
+            <a href="https://example.com/desktop-light.svg">desktop-light.svg | Desktop Light</a>
+            <a href="https://example.com/desktop-dark.svg">desktop-dark.svg | Desktop Dark</a>
+            <a href="https://example.com/desktop-scroll.svg">desktop-scroll.svg | Desktop Scroll</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const [result, errors] = parseBrand(container.querySelector('.gnav-brand'));
+    expect(errors).to.have.lengthOf(0);
+    expect(result.data.imageData.scrollThemeImageSrc).to.equal('https://example.com/desktop-scroll.svg');
+    expect(result.data.imageData.mobileScrollThemeImageSrc).to.equal('https://example.com/mobile-scroll.svg');
+  });
+
+  it('should not error when the 3rd scroll-theme image is absent', () => {
+    const container = document.createElement('div');
+    container.innerHTML = `
+      <div class="gnav-brand">
+        <div><a href="https://example.com/">Adobe</a></div>
+        <div>
+          <div>
+            <a href="https://example.com/mobile-light.svg">mobile-light.svg | Mobile Light</a>
+            <a href="https://example.com/mobile-dark.svg">mobile-dark.svg | Mobile Dark</a>
+          </div>
+          <div>
+            <a href="https://example.com/desktop-light.svg">desktop-light.svg | Desktop Light</a>
+            <a href="https://example.com/desktop-dark.svg">desktop-dark.svg | Desktop Dark</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const [result, errors] = parseBrand(container.querySelector('.gnav-brand'));
+    expect(errors).to.have.lengthOf(0);
+    expect(result.data.imageData.scrollThemeImageSrc).to.equal('');
+    expect(result.data.imageData.mobileScrollThemeImageSrc).to.equal('');
+  });
+
   it('should set isDarkBg when dark-bg class is present', () => {
     const container = document.createElement('div');
     container.innerHTML = `

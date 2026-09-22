@@ -202,6 +202,7 @@ export const renderGnavString = ({
   placeholders,
   localnav,
   brandConciergeEnabled,
+  notificationsEnabled,
 }: GlobalNavigationData
 ): string => {
   const menuComponents = components.filter((c) => c.type !== "Brand");
@@ -296,6 +297,7 @@ export const renderGnavString = ({
   </ul>
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
+  ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
   ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>

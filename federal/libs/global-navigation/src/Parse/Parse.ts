@@ -16,6 +16,7 @@ export type GlobalNavigationData = {
   unavEnabled: boolean;
   placeholders: Map<string, string>;
   brandConciergeEnabled: boolean;
+  notificationsEnabled: boolean;
 };
 
 export const parseNavigation = (
@@ -59,6 +60,7 @@ export const parseNavigation = (
   const localnav = getMetadata('localnav') === 'true';
   const darkFont = getMetadata('gnav-dark-font') === 'true';
   const brandConciergeEnabled = getMetadata('gnav-brand-concierge') === 'on';
+  const notificationsEnabled = getMetadata('gnav-notifications') === 'on';
   const errors = [
     breadcrumbErrors,
     componentErrors,
@@ -75,5 +77,6 @@ export const parseNavigation = (
     unavEnabled,
     placeholders,
     brandConciergeEnabled,
+    notificationsEnabled,
   }
 };

@@ -271,8 +271,8 @@ export const renderGnavString = ({
 
       return `
         <li class="feds-brand-wrapper">
-          ${brandHTML}
           ${toggleButton}
+          ${brandHTML}
         </li>
         <li
           id="feds-menu-wrapper"

@@ -4,6 +4,7 @@ import {
   fetchAndProcessPlainHTML,
   federateUrl,
   getMetadata,
+  inlineNestedFragments,
   replaceDotMedia,
 } from "../Utils/Utils";
 
@@ -22,9 +23,11 @@ export const getInitialHTML = async ({
 
   const promoBarEl: Promise<HTMLElement | null> = promoUrl === null
     ? Promise.resolve(null)
-    : fetchAndProcessPlainHTML(promoUrl).then(promoResult => {
-        const el = promoResult instanceof IrrecoverableError
-          ? null : promoResult;
+    : fetchAndProcessPlainHTML(promoUrl).then(async promoResult => {
+        if (promoResult instanceof IrrecoverableError)
+          return null;
+        const inlined = await inlineNestedFragments(promoResult);
+        const el = inlined instanceof IrrecoverableError ? null : inlined;
         const promoBar = el?.querySelector<HTMLElement>('.gnav-promo') ?? null;
         if (promoBar !== null) {
           const fetchedFrom = federateUrl(
@@ -35,7 +38,11 @@ export const getInitialHTML = async ({
         return promoBar;
       });
 
-  const mainNav = await fetchAndProcessPlainHTML(gnavSource);
+  const rawMainNav = await fetchAndProcessPlainHTML(gnavSource);
+  if (rawMainNav instanceof IrrecoverableError)
+    return rawMainNav;
+
+  const mainNav = await inlineNestedFragments(rawMainNav);
   if (mainNav instanceof IrrecoverableError)
     return mainNav;
 

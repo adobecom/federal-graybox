@@ -1,8 +1,27 @@
-import { getMiloConfig, isMerchLink, isMasLink } from '../Utils/Utils';
+import { getMiloConfig, isMerchLink, isMasLink, isMasFieldLink, getMerchDecorators } from '../Utils/Utils';
 import { RecoverableError } from '../Error/Error';
 
 type MerchModule = {
-  default?: (link: HTMLAnchorElement) => void;
+  default?: (link: HTMLAnchorElement) => unknown;
+};
+
+/**
+ * Milo's merch block replaces the authored `<a>` outright with its own
+ * checkout-link/price element (`el.replaceWith(merch)`), which drops
+ * whatever classes the original anchor had. CTA-authored merch links rely on
+ * `feds-primary-cta`/`feds-secondary-cta` for gnav button styling, so those
+ * need to survive onto the replacement element.
+ */
+const preserveCtaClasses = (
+  link: HTMLAnchorElement,
+  decorate: (link: HTMLAnchorElement) => unknown,
+): void => {
+  const ctaClasses = [...link.classList]
+    .filter((c) => c === 'feds-primary-cta' || c === 'feds-secondary-cta');
+  void Promise.resolve(decorate(link)).then((result) => {
+    if (ctaClasses.length === 0) return;
+    if (result instanceof HTMLElement) result.classList.add(...ctaClasses);
+  });
 };
 
 /**
@@ -32,17 +51,30 @@ export const initMerchLinks = async (
       placeholder.replaceWith(link);
     });
 
+  // Tag OST and inline M@S field links so the `a.merch` path resolves them to
+  // an inline value (mirrors Milo's `decorateAutoBlock` downgrade). Lets cards
+  // preserve a price/field anchor without re-implementing the tagging.
+  mountpoint.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
+    if (isMerchLink(link.href) || isMasFieldLink(link.href)) {
+      link.classList.add('merch');
+    }
+  });
+
   const merchLinks = mountpoint.querySelectorAll<HTMLAnchorElement>('a.merch');
+  // Full M@S cards only; field links (tagged above) never build a merch-card.
   const masLinks = [...mountpoint.querySelectorAll<HTMLAnchorElement>('a[href]')]
-    .filter((link) => isMasLink(link.href));
+    .filter((link) => isMasLink(link.href) && !isMasFieldLink(link.href));
 
   if (merchLinks.length === 0 && masLinks.length === 0) return errors;
 
   try {
-    const config = getMiloConfig();
-    const { base } = config;
+    const injected = getMerchDecorators();
+    // base is only needed for the fallback import; injected decorators skip it.
+    const needsBase = (merchLinks.length > 0 && !injected.merch)
+      || (masLinks.length > 0 && !injected.masCard);
+    const base = needsBase ? getMiloConfig().base : '';
 
-    if (base === '') {
+    if (needsBase && base === '') {
       errors.add(
         new RecoverableError(
           'base not found in config, cannot initialize merch links'
@@ -51,25 +83,25 @@ export const initMerchLinks = async (
       return errors;
     }
 
-    // OST / miniplans links: Milo `merch` block
+    // OST / miniplans + inline M@S field links: Milo `merch` block
     if (merchLinks.length > 0) {
-      const merchModule = await import(
-        `${base}/blocks/merch/merch.js`
-      ) as MerchModule;
-      const decorateMerchLink = merchModule.default;
+      const decorateMerchLink = injected.merch
+        ?? (await import(`${base}/blocks/merch/merch.js`) as MerchModule).default;
       if (decorateMerchLink === undefined) {
         errors.add(new RecoverableError('decorateMerchLink not found in merch module'));
       } else {
-        merchLinks.forEach((link) => { decorateMerchLink(link); });
+        merchLinks.forEach((link) => {
+          preserveCtaClasses(link, decorateMerchLink);
+        });
       }
     }
 
-    // mas.adobe.com studio links: Milo `merch-card-autoblock` block
+    // Full M@S cards: Milo `merch-card-autoblock` block
     if (masLinks.length > 0) {
-      const masModule = await import(
-        `${base}/blocks/merch-card-autoblock/merch-card-autoblock.js`
-      ) as MerchModule;
-      const decorateMasLink = masModule.default;
+      const decorateMasLink = injected.masCard
+        ?? (await import(
+          `${base}/blocks/merch-card-autoblock/merch-card-autoblock.js`
+        ) as MerchModule).default;
       if (decorateMasLink === undefined) {
         errors.add(new RecoverableError('default export not found in merch-card-autoblock module'));
       } else {

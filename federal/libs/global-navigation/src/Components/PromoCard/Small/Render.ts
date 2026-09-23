@@ -7,8 +7,10 @@ export const promoCardSmall = ({ card }: PromoCardSmall): HTML =>
 
 const renderCard = ({
   title,
+  titleHtml,
   body,
   cta,
+  ctaHtml,
   bgImageAlt,
   bgImageSrc,
 }: PromoCardSmallData): HTML => `
@@ -28,15 +30,25 @@ const renderCard = ({
   <div class="promo-card-small__content">
       <div class="promo-card-small__text">
         <h2 id="title-${sanitize(title)}" class="promo-card-small__title" role="heading" aria-level="2">
-          ${title}
+          ${titleHtml}
         </h2>
         ${body ? `<p class="promo-card-small__body">${body}</p>` : ""}
       </div>
-      ${cta === null
-        ? ""
-        : `<div class="promo-card-small__cta">
-             ${secondaryCTA({ ...cta, ariaAttrs: { 'aria-describedby': `title-${sanitize(title)}` } })}
-           </div>`}
+      ${renderCta({ cta, ctaHtml, title })}
     </div>
   </article>
 `.trim();
+
+const renderCta = ({
+  cta,
+  ctaHtml,
+  title,
+}: Pick<PromoCardSmallData, "cta" | "ctaHtml" | "title">): HTML => {
+  if (ctaHtml !== null) {
+    return `<div class="promo-card-small__cta promo-card-small__cta--merch">${ctaHtml}</div>`;
+  }
+  if (cta === null) return "";
+  return `<div class="promo-card-small__cta">
+             ${secondaryCTA({ ...cta, ariaAttrs: { 'aria-describedby': `title-${sanitize(title)}` } })}
+           </div>`;
+};

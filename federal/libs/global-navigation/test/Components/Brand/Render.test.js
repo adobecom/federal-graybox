@@ -62,6 +62,72 @@ describe('Brand Render', () => {
     expect(html).to.include('class="feds-brand-container feds-dark-bg"');
   });
 
+  it('should render an authored scroll-theme image as the 3rd image', () => {
+    const html = brand({
+      type: 'Brand',
+      data: {
+        href: 'https://example.com/',
+        label: 'Adobe',
+        isDarkBg: false,
+        imageData: {
+          type: 'svg',
+          lightThemeImageSrc: 'https://example.com/desktop-light.svg',
+          lightThemeImageAlt: 'Desktop Light',
+          darkThemeImageSrc: 'https://example.com/desktop-dark.svg',
+          darkThemeImageAlt: 'Desktop Dark',
+          mobileLightThemeImageSrc: 'https://example.com/mobile-light.svg',
+          mobileLightThemeImageAlt: 'Mobile Light',
+          mobileDarkThemeImageSrc: 'https://example.com/mobile-dark.svg',
+          mobileDarkThemeImageAlt: 'Mobile Dark',
+          scrollThemeImageSrc: 'https://example.com/desktop-scroll.svg',
+          scrollThemeImageAlt: 'Desktop Scroll',
+          mobileScrollThemeImageSrc: 'https://example.com/mobile-scroll.svg',
+          mobileScrollThemeImageAlt: 'Mobile Scroll',
+        },
+      },
+    });
+
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    const desktopImgs = container.querySelectorAll('.desktop-brand img');
+    const mobileImgs = container.querySelectorAll('.mobile-brand img');
+    expect(desktopImgs[2].getAttribute('src')).to.equal('https://example.com/desktop-scroll.svg');
+    expect(mobileImgs[2].getAttribute('src')).to.equal('https://example.com/mobile-scroll.svg');
+  });
+
+  it('should fallback missing scroll-theme image to the light image', () => {
+    const html = brand({
+      type: 'Brand',
+      data: {
+        href: 'https://example.com/',
+        label: 'Adobe',
+        isDarkBg: false,
+        imageData: {
+          type: 'svg',
+          lightThemeImageSrc: 'https://example.com/desktop-light.svg',
+          lightThemeImageAlt: 'Desktop Light',
+          darkThemeImageSrc: 'https://example.com/desktop-dark.svg',
+          darkThemeImageAlt: 'Desktop Dark',
+          mobileLightThemeImageSrc: 'https://example.com/mobile-light.svg',
+          mobileLightThemeImageAlt: 'Mobile Light',
+          mobileDarkThemeImageSrc: 'https://example.com/mobile-dark.svg',
+          mobileDarkThemeImageAlt: 'Mobile Dark',
+          scrollThemeImageSrc: '',
+          scrollThemeImageAlt: '',
+          mobileScrollThemeImageSrc: '',
+          mobileScrollThemeImageAlt: '',
+        },
+      },
+    });
+
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    const desktopImgs = container.querySelectorAll('.desktop-brand img');
+    const mobileImgs = container.querySelectorAll('.mobile-brand img');
+    expect(desktopImgs[2].getAttribute('src')).to.equal('https://example.com/desktop-light.svg');
+    expect(mobileImgs[2].getAttribute('src')).to.equal('https://example.com/mobile-light.svg');
+  });
+
   it('should fallback missing dark assets to light assets', () => {
     const html = brand({
       type: 'Brand',

@@ -38,6 +38,19 @@ describe('CTA Render', () => {
       expect(anchor.getAttribute('target')).to.equal('_blank');
       expect(anchor.hasAttribute('data-feds-hide-when-registered')).to.be.true;
     });
+
+    it('renders textContent with no surrounding whitespace so milo merch /^CTA +/ strips cleanly', () => {
+      const html = primaryCTA({
+        type: 'PrimaryCTA',
+        text: 'CTA Buy now',
+        href: 'https://www.adobe.com/tools/ost?type=checkoutUrl',
+      });
+      const container = document.createElement('div');
+      container.innerHTML = html;
+      const anchor = container.querySelector('a.feds-primary-cta');
+      expect(anchor.textContent).to.equal('CTA Buy now');
+      expect(anchor.textContent.replace(/^CTA +/, '')).to.equal('Buy now');
+    });
   });
 
   describe('secondaryCTA', () => {

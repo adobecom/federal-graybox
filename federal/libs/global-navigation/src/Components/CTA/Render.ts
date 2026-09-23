@@ -17,9 +17,7 @@ export const primaryCTA = ({
   ${target !== '' ? ` target="${target}"` : ''}
   ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
->
-  ${text}
-</a>
+>${text}</a>
 `;
 };
 
@@ -39,9 +37,7 @@ export const secondaryCTA = ({
   ${target !== '' ? ` target="${target}"` : ''}
   ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
->
-  ${text}
-</a>
+>${text}</a>
 `;
 };
 

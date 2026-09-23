@@ -42,6 +42,21 @@ const MAS_LINK_PATH = 'mas.adobe.com/studio.html';
 export const isMasLink = (href: string): boolean =>
   href.includes(MAS_LINK_PATH);
 
+/**
+ * Checks if a URL is an inline M@S field link (studio.html#...&field=...) that
+ * renders a single value via the `merch` block, not a full merch-card.
+ * @param href - The URL to check
+ * @returns true if the URL is an inline mas field link
+ */
+export const isMasFieldLink = (href: string): boolean => {
+  if (!isMasLink(href)) return false;
+  try {
+    return new URL(href).hash.includes('field=');
+  } catch (_error) {
+    return href.includes('field=');
+  }
+};
+
 // split arrays based on a predicate
 // unlike string.prototype.split, it works on
 // all arrays.
@@ -254,6 +269,27 @@ export const [setDecorateBody, getDecorateBody] =
     ];
   })();
 
+// Host-injected Milo commerce block decorators (loaded from Milo's base)
+export type MerchDecorators = {
+  merch?: (link: HTMLAnchorElement) => unknown;    // `merch` block default
+  masCard?: (link: HTMLAnchorElement) => unknown;  // `merch-card-autoblock`
+};
+
+type MerchDecoratorsStateFunctions = [
+  (decorators: MerchDecorators) => void,
+  () => MerchDecorators,
+];
+
+export const [setMerchDecorators, getMerchDecorators] =
+  ((): MerchDecoratorsStateFunctions => {
+    let merchDecorators: MerchDecorators = {};
+
+    return [
+      (next: MerchDecorators): void => { merchDecorators = next ?? {}; },
+      (): MerchDecorators => merchDecorators,
+    ];
+  })();
+
 export const localizeHref = (href: string): string => {
   try {
     const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;
@@ -460,13 +496,13 @@ export const replaceDotMedia = (path: string, ele: Element): void => {
   resetAttributeBase('source', 'srcset');
 };
 
-export const inlineNestedFragments = async (
-  element: Element | HTMLElement
-): Promise<Element | HTMLElement | IrrecoverableError> => {
+export const inlineNestedFragments = async <T extends Element>(
+  element: T
+): Promise<T | IrrecoverableError> => {
   const processElement = async (
-    currentElem: Element | HTMLElement | IrrecoverableError,
+    currentElem: Element | IrrecoverableError,
     visitedUrls: Set<string>
-  ): Promise<Element | HTMLElement | IrrecoverableError> => {
+  ): Promise<Element | IrrecoverableError> => {
     if (currentElem instanceof IrrecoverableError)
       return currentElem;
     try {
@@ -498,7 +534,9 @@ export const inlineNestedFragments = async (
       return new IrrecoverableError(JSON.stringify(error));
     }
   }
-  return processElement(element, new Set());
+  // processElement always resolves to the same object reference it was
+  // given (mutated in place via `replaceWith`), so this is safe.
+  return processElement(element, new Set()) as Promise<T | IrrecoverableError>;
 };
 
 export const renderListItems = <T>(

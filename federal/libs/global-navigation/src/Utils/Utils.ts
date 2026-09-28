@@ -17,6 +17,7 @@ export const icons = {
   chevronLeft: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" focusable="false"><path d="M12.5 4l-5 6 5 6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   chevronRight: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="3" height="6" viewBox="0 0 3 6" focusable="false"><path d="M.5.5 2.5 3 .5 5.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>',
   chevronDown: '<svg class="chevron-down" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="6" height="3.375" viewBox="0 0 6 3.375" focusable="false"><path d="M.5.5 3 2.875 5.5.5" stroke="currentColor" stroke-width="1" fill="none"/></svg>',
+  chevronRightBold: '<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" focusable="false"><path d="M3.64278 11.3573C3.42347 11.3573 3.20417 11.2736 3.03676 11.1062C2.70194 10.7714 2.70194 10.229 3.03676 9.89418L6.93073 6.00021L3.03676 2.10623C2.70194 1.77141 2.70194 1.229 3.03676 0.894179C3.37157 0.559362 3.91399 0.559362 4.24881 0.894179L8.74881 5.39418C9.08363 5.729 9.08363 6.27141 8.74881 6.60623L4.24881 11.1062C4.0814 11.2736 3.86209 11.3573 3.64278 11.3573Z" fill="currentColor"/></svg>',
 };
 
 // URL path segments that should receive the `merch` class

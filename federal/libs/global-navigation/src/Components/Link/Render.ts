@@ -1,4 +1,9 @@
-import { getAnalyticsAttrs, getAriaAttrs, localizeHref } from "../../Utils/Utils";
+import {
+  getAnalyticsAttrs,
+  getAriaAttrs,
+  isMasFieldLink,
+  localizeHref,
+} from "../../Utils/Utils";
 import { Link } from "./Parse";
 
 export const link = ({
@@ -14,5 +19,8 @@ export const link = ({
   const textHTML = mobileText !== undefined
     ? `<span class="feds-link__desktop-text">${text}</span><span class="feds-link__mobile-text">${mobileText}</span>`
     : text;
-  return `<a class="feds-link ${highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(href)}"${getAriaAttrs(ariaAttrs, ariaLabel)}${getAnalyticsAttrs(null, daaLl ?? text)}>${textHTML}${svgIcon}</a>`;
+  const pendingMerchAttr = isMasFieldLink(href)
+    ? ' data-feds-merch-pending'
+    : '';
+  return `<a class="feds-link ${highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(href)}"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}${getAnalyticsAttrs(null, daaLl ?? text)}>${textHTML}${svgIcon}</a>`;
 };

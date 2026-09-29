@@ -8,7 +8,8 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
-import { initMerchLinks } from "./PostRendering/MerchLinks";
+import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks";
+import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
@@ -595,13 +596,17 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
     // then restore via toggle at the end.
     header.classList.remove('is-compact');
 
-    // Sum individual li widths inside gnav-items — these are not flex-grow so
-    // their offsetWidth reflects their true content width. Brand and utilities
-    // are fixed-size flex items so offsetWidth is correct for them too.
-    const brandWidth = brandWrapper?.offsetWidth ?? 0;
-    const itemsWidth = gnavItems?.offsetWidth ?? 0;
-    const utilitiesWidth = utilities?.offsetWidth ?? 0;
-    const ctaWidth = productCta?.offsetWidth ?? 0;
+    // The flex list's offsetWidth can be smaller than its content.
+    const brandWidth = brandWrapper === null
+      ? 0
+      : Math.max(brandWrapper.offsetWidth, brandWrapper.scrollWidth);
+    const itemsWidth = getIntrinsicItemsWidth(gnavItems);
+    const utilitiesWidth = utilities === null
+      ? 0
+      : Math.max(utilities.offsetWidth, utilities.scrollWidth);
+    const ctaWidth = productCta === null
+      ? 0
+      : Math.max(productCta.offsetWidth, productCta.scrollWidth);
     const contentWidth = brandWidth + itemsWidth +
       utilitiesWidth + ctaWidth + 40;
 
@@ -610,7 +615,10 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
 
   const observer = new ResizeObserver(check);
   observer.observe(header);
+  // UNAV can resize without changing the header's border box.
+  if (utilities !== null) observer.observe(utilities);
   isDesktop.addEventListener('change', check);
+  mountpoint.addEventListener(MERCH_RESOLVED_EVENT, check);
   check();
 };
 

@@ -1,4 +1,11 @@
-import { getAnalyticsAttrs, getAriaAttrs, getTargetAttrs, getRegistrationGateAttrs, localizeHref } from "../../Utils/Utils";
+import {
+  getAnalyticsAttrs,
+  getAriaAttrs,
+  getTargetAttrs,
+  getRegistrationGateAttrs,
+  isMasFieldLink,
+  localizeHref,
+} from "../../Utils/Utils";
 import { PrimaryCTA, ProductEntryCTA, SecondaryCTA } from "./Parse";
 
 export const primaryCTA = ({
@@ -11,9 +18,12 @@ export const primaryCTA = ({
   const { href: unblankedHref, target } = getTargetAttrs(href);
   const { href: strippedHref, hideWhenRegistered } =
     getRegistrationGateAttrs(unblankedHref);
+  const pendingMerchAttr = isMasFieldLink(strippedHref)
+    ? ' data-feds-merch-pending'
+    : '';
   return `
 <a href="${localizeHref(strippedHref)}"
-  class="feds-primary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
+  class="feds-primary-cta"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
   ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
@@ -31,9 +41,12 @@ export const secondaryCTA = ({
   const { href: unblankedHref, target } = getTargetAttrs(href);
   const { href: strippedHref, hideWhenRegistered } =
     getRegistrationGateAttrs(unblankedHref);
+  const pendingMerchAttr = isMasFieldLink(strippedHref)
+    ? ' data-feds-merch-pending'
+    : '';
   return `
 <a href="${localizeHref(strippedHref)}"
-  class="feds-secondary-cta"${getAriaAttrs(ariaAttrs, ariaLabel)}
+  class="feds-secondary-cta"${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}
   ${target !== '' ? ` target="${target}"` : ''}
   ${hideWhenRegistered ? ' data-feds-hide-when-registered' : ''}
   ${getAnalyticsAttrs(null, daaLl ?? text)}
@@ -46,4 +59,3 @@ export const productEntryCTA = (
 ): HTML => `<div class="feds-product-entry-cta">${
   cta.type === "PrimaryCTA" ? primaryCTA(cta) : secondaryCTA(cta)
 }</div>`;
-

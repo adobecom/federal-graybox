@@ -51,9 +51,12 @@ export const parseNavigation = (
   // rendered to the right of the gnav (immediately to the left of the
   // unav) rather than inside the menu list, so we lift the first
   // ProductEntryCTA out of the components array.
-  const productCTA = parsedComponents.find(
-    (c): c is ProductEntryCTA => c.type === "ProductEntryCTA"
-  ) ?? null;
+  const productEntryCtaEnabled = getMetadata('product-entry-cta')?.toLowerCase() === 'on';
+  const productCTA = productEntryCtaEnabled
+    ? parsedComponents.find(
+      (c): c is ProductEntryCTA => c.type === "ProductEntryCTA"
+    ) ?? null
+    : null;
   const components = parsedComponents.filter(
     (c) => c.type !== "ProductEntryCTA"
   );

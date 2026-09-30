@@ -37,6 +37,10 @@
 @import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
 
+.global-navigation ul.feds-gnav-items > li > [data-feds-merch-pending] {
+  display: none !important;
+}
+
 :root {
   --body-font-family-base: var(--s2a-font-family-default), adobe-clean, "Trebuchet MS", sans-serif;
   --body-font-family: var(--body-font-family-base);
@@ -57,6 +61,12 @@
   padding: 0;
   margin: 0;
   overflow: hidden;
+  white-space: nowrap;
+  text-decoration: none;
+  font-family: var(--body-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-label);
+  border-radius: var(--s2a-border-radius-round);
 }
 
 .trap-focus-gnav {
@@ -77,8 +87,33 @@ nav:has(.feds-menu-active) .trap-focus-gnav {
 }
 
 .feds-skip-link:focus {
-  outline: 2px solid var(--s2a-color-blue-800);
-  outline-offset: 1px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2a-spacing-xs);
+  width: auto;
+  height: auto;
+  overflow: visible;
+  padding: 10px var(--s2a-spacing-lg);
+  margin: var(--s2a-spacing-sm);
+  border: 1.5px solid var(--s2a-color-gray-25);
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+  outline: 1.5px solid var(--s2a-color-gray-25);
+  outline-offset: 3px;
+}
+
+.feds-skip-link:focus svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+/* Dark-font gnav (nav sits on a light background): invert ring/pill to match primary CTA theming */
+.global-navigation.dark-font .feds-skip-link:focus {
+  border-color: var(--s2a-color-gray-1000);
+  background-color: var(--s2a-color-gray-1000);
+  color: var(--s2a-color-gray-25);
+  outline-color: var(--s2a-color-gray-1000);
 }
 
 /* =========================================

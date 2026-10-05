@@ -1,5 +1,5 @@
 /* =========================================
-   Promo Bar — shared base
+   Promo Bar — shared base 
    ========================================= */
 
 body:has(.feds-menu-active:not(.small-menu)) .feds-promo-bar,
@@ -472,7 +472,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   .feds-promo-bar-slot--desktop {
     display: contents;
   }
-  
+
   .feds-promo-bar--maximized-release .feds-promo-bar-body{
     max-width: 480px;
   }

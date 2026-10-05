@@ -1558,10 +1558,7 @@ header.global-navigation.is-compact nav.localnav:has(.feds-menu-wrapper.is-open)
 header.global-navigation.is-compact .feds-link__desktop-text { display: none; }
 header.global-navigation.is-compact .feds-link__mobile-text { display: inline; }
 
-/* Hide product entry CTA (mirrors line 162-164) */
-header.global-navigation.is-compact .feds-product-entry-cta {
-  display: none;
-}
+/* Toolbar CTAs stay visible in is-compact — see Components/CTA/cta.css */
 
 /* Show hamburger (overrides desktop display:none) */
 header.global-navigation.is-compact nav .feds-nav-toggle {

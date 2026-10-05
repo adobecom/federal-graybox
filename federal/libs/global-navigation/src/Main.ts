@@ -234,6 +234,16 @@ export const renderGnavString = ({
         : 'content' in localnavBarSibling
           ? localnavBarSibling.content
           : '';
+  // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
+  // stays visible beside the hamburger, not only inside the drawer.
+  const ctaComponents = components.filter(
+    (c) => c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA'
+  );
+  const trailingCta = ctaComponents[ctaComponents.length - 1];
+  const pinnedCtaHTML = trailingCta !== undefined
+    ? `<div class="feds-pinned-cta">${component(trailingCta)}</div>`
+    : '';
+
   return `
 <nav class="${localnav ? "localnav" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
@@ -300,6 +310,7 @@ export const renderGnavString = ({
     })()}
   </ul>
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
+  ${pinnedCtaHTML}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
   ${unavEnabled ? '<div class="feds-utilities"></div>' : ''}
@@ -566,51 +577,67 @@ const initHeaderAnalytics = (
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
 };
 
+// Min gap (px) between the brand/hamburger and the trailing CTA group.
+const CTA_OVERFLOW_GAP = 32;
+
 const initCompactOverflow = (mountpoint: HTMLElement): void => {
   const header = mountpoint.closest<HTMLElement>('header.global-navigation');
   if (!header) return;
 
+  const nav = mountpoint.querySelector<HTMLElement>('nav');
   const brandWrapper = mountpoint.querySelector<HTMLElement>('.feds-brand-wrapper');
   const gnavItems = mountpoint.querySelector<HTMLElement>('.feds-gnav-items');
   const utilities = mountpoint.querySelector<HTMLElement>('.feds-utilities');
+  const bcWrapper = mountpoint.querySelector<HTMLElement>('.feds-bc-wrapper');
+  const pinnedCta = mountpoint.querySelector<HTMLElement>('.feds-pinned-cta');
   const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
 
   const check = (): void => {
-    if (!isDesktop.matches) {
-      header.classList.remove('is-compact');
-      return;
-    }
-    // Skip re-measuring while a menu/popup is open. Stripping `is-compact`
-    // below (even momentarily) drops the compact-scoped body scroll-lock
-    // (see `body:has(header.global-navigation.is-compact ...)` in
-    // styles.css), which lets the scrollbar flash back in and changes
-    // `header`'s width — the very thing this function's ResizeObserver
-    // watches. That retriggers `check()`, which strips `is-compact` again,
-    // forever: an infinite loop that keeps resetting the gnav items'
-    // reveal animation mid-flight, so they never finish fading in (visible
-    // as a blank open menu). Nothing about open/closed state should change
-    // whether the nav content overflows, so it's safe to just wait for the
-    // next real resize or breakpoint change instead.
+    // Skip re-measuring while a menu/popup is open. Stripping the state classes
+    // below (even momentarily) drops the compact-scoped body scroll-lock (see
+    // `body:has(header.global-navigation.is-compact ...)` in styles.css), which
+    // lets the scrollbar flash back in and changes `header`'s width — the very
+    // thing this function's ResizeObserver watches — retriggering check() in an
+    // infinite loop that resets the gnav reveal animation mid-flight. Nothing
+    // about open/closed state changes whether the content overflows, so just
+    // wait for the next real resize or breakpoint change.
     if (header.querySelector('.feds-menu-wrapper.is-open, .feds-popup.is-open')) return;
-    // Temporarily strip is-compact so we measure the natural desktop widths,
-    // then restore via toggle at the end.
+
+    const mobile = !isDesktop.matches;
+
+    // Strip both classes first so measurements read natural (all-shown) widths.
     header.classList.remove('is-compact');
+    header.classList.remove('feds-cta-overflow');
 
-    // The flex list's offsetWidth can be smaller than its content.
-    const brandWidth = brandWrapper === null
-      ? 0
-      : Math.max(brandWrapper.offsetWidth, brandWrapper.scrollWidth);
-    const itemsWidth = getIntrinsicItemsWidth(gnavItems);
-    const utilitiesWidth = utilities === null
-      ? 0
-      : Math.max(utilities.offsetWidth, utilities.scrollWidth);
-    const ctaWidth = productCta === null
-      ? 0
-      : Math.max(productCta.offsetWidth, productCta.scrollWidth);
-    const contentWidth = brandWidth + itemsWidth +
-      utilitiesWidth + ctaWidth + 40;
+    // Stage 1: is-compact (desktop overflow collapse; mobile uses the drawer).
+    if (!mobile) {
+      // The flex list's offsetWidth can be smaller than its content.
+      const brandWidth = brandWrapper === null
+        ? 0
+        : Math.max(brandWrapper.offsetWidth, brandWrapper.scrollWidth);
+      const itemsWidth = getIntrinsicItemsWidth(gnavItems);
+      const utilitiesWidth = utilities === null
+        ? 0
+        : Math.max(utilities.offsetWidth, utilities.scrollWidth);
+      const ctaWidth = productCta === null
+        ? 0
+        : Math.max(productCta.offsetWidth, productCta.scrollWidth);
+      const contentWidth = brandWidth + itemsWidth +
+        utilitiesWidth + ctaWidth + 40;
+      header.classList.toggle('is-compact', contentWidth > header.clientWidth);
+    }
 
-    header.classList.toggle('is-compact', contentWidth > header.clientWidth);
+    // Stage 2: when collapsed, hide both toolbar CTAs if they'd overlap the
+    // hamburger (they stay reachable in the drawer).
+    const collapsed = mobile || header.classList.contains('is-compact');
+    if (!collapsed || (!pinnedCta && !productCta)) return;
+    const needed = (brandWrapper?.offsetWidth ?? 0)
+      + (bcWrapper?.offsetWidth ?? 0)
+      + (pinnedCta?.offsetWidth ?? 0)
+      + (productCta?.offsetWidth ?? 0)
+      + (utilities?.offsetWidth ?? 0) + CTA_OVERFLOW_GAP;
+    const available = nav?.clientWidth ?? header.clientWidth;
+    header.classList.toggle('feds-cta-overflow', needed > available);
   };
 
   const observer = new ResizeObserver(check);

@@ -57,6 +57,9 @@ export type Input = {
   decorateBody?: DecorateBody;
   // Host-injected Milo commerce decorators; falls back to a config.base import.
   merchDecorators?: MerchDecorators;
+  // Milo's appendHtmlToLink: adds `.html` to extensionless internal links
+  // when config.useDotHtml is on. Runs pre-localize to mirror c1.
+  appendHtmlToLink?: (link: HTMLAnchorElement) => void;
   convertStageLinks?: (args: {
     anchors: HTMLAnchorElement[];
     hostname: string;
@@ -92,7 +95,16 @@ export const main = async (
 
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
-  setDecorateBody(input.decorateBody ?? (async (): Promise<void> => {}));
+  setDecorateBody(async (body): Promise<void> => {
+    const anchors = [...body.querySelectorAll<HTMLAnchorElement>('a')];
+    anchors.forEach((anchor) => input.appendHtmlToLink?.(anchor));
+    await input.decorateBody?.(body);
+    input.convertStageLinks?.({
+      anchors,
+      hostname: window.location.hostname,
+      href: window.location.href,
+    });
+  });
   if (input.merchDecorators) setMerchDecorators(input.merchDecorators);
   // Normalize null → undefined so the stored state matches the
   // `LingoLocaleConfig | undefined` invariant even if a JS caller passes null.
@@ -130,12 +142,6 @@ export const main = async (
   }
 
   await renderGnav(gnavData)(mountpoint);
-
-  input.convertStageLinks?.({
-    anchors: [...mountpoint.querySelectorAll('a')],
-    hostname: window.location.hostname,
-    href: window.location.href,
-  });
 
   return postRenderingTasks(input);
 };

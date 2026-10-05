@@ -1,6 +1,6 @@
 // Shared icon-fetching logic used across PromoBar, ProductCard, and PromoCard.
 // An icon is authored in one of two formats:
-//   1. <a href="....svg">https://absolute-url.svg | Alt Text</a>
+//   1. <a href="...svg">https://absolute-url.svg | Alt Text</a>
 //      The href attribute is often a relative in-page path; the resolvable
 //      absolute icon URL lives in the link text, before the " | Alt Text".
 //   2. A bare <picture><img src="..." alt="..."></picture>, with no anchor.

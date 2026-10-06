@@ -13,6 +13,8 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
     > .section:first-child {
       border-top-left-radius: var(--s2a-border-radius-lg);
       border-top-right-radius: var(--s2a-border-radius-lg);
+      overflow: clip;
+      background-color: var(--s2a-color-background-default);
     }
   }
 }
@@ -22,6 +24,7 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
   .router-marquee {
     border-top-left-radius: var(--s2a-border-radius-lg);
     border-top-right-radius: var(--s2a-border-radius-lg);
+    overflow: clip;
   }
 }
 

@@ -779,6 +779,92 @@ describe('UNAV Loader Integration Tests', () => {
   // ==========================================================================
   
   describe('UniversalNav initialization', () => {
+    it('should wait for IMS session restoration before initializing UNAV and AUP', async () => {
+      let resolveIms;
+      const imsReady = new Promise((resolve) => { resolveIms = resolve; });
+      let capturedConfig;
+      window.adobeIMS.isSignedInUser = () => false;
+      window.UniversalNav = (config) => {
+        capturedConfig = config;
+        return Promise.resolve();
+      };
+
+      const loading = loadUnav(navElement, { imsReady });
+      await Promise.resolve();
+      expect(capturedConfig).to.equal(undefined);
+      expect(getAupSdkInstance()).to.equal(undefined);
+      expect(appendedElements).to.have.length(0);
+
+      window.adobeIMS.isSignedInUser = () => true;
+      resolveIms();
+      const result = await loading;
+
+      expect(result).to.not.be.instanceOf(RecoverableError);
+      expect(capturedConfig.fetchAUPSDKInstance).to.be.a('function');
+      expect(capturedConfig.children.some((child) => child.name === 'notifications')).to.be.true;
+      expect(getAupSdkInstance()).to.not.equal(undefined);
+    });
+
+    it('should initialize signed-out UNAV after IMS is ready without loading AUP', async () => {
+      window.adobeIMS.isSignedInUser = () => false;
+      let capturedConfig;
+      window.UniversalNav = (config) => {
+        capturedConfig = config;
+        return Promise.resolve();
+      };
+
+      const result = await loadUnav(navElement, { imsReady: Promise.resolve() });
+
+      expect(result).to.not.be.instanceOf(RecoverableError);
+      expect(capturedConfig.fetchAUPSDKInstance).to.equal(undefined);
+      expect(getAupSdkInstance()).to.equal(undefined);
+    });
+
+    it('should resume initialization when IMS becomes ready after a timeout', async () => {
+      window.adobeIMS.isSignedInUser = () => false;
+      let capturedConfig;
+      window.UniversalNav = (config) => {
+        capturedConfig = config;
+        return Promise.resolve();
+      };
+      const loading = loadUnav(navElement, {
+        imsReady: Promise.reject(new Error('IMS timeout')),
+      });
+      await Promise.resolve();
+      expect(capturedConfig).to.equal(undefined);
+      expect(getAupSdkInstance()).to.equal(undefined);
+
+      window.adobeIMS.initialized = true;
+      window.adobeIMS.isSignedInUser = () => true;
+      window.dispatchEvent(new CustomEvent('onImsLibInstance'));
+      const result = await loading;
+
+      expect(result).to.not.be.instanceOf(RecoverableError);
+      expect(capturedConfig.fetchAUPSDKInstance).to.be.a('function');
+      expect(getAupSdkInstance()).to.not.equal(undefined);
+    });
+
+    it('should handle IMS readiness arriving before the timeout handler', async () => {
+      window.adobeIMS.initialized = true;
+      const result = await loadUnav(navElement, {
+        imsReady: Promise.reject(new Error('IMS timeout')),
+      });
+
+      expect(result).to.not.be.instanceOf(RecoverableError);
+      expect(getAupSdkInstance()).to.not.equal(undefined);
+    });
+
+    it('should report IMS failures without initializing UNAV or AUP', async () => {
+      const result = await loadUnav(navElement, {
+        imsReady: Promise.reject(new Error('Missing IMS Client ID')),
+      });
+
+      expect(result).to.be.instanceOf(RecoverableError);
+      expect(result.message).to.equal('Missing IMS Client ID');
+      expect(appendedElements).to.have.length(0);
+      expect(getAupSdkInstance()).to.equal(undefined);
+    });
+
     it('should call UniversalNav with config', async () => {
       let unavWasCalled = false;
       let capturedConfig;

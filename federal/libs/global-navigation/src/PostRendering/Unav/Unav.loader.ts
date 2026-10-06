@@ -182,11 +182,17 @@ const setProfileSignUpRequired = (
  *   matches on-page pricing; when absent or it rejects,
  *   the locale-derived default is used. A promise is awaited once in the
  *   async body (after gnav render) so geo detection never blocks nav paint.
+ *   `imsReady` lets the host defer authentication-dependent initialization
+ *   until IMS has restored the session. An IMS timeout waits for the late
+ *   `onImsLibInstance` event.
  * @returns Promise resolving to Unav object or RecoverableError
  */
 export const loadUnav = async (
   nav: HTMLElement,
-  options?: { countryCode?: string | Promise<string | undefined> }
+  options?: {
+    countryCode?: string | Promise<string | undefined>;
+    imsReady?: Promise<void>;
+  }
 ): Promise<Unav | RecoverableError> => {
   try {
     // ========================================================================
@@ -212,6 +218,20 @@ export const loadUnav = async (
     const trimmedValue = rawValue.trim();
     if (meta instanceof HTMLMetaElement && trimmedValue.length === 0) {
       errors.add(new RecoverableError('metadata "universal-nav" has no value'));
+    }
+
+    try {
+      await options?.imsReady;
+    } catch (error) {
+      if (!(error instanceof Error) || error.message !== 'IMS timeout') throw error;
+      lanaLog('IMS timeout; waiting for the late IMS instance', 'universalnav');
+      await new Promise<void>((resolve) => {
+        if (window.adobeIMS?.initialized === true) {
+          resolve();
+          return;
+        }
+        window.addEventListener('onImsLibInstance', () => resolve(), { once: true });
+      });
     }
 
     // ========================================================================

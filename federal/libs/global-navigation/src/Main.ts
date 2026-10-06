@@ -172,8 +172,10 @@ mountpoint: HTMLElement
   }
   if (data.components.filter(c => c.type !== 'Brand').length === 0) mountpoint.classList.add('thin');
   if (data.darkFont) mountpoint.classList.add('dark-font');
+  // SmallMenu triggers also carry `.mega-menu` (see SmallMenu/Render), so
+  // exclude `.small-menu` to stay aligned 1:1 with megaMenuComponents.
   const megaMenus = [
-    ...mountpoint.querySelectorAll('.mega-menu ~ .feds-popup')
+    ...mountpoint.querySelectorAll('.mega-menu:not(.small-menu) ~ .feds-popup:not(.small-menu)')
   ]
   megaMenus.forEach(mm => {
     mm.innerHTML = '';

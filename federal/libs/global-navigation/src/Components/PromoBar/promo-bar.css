@@ -1,5 +1,5 @@
 /* =========================================
-   Promo Bar — shared base 
+   Promo Bar — shared base
    ========================================= */
 
 body:has(.feds-menu-active:not(.small-menu)) .feds-promo-bar,
@@ -24,9 +24,9 @@ body:has(.feds-promo-aside-wrapper.feds-promo-bar--reveal):not(:has(header.feds-
   .router-marquee {
     border-top-left-radius: var(--s2a-border-radius-lg);
     border-top-right-radius: var(--s2a-border-radius-lg);
-    overflow: clip;
   }
 }
+
 
 body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--reveal {
   visibility: hidden;

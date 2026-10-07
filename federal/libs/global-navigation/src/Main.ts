@@ -474,13 +474,15 @@ const initPopoverCloseOnResize = (mountpoint: HTMLElement): void => {
 };
 
 const initPopoverCloseOnUnavInteraction = (mountpoint: HTMLElement): void => {
-  [...mountpoint.querySelector('.feds-utilities #universal-nav')?.children ?? []].forEach(child => {
-    child.addEventListener('click', () => closePopovers(mountpoint));
-    child.addEventListener('keydown', (event) => {
-      if ((event as KeyboardEvent).key === 'Enter')
-        closePopovers(mountpoint);
-    });
-  });
+  // Delegate to the container to handle late IMS recovery.
+  const utilities = mountpoint.querySelector('.feds-utilities');
+  const closeOnInteraction = (event: Event): void => {
+    if (!(event.target instanceof Element) || !event.target.closest('#universal-nav')) return;
+    if (event instanceof KeyboardEvent && event.key !== 'Enter') return;
+    closePopovers(mountpoint);
+  };
+  utilities?.addEventListener('click', closeOnInteraction);
+  utilities?.addEventListener('keydown', closeOnInteraction);
 };
 
 const initHeaderScrollState = (mountpoint: HTMLElement): void => {

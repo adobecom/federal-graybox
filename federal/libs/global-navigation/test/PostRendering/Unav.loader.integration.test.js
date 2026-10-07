@@ -820,28 +820,84 @@ describe('UNAV Loader Integration Tests', () => {
       expect(getAupSdkInstance()).to.equal(undefined);
     });
 
-    it('should resume initialization when IMS becomes ready after a timeout', async () => {
+    it('should finish loading after a timeout and initialize UNAV only once on late IMS readiness', async () => {
       window.adobeIMS.isSignedInUser = () => false;
       let capturedConfig;
+      let resolveInitialized;
+      let initializationCount = 0;
+      const initialized = new Promise((resolve) => { resolveInitialized = resolve; });
       window.UniversalNav = (config) => {
         capturedConfig = config;
+        initializationCount += 1;
+        resolveInitialized();
         return Promise.resolve();
       };
-      const loading = loadUnav(navElement, {
+      const result = await loadUnav(navElement, {
         imsReady: Promise.reject(new Error('IMS timeout')),
       });
-      await Promise.resolve();
+
+      expect(result).to.not.be.instanceOf(RecoverableError);
+      expect([...result.errors].some((error) => error.message.includes('IMS timeout'))).to.be.true;
       expect(capturedConfig).to.equal(undefined);
       expect(getAupSdkInstance()).to.equal(undefined);
 
       window.adobeIMS.initialized = true;
       window.adobeIMS.isSignedInUser = () => true;
       window.dispatchEvent(new CustomEvent('onImsLibInstance'));
-      const result = await loading;
+      window.dispatchEvent(new CustomEvent('onImsLibInstance'));
+      await initialized;
 
-      expect(result).to.not.be.instanceOf(RecoverableError);
+      expect(initializationCount).to.equal(1);
       expect(capturedConfig.fetchAUPSDKInstance).to.be.a('function');
       expect(getAupSdkInstance()).to.not.equal(undefined);
+    });
+
+    it('should reload only after late IMS initialization without queuing earlier requests', async () => {
+      let resolveInitialized;
+      const initialized = new Promise((resolve) => { resolveInitialized = resolve; });
+      window.UniversalNav = () => {
+        resolveInitialized();
+        return Promise.resolve();
+      };
+      let reloadCount = 0;
+      window.UniversalNav.reload = () => {
+        reloadCount += 1;
+      };
+      const result = await loadUnav(navElement, {
+        imsReady: Promise.reject(new Error('IMS timeout')),
+      });
+
+      result.reloadUnav();
+      expect(reloadCount).to.equal(0);
+      window.adobeIMS.initialized = true;
+      window.dispatchEvent(new CustomEvent('onImsLibInstance'));
+      await initialized;
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(reloadCount).to.equal(0);
+      result.reloadUnav();
+      expect(reloadCount).to.equal(1);
+    });
+
+    it('should report deferred UNAV initialization failures', async () => {
+      let resolveFailure;
+      const failed = new Promise((resolve) => { resolveFailure = resolve; });
+      const originalLana = window.lana;
+      window.lana = { log: (message) => {
+        if (message.includes('late UNAV failure')) resolveFailure();
+      } };
+      window.UniversalNav = () => Promise.reject(new Error('late UNAV failure'));
+      try {
+        const result = await loadUnav(navElement, {
+          imsReady: Promise.reject(new Error('IMS timeout')),
+        });
+        window.adobeIMS.initialized = true;
+        window.dispatchEvent(new CustomEvent('onImsLibInstance'));
+        await failed;
+
+        expect([...result.errors].some((error) => error.message === 'late UNAV failure')).to.be.true;
+      } finally {
+        window.lana = originalLana;
+      }
     });
 
     it('should handle IMS readiness arriving before the timeout handler', async () => {

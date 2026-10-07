@@ -1,3 +1,4 @@
+
 /* =========================================
    Promo Bar — shared base
    ========================================= */
@@ -288,8 +289,8 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     margin: 0;
     letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
     font-family: var(--heading-font-family, "Adobe Clean Display", sans-serif);
-    font-size: var(--s2a-typography-font-size-heading-4);
-    line-height: var(--s2a-typography-line-height-heading-4);
+    font-size: var(--s2a-typography-font-size-heading-3);
+    line-height: var(--s2a-typography-line-height-heading-3);
     font-weight: var(--s2a-font-weight-adobe-clean-black);
   }
 
@@ -483,9 +484,7 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
   .feds-promo-bar--maximized-release .feds-promo-bar-headline{
     letter-spacing: var(--s2a-typography-letter-spacing-heading-4);
   }
-
 }
-
 
 @media (width >= 768px) {
   .feds-promo-bar--maximized-release .feds-promo-bar-inner {
@@ -495,10 +494,32 @@ body:has(header.feds-header-scrolled) .feds-promo-aside-wrapper.feds-promo-bar--
     min-height: 0;
     overflow: hidden;
   }
+  .feds-promo-bar--maximized .feds-promo-bar-headline {
+    max-width: 293px;
+  }
   /* .feds-promo-bar--maximized-release .feds-promo-bar-bg img {
     object-fit: cover;
     object-position: left;
   } */
+}
+
+@media (width > 1279px) {
+  .feds-promo-bar--maximized .feds-promo-bar-headline {
+    letter-spacing: var(--s2a-font-letter-spacing-neg-1);
+    font-size: var(--s2a-font-size-4xl);
+    line-height: var(--s2a-font-line-height-lg);
+    max-width: 430px;
+  }
+}
+
+@media (width > 1440px) {
+  .feds-promo-bar--maximized .feds-promo-bar-left {
+    flex: 1;
+    max-inline-size: 1212px;
+  }
+  .feds-promo-bar--maximized .feds-promo-bar-headline {
+    max-width: 755px;
+  }
 }
 
 /* =========================================

@@ -38,8 +38,6 @@ export type Input = {
   isLocalNav: boolean;
   mountpoint: HTMLElement;
   unavEnabled: boolean;
-  // Host IMS readiness; only UNAV waits, not the navigation shell.
-  imsReady?: Promise<void>;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
   // Geo-validated market for the unav and drives the cart. String or a
@@ -116,9 +114,9 @@ export const main = async (
   setPlaceholders(combineWithFederalPlaceholders(input));
 
   // Kick off AUP SDK init in parallel with gnav fetch/parse/render and the
-  // UniversalNav.js download when the host has no pending IMS initialization.
-  // Otherwise loadUnav() starts AUP after the host's readiness promise settles.
-  if (unavEnabled && input.imsReady === undefined) preloadAupSdk();
+  // UniversalNav.js download. Bails internally if prerequisites aren't met;
+  // loadUnav() retries defensively for the late-IMS case.
+  if (unavEnabled) preloadAupSdk();
 
   const initial = await getInitialHTML(input)
   if (initial instanceof IrrecoverableError) {
@@ -352,7 +350,7 @@ export const postRenderingTasks = async (
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
   initCompactOverflow(input.mountpoint);
-  initPromoCountdownInMinimizedBar();
+  initPromoCountdownInPromoBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -363,7 +361,6 @@ export const postRenderingTasks = async (
   initEventRegistrationGating(input.mountpoint);
   const unav = await loadUnav(input.mountpoint, {
     countryCode: input.countryCode,
-    imsReady: input.imsReady,
   });
   if (unav instanceof RecoverableError) {
     errors.add(unav);
@@ -763,24 +760,60 @@ const waitUntilVisible = (callback: () => void): void => {
 
 /**
  * Injects a countdown timer into every `.feds-promo-bar-inner` slot of a
- * `minimized` PromoBar.  Reads the `gnav-promo-countdown` meta tag for the
- * start/end window; no-ops silently when the tag is absent, malformed, or
- * the current time is outside the window.
+ * `minimized` / `maximized` PromoBar.  Reads the `gnav-promo-countdown`
+ * meta tag for the start/end window; no-ops silently when the tag is absent,
+ * malformed, or the current time is outside the window.
  */
-const initPromoCountdownInMinimizedBar = (): void => {
+const initPromoCountdownInPromoBar = (): void => {
   const promoBar = document.querySelector<HTMLElement>(
-    '.feds-promo-aside-wrapper .feds-promo-bar--minimized',
+    '.feds-promo-aside-wrapper .feds-promo-bar',
   );
   if (promoBar === null) return;
 
   const isDark = promoBar.classList.contains('feds-promo-bar--dark');
-  const inners = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-inner');
 
-  inners.forEach((inner) => {
-    const textEl = inner.querySelector<HTMLElement>('.feds-promo-bar-text');
-    if (textEl === null) return;
-    initPromoCountdown(inner, textEl, isDark);
+  if (promoBar.classList.contains('feds-promo-bar--minimized')) {
+    const inners = promoBar.querySelectorAll<HTMLElement>('.feds-promo-bar-inner');
+    inners.forEach((inner) => {
+      const textEl = inner.querySelector<HTMLElement>('.feds-promo-bar-text');
+      if (textEl === null) return;
+      initPromoCountdown(inner, textEl, isDark);
+    });
+    return;
+  }
+
+  // Maximized / maximized-release: the icon lives inside the product
+  // container, so the timer is grouped there, before the product name.
+  const containers = promoBar.querySelectorAll<HTMLElement>(
+    '.feds-promo-product-container',
+  );
+  
+  containers.forEach((container) => {
+    const productName = container.querySelector<HTMLElement>(
+      ':scope > .feds-promo-bar-product',
+    );
+    if (productName === null) return;
+    initPromoCountdown(container, productName, isDark);
+    const cdt = isDark ? '.feds-cdt--dark' : '.feds-cdt'
+    if (container.querySelector(cdt) == null) return;
+    productName.style.setProperty('display', 'none');
+
+    const restore = new MutationObserver(() => {
+      if (container.querySelector(cdt) != null) return;
+      productName.style.removeProperty('display');
+      restore.disconnect();
+    });
+    restore.observe(container, { childList: true, subtree: true});
+
+    const cleanup = new MutationObserver(() => {
+      if (document.contains(container)) return;
+      restore.disconnect();
+      cleanup.disconnect();
+    });
+    cleanup.observe(document.body, { childList: true, subtree: true});
+
   });
+  
 };
 
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {

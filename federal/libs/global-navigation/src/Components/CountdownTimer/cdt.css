@@ -1,6 +1,6 @@
 /* =========================================
    Promo Bar — Countdown Timer (CDT)
-   Appears only inside .feds-promo-bar--minimized
+   Appears only inside .feds-promo-bar--minimized and --maximized
    Rendered as a single "DD:HH:MM:SS" text node,
    displayed as a flex item in .feds-promo-bar-inner
    ========================================= */
@@ -38,4 +38,16 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* for maximized countdown time */
+.feds-promo-bar--maximized .feds-cdt, .feds-promo-bar--maximized .feds-cdt--dark  {
+  font-size: var(--s2a-typography-font-size-body-md);
+  font-weight: var(--s2a-font-weight-adobe-clean-black);
+}
+
+@media (width >= 1024px) {
+  .feds-promo-bar--maximized .feds-cdt, .feds-promo-bar--maximized .feds-cdt--dark {
+    font-size: var(--s2a-typography-font-size-body-lg);
+  }
 }

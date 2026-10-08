@@ -288,7 +288,6 @@ header.feds-header-scrolled:not(:has(.localnav)):not(:has(.feds-popup.is-open:no
 
 .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
-  white-space: normal;
 }
 
 /* Scrolled OR any popup/drawer open → backdrop is light/gray, so

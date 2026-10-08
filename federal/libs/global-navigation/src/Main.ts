@@ -13,7 +13,7 @@ import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
@@ -67,6 +67,11 @@ export type Input = {
     hostname: string;
     href: string;
   }) => void;
+  // Host-injected loader for Milo's brand-concierge-global block. Called with
+  // the authored `.brand-concierge-global` block from the gnav source when
+  // `gnav-brand-concierge` is on; the block mounts its UI into the
+  // `.feds-bc-wrapper`.
+  loadBrandConcierge?: LoadBrandConcierge;
 };
 
 export const main = async (
@@ -108,6 +113,7 @@ export const main = async (
     });
   });
   if (input.merchDecorators) setMerchDecorators(input.merchDecorators);
+  if (input.loadBrandConcierge) setLoadBrandConcierge(input.loadBrandConcierge);
   // Normalize null → undefined so the stored state matches the
   // `LingoLocaleConfig | undefined` invariant even if a JS caller passes null.
   setLingoLocaleConfig(input.lingoRegion ?? undefined);
@@ -131,6 +137,19 @@ export const main = async (
     throw mainNav;
   }
 
+  // Detach the brand-concierge-global block before parsing so its authored
+  // rows aren't rendered as a nav item; it's loaded separately into
+  // `.feds-bc-wrapper`, mirroring c1 where the block never enters the page.
+  const brandConciergeBlock
+    = mainNav.querySelector<HTMLElement>('.brand-concierge-global');
+
+  let brandConciergeWrapper = brandConciergeBlock;
+  while (brandConciergeWrapper?.parentElement
+    && brandConciergeWrapper.parentElement !== mainNav) {
+    brandConciergeWrapper = brandConciergeWrapper.parentElement;
+  }
+  brandConciergeWrapper?.remove();
+
   const gnavData = parseNavigation(
     mainNav,
     unavEnabled,
@@ -144,6 +163,14 @@ export const main = async (
   }
 
   await renderGnav(gnavData)(mountpoint);
+
+  if (gnavData.brandConciergeEnabled && brandConciergeBlock !== null) {
+    try {
+      await getLoadBrandConcierge()(brandConciergeBlock);
+    } catch (error) {
+      lanaLog(`Failed to load brand concierge: ${error}`);
+    }
+  }
 
   return postRenderingTasks(input);
 };
@@ -635,8 +662,11 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
       const ctaWidth = productCta === null
         ? 0
         : Math.max(productCta.offsetWidth, productCta.scrollWidth);
+      const bcWidth = bcWrapper === null
+        ? 0
+        : Math.max(bcWrapper.offsetWidth, bcWrapper.scrollWidth);
       const contentWidth = brandWidth + itemsWidth +
-        utilitiesWidth + ctaWidth + 40;
+        utilitiesWidth + ctaWidth + bcWidth + 40;
       header.classList.toggle('is-compact', contentWidth > header.clientWidth);
     }
 
@@ -657,6 +687,7 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
   observer.observe(header);
   // UNAV can resize without changing the header's border box.
   if (utilities !== null) observer.observe(utilities);
+  if (bcWrapper !== null) observer.observe(bcWrapper);
   isDesktop.addEventListener('change', check);
   mountpoint.addEventListener(MERCH_RESOLVED_EVENT, check);
   check();
@@ -792,7 +823,7 @@ const initPromoCountdownInPromoBar = (): void => {
   const containers = promoBar.querySelectorAll<HTMLElement>(
     '.feds-promo-product-container',
   );
-  
+
   containers.forEach((container) => {
     const productName = container.querySelector<HTMLElement>(
       ':scope > .feds-promo-bar-product',
@@ -818,7 +849,7 @@ const initPromoCountdownInPromoBar = (): void => {
     cleanup.observe(document.body, { childList: true, subtree: true});
 
   });
-  
+
 };
 
 const initPromoBarHeight = (mountpoint: HTMLElement): void => {

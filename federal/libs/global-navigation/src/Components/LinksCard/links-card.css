@@ -238,6 +238,9 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
   flex-direction: column;
   align-items: flex-start;
   gap: var(--s2a-spacing-2xs, 4px);
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .feds-popup .links-card .links-card-links .links-card-links__item-description {

@@ -75,6 +75,11 @@
   color: inherit;
 }
 
+.global-navigation .feds-gnav-cards .promo-card-small__body a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 .global-navigation .feds-gnav-cards .promo-card-small__cta .feds-secondary-cta {
   display: inline-flex;
   align-items: center;

@@ -42,9 +42,8 @@ const AUP_SDK_VERSION = '1.0.756';
 /**
  * Module-scoped single-flight promise for AUP SDK readiness.
  *
- * Kicked off from main() at IMS-ready time so script load + preloadSDK +
- * updateConfig run in parallel with gnav fetch/parse/render and the
- * UniversalNav.js download, instead of blocking inside Unav-Time.
+ * Started from main() when the host doesn't provide an IMS-readiness promise,
+ * or from loadUnav() after IMS readiness. Script loading races UniversalNav.js.
  */
 let aupSdkPromise: Promise<unknown> | undefined;
 
@@ -182,9 +181,56 @@ const setProfileSignUpRequired = (
  *   matches on-page pricing; when absent or it rejects,
  *   the locale-derived default is used. A promise is awaited once in the
  *   async body (after gnav render) so geo detection never blocks nav paint.
+ *   `imsReady` lets the host defer authentication-dependent initialization
+ *   until IMS has restored the session. An IMS timeout lets GNav initialization
+ *   finish and resumes UNAV separately on the late `onImsLibInstance` event.
  * @returns Promise resolving to Unav object or RecoverableError
  */
 export const loadUnav = async (
+  nav: HTMLElement,
+  options?: {
+    countryCode?: string | Promise<string | undefined>;
+    imsReady?: Promise<void>;
+  }
+): Promise<Unav | RecoverableError> => {
+  if (!(nav.querySelector('.feds-utilities') instanceof HTMLElement)) {
+    return new RecoverableError('missing ".feds-utilities" container');
+  }
+
+  try {
+    await options?.imsReady;
+    return initializeUnav(nav, options);
+  } catch (error) {
+    const failure = new RecoverableError(
+      error instanceof Error ? error.message : 'failed to initialize IMS'
+    );
+    if (failure.message !== 'IMS timeout') return failure;
+    if (window.adobeIMS?.initialized === true) {
+      return initializeUnav(nav, options);
+    }
+
+    const errors = new Set<RecoverableError>([failure]);
+    let deferredUnav: Unav | undefined;
+    lanaLog('IMS timeout; UNAV initialization deferred', 'universalnav', 'i');
+    window.addEventListener('onImsLibInstance', () => {
+      void initializeUnav(nav, options).then((result) => {
+        const failures = result instanceof RecoverableError
+          ? [result] : result.errors;
+        if (!(result instanceof RecoverableError)) deferredUnav = result;
+        failures.forEach((lateError) => {
+          errors.add(lateError);
+          lanaLog(lateError.message, 'universalnav');
+        });
+      });
+    }, { once: true });
+    return {
+      errors,
+      reloadUnav: (): void => deferredUnav?.reloadUnav(),
+    };
+  }
+};
+
+const initializeUnav = async (
   nav: HTMLElement,
   options?: { countryCode?: string | Promise<string | undefined> }
 ): Promise<Unav | RecoverableError> => {
@@ -276,9 +322,8 @@ export const loadUnav = async (
       unavVersion = '1.6';
     }
 
-    // Defensive: covers the late-IMS case where main() bailed because
-    // adobeIMS wasn't signed-in yet. Called before Promise.all so the AUP
-    // script still races UniversalNav.js even in the fallback path.
+    // Start AUP after IMS readiness, including deferred timeout recovery.
+    // Called before Promise.all so AUP and UNAV scripts download in parallel.
     preloadAupSdk();
 
     // Load JS and CSS in parallel. AUP SDK was already kicked off above

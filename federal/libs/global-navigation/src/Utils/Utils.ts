@@ -291,6 +291,29 @@ export const [setMerchDecorators, getMerchDecorators] =
     ];
   })();
 
+// Host-injected loader for Milo's brand-concierge-global block. Federal
+// renders the empty `.feds-bc-wrapper`; the host loads the block, which
+// mounts its UI into that wrapper, when `gnav-brand-concierge` is on.
+// Defaults to a no-op.
+export type LoadBrandConcierge = (block: HTMLElement) => Promise<void>;
+
+type LoadBrandConciergeStateFunctions = [
+  (loader: LoadBrandConcierge) => void,
+  () => LoadBrandConcierge,
+];
+
+export const [setLoadBrandConcierge, getLoadBrandConcierge] =
+  ((): LoadBrandConciergeStateFunctions => {
+    let loadBrandConcierge: LoadBrandConcierge = async (): Promise<void> => {};
+
+    return [
+      (next: LoadBrandConcierge): void => {
+        loadBrandConcierge = next ?? (async (): Promise<void> => {});
+      },
+      (): LoadBrandConcierge => loadBrandConcierge,
+    ];
+  })();
+
 export const localizeHref = (href: string): string => {
   try {
     const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;

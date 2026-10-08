@@ -23,6 +23,7 @@ declare global {
     
     /** Adobe Identity Management System */
     adobeIMS?: {
+      initialized?: boolean;
       signIn: (context: object) => void;
       isSignedInUser: () => boolean;
       getAccessToken: () => { token?: string } | null;

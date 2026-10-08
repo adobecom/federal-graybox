@@ -38,6 +38,8 @@ export type Input = {
   isLocalNav: boolean;
   mountpoint: HTMLElement;
   unavEnabled: boolean;
+  // Host IMS readiness; only UNAV waits, not the navigation shell.
+  imsReady?: Promise<void>;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
   // Geo-validated market for the unav and drives the cart. String or a
@@ -114,9 +116,9 @@ export const main = async (
   setPlaceholders(combineWithFederalPlaceholders(input));
 
   // Kick off AUP SDK init in parallel with gnav fetch/parse/render and the
-  // UniversalNav.js download. Bails internally if prerequisites aren't met;
-  // loadUnav() retries defensively for the late-IMS case.
-  if (unavEnabled) preloadAupSdk();
+  // UniversalNav.js download when the host has no pending IMS initialization.
+  // Otherwise loadUnav() starts AUP after the host's readiness promise settles.
+  if (unavEnabled && input.imsReady === undefined) preloadAupSdk();
 
   const initial = await getInitialHTML(input)
   if (initial instanceof IrrecoverableError) {
@@ -361,6 +363,7 @@ export const postRenderingTasks = async (
   initEventRegistrationGating(input.mountpoint);
   const unav = await loadUnav(input.mountpoint, {
     countryCode: input.countryCode,
+    imsReady: input.imsReady,
   });
   if (unav instanceof RecoverableError) {
     errors.add(unav);

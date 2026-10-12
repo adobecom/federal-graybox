@@ -428,24 +428,14 @@ const initializeUnav = async (
               window.adobeArp = window.adobeArp ?? {};
               window.adobeArp.sessionToken = token;
               window.dispatchEvent(new CustomEvent('arp:tokenReady', { detail: { token } }));
-              const existingCustom =
-                window.alloy_all?.data?._adobe_corpnew?.digitalData?.custom;
-              window.alloy_all = {
-                ...window.alloy_all,
-                data: {
-                  ...window.alloy_all?.data,
-                  _adobe_corpnew: {
-                    ...window.alloy_all?.data?._adobe_corpnew,
-                    digitalData: {
-                      ...window.alloy_all?.data?._adobe_corpnew?.digitalData,
-                      custom: {
-                        ...existingCustom,
-                        arp_token: token,
-                      },
-                    },
-                  },
-                },
-              };
+              // Preserve the analytics object bound to Launch getters/setters.
+              window.alloy_all ??= {};
+              window.alloy_all.data ??= {};
+              window.alloy_all.data._adobe_corpnew ??= {};
+              window.alloy_all.data._adobe_corpnew.digitalData ??= {};
+              window.alloy_all.data._adobe_corpnew.digitalData.custom ??= {};
+              window.alloy_all.data._adobe_corpnew.digitalData.custom
+                .arp_token = token;
             },
             successCallback: (): void => {},
             errorCallback: (error: unknown): void => {

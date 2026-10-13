@@ -422,22 +422,22 @@ export const postRenderingTasks = async (
 
   // Runs before `await loadUnav` so a slow/failed UNAV load can't delay it.
   initEventRegistrationGating(input.mountpoint);
-  const unav = await loadUnav(input.mountpoint, {
-    countryCode: input.countryCode,
-    imsReady: input.imsReady,
-  });
-  if (unav instanceof RecoverableError) {
-    errors.add(unav);
-    lanaLog(unav.message);
+  let reloadUnav = (): void => {};
+  if (input.unavEnabled) {
+    const unav = await loadUnav(input.mountpoint, {
+      countryCode: input.countryCode,
+      imsReady: input.imsReady,
+    });
+    if (unav instanceof RecoverableError) {
+      errors.add(unav);
+      lanaLog(unav.message);
+    }
+    else {
+      unav.errors.forEach((error: RecoverableError) => errors.add(error));
+      reloadUnav = unav.reloadUnav;
+    }
+    initPopoverCloseOnUnavInteraction(input.mountpoint);
   }
-  else
-    unav.errors.forEach((error: RecoverableError) => errors.add(error));
-  initPopoverCloseOnUnavInteraction(input.mountpoint);
-
-  const reloadUnav
-    = unav instanceof RecoverableError
-    ? (): void => {}
-    : unav.reloadUnav;
 
   const localnavMarginTop = 8;
   const breadcrumbs = input.mountpoint.querySelector('nav > ul.feds-breadcrumbs');

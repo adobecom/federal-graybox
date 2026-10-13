@@ -10,10 +10,11 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks";
 import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
+
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
 import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
@@ -140,10 +141,43 @@ export const main = async (
   // Detach the brand-concierge-global block before parsing so its authored
   // rows aren't rendered as a nav item; it's loaded separately into
   // `.feds-bc-wrapper`, mirroring c1 where the block never enters the page.
-  const brandConciergeBlock
+  const brandConciergeEnabled = getMetadata('gnav-brand-concierge') === 'on';
+  let brandConciergeBlock
     = mainNav.querySelector<HTMLElement>('.brand-concierge-global');
 
-  let brandConciergeWrapper = brandConciergeBlock;
+  // The block may be authored inline, as a `#_inline` fragment (already
+  // expanded upstream), or as a plain fragment link — either inside a
+  // `.brand-concierge-global` block or, when enabled, as a bare link.
+  const brandConciergeLink = brandConciergeEnabled
+    ? (brandConciergeBlock ?? mainNav).querySelector<HTMLAnchorElement>(
+      'a[href*="/fragments/"][href*="brand-concierge"]',
+    )
+    : null;
+  // Element stripped from the nav so the block/link isn't parsed as a nav item.
+  let brandConciergeWrapper: HTMLElement | null
+    = brandConciergeBlock ?? brandConciergeLink;
+
+  // brandConciergeLink is only set when enabled, so no extra guard is needed.
+  if (brandConciergeLink) {
+    try {
+      const fragmentBody = await fetchAndProcessPlainHTML(
+        new URL(brandConciergeLink.href.split('#')[0]),
+      );
+      if (!(fragmentBody instanceof IrrecoverableError)) {
+        const inner = fragmentBody.querySelector<HTMLElement>('.brand-concierge-global')
+          ?? fragmentBody;
+        // A bare link has no block wrapper; synthesize one for the host loader.
+        if (!brandConciergeBlock) {
+          brandConciergeBlock = document.createElement('div');
+          brandConciergeBlock.className = 'brand-concierge-global';
+        }
+        brandConciergeBlock.replaceChildren(...inner.children);
+      }
+    } catch (error) {
+      lanaLog(`Failed to resolve brand concierge fragment: ${error}`);
+    }
+  }
+
   while (brandConciergeWrapper?.parentElement
     && brandConciergeWrapper.parentElement !== mainNav) {
     brandConciergeWrapper = brandConciergeWrapper.parentElement;

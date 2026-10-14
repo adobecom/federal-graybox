@@ -12,22 +12,24 @@ export const productlist = (
     </ul>
   `.trim();
   const tabcontent = `
-    <ul class="tab-content">
+    <ul class="tab-content" role="presentation">
       ${categories.map(({ links }: ProductCategory, i: number) => {
         const includesText = placeholders.get('product-list-includes') ?? 'includes';
         const productText = placeholders.get('product-list-product') ?? 'product';
         const productsText = placeholders.get('product-list-products') ?? 'products';
         const productWord = links.length === 1 ? productText : productsText;
         return `
-      <li>
+      <li role="presentation">
         <span id="product-hint-${i}" class="product-hint">${includesText} ${links.length} ${productWord}</span>
-        <ul
+        <div
           id="${i}"
           role="tabpanel"
           ${i === 0 ? '' : 'hidden'}
         >
-          ${links.map(link => `<li>${productCard(link)}</li>`).join('')}
-        </ul>
+          <ul role="list">
+            ${links.map(link => `<li>${productCard(link)}</li>`).join('')}
+          </ul>
+        </div>
       </li>
       `.trim();
       }).join('')}

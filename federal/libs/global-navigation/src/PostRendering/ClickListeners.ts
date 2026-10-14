@@ -46,7 +46,7 @@ export const initClickListeners = (
   skipLink?.addEventListener('click', onSkipLinkClick);
 
   const tabButtons = [...gnav.querySelectorAll<HTMLButtonElement>('.tabs button[role="tab"]')];
-  const tabPanels = [...gnav.querySelectorAll('.tab-content ul')];
+  const tabPanels = [...gnav.querySelectorAll('.tab-content [role="tabpanel"], .tab-content > li > ul:not([role="tabpanel"])')];
   const tabButtonClickCallbacks = tabButtons.map((button, i) => (): void => {
 
       const popup = tabPanels[i].closest(`.feds-popup.${IS_OPEN_CLASS}`);

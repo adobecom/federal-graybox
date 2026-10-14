@@ -40,10 +40,6 @@
   border-top-color: var(--s2a-color-transparent-black-08);
 }
 
-/* .global-navigation:has(.feds-popup.small-menu.is-open) .feds-breadcrumbs {
-  border-top-color: var(--s2a-color-transparent-black-08);
-} */
-
 .global-navigation .feds-breadcrumbs > li {
   display: inline-flex;
   align-items: center;
@@ -120,7 +116,6 @@
    both read fine on both backdrops). */
 .global-navigation.feds-header-scrolled .feds-breadcrumbs {
   border-top-color: rgba(0, 0, 0, 0.12);
-  /* box-shadow: 0 67px 19px 0 rgba(0, 0, 0, 0.00), 0 43px 17px 0 rgba(0, 0, 0, 0.01), 0 24px 14px 0 rgba(0, 0, 0, 0.04), 0 11px 11px 0 rgba(0, 0, 0, 0.07), 0 3px 6px 0 rgba(0, 0, 0, 0.08); */
   border-bottom-right-radius: var(--s2a-border-radius-16);
   border-bottom-left-radius: var(--s2a-border-radius-16);
 }

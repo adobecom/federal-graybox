@@ -57,7 +57,8 @@ const parseContent = (cell: Element): PromoBarContent => {
   const iconAlt = iconMatch?.alt ?? null;
 
   const bgPictures = pictures.filter((p) => p !== iconMatch?.element);
-  const bgPicture = bgPictures[bgPictures.length - 1] ?? null;
+  const [lastBgPicture] = bgPictures.slice(-1);
+  const bgPicture = lastBgPicture ?? null;
   // Keep the full <picture> markup (all <source> variants + fallback <img>)
   // so responsive/format switching survives into the rendered output. By
   // this point replaceDotMedia has already rewritten src/srcset to absolute
@@ -157,10 +158,14 @@ export const parsePromoBar = (
   // 2 cells → [0] mobile+tablet, [1] desktop
   // 3 cells → [0] mobile, [1] tablet, [2] desktop
   const ALL: PromoBarViewport[] = ['mobile', 'tablet', 'desktop'];
-  const viewportGroups: PromoBarViewport[][] =
-    parsed.length === 3 ? [['mobile'], ['tablet'], ['desktop']]
-    : parsed.length === 2 ? [['mobile', 'tablet'], ['desktop']]
-    : parsed.map(() => ALL);
+  let viewportGroups: PromoBarViewport[][];
+  if (parsed.length === 3) {
+    viewportGroups = [['mobile'], ['tablet'], ['desktop']];
+  } else if (parsed.length === 2) {
+    viewportGroups = [['mobile', 'tablet'], ['desktop']];
+  } else {
+    viewportGroups = parsed.map(() => ALL);
+  }
   const slots: PromoBarSlot[] = parsed.map((content, i) => ({
     viewports: viewportGroups[i],
     content,

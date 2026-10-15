@@ -328,6 +328,10 @@ nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup .feds-popup-header {
   header.global-navigation nav.localnav > .feds-breadcrumbs {
     display: none;
   }
+
+  header.global-navigation:not(.is-compact) .feds-gnav-items > li > .feds-link:first-child {
+    outline-offset: var(--s2a-spacing-xs);
+  }
 }
 
 /* =========================================

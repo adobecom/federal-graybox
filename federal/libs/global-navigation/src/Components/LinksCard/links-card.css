@@ -232,6 +232,7 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
   font-size: var(--s2a-font-size-sm);
   font-weight: var(--s2a-font-weight-adobe-clean-regular);
   display: inline-flex;
+  margin-left: 2px;
 }
 
 .feds-popup .links-card .links-card-links .links-card-links__item-link {

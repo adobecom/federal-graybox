@@ -46,7 +46,7 @@ export const initClickListeners = (
   skipLink?.addEventListener('click', onSkipLinkClick);
 
   const tabButtons = [...gnav.querySelectorAll<HTMLButtonElement>('.tabs button[role="tab"]')];
-  const tabPanels = [...gnav.querySelectorAll('.tab-content ul')];
+  const tabPanels = [...gnav.querySelectorAll('.tab-content [role="tabpanel"], .tab-content > li > ul:not([role="tabpanel"])')];
   const tabButtonClickCallbacks = tabButtons.map((button, i) => (): void => {
 
       const popup = tabPanels[i].closest(`.feds-popup.${IS_OPEN_CLASS}`);
@@ -240,6 +240,9 @@ const animations = (gnav: HTMLElement): void => {
 }
 
 const linksCardListeners = (mountpoint: HTMLElement): void => {
+  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
+  const syncFns: (() => void)[] = [];
+
   mountpoint.querySelectorAll<HTMLElement>('.feds-popup:not(.small-menu) article.links-card')
     .forEach(article => {
       const articleTitle = article.querySelector<HTMLElement>('div.links-card-title-container');
@@ -252,6 +255,9 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
       // On desktop we strip these attributes so the heading reads as a
       // plain heading (no spurious button role).
       const updateExpanded = (): void => {
+        const isClosed = !isNavDesktop() && article.classList.contains('closed');
+        article.querySelectorAll<HTMLElement>('.links-card-links, .links-card-footer')
+          .forEach(content => { content.inert = isClosed; });
         articleTitle.setAttribute(
           'aria-expanded',
           String(!article.classList.contains('closed')),
@@ -263,6 +269,8 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
           articleTitle.removeAttribute('tabindex');
           articleTitle.removeAttribute('role');
           articleTitle.removeAttribute('aria-expanded');
+          article.querySelectorAll<HTMLElement>('.links-card-links, .links-card-footer')
+            .forEach(content => { content.inert = false; });
         } else {
           articleTitle.setAttribute('tabindex', '0');
           articleTitle.setAttribute('role', 'button');
@@ -270,6 +278,7 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
         }
       };
       syncMobileAttrs();
+      syncFns.push(syncMobileAttrs);
       isDesktop.addEventListener('change', syncMobileAttrs);
 
       const toggle = (): void => {
@@ -301,4 +310,13 @@ const linksCardListeners = (mountpoint: HTMLElement): void => {
         toggle();
       });
     })
+
+  // `is-compact` is toggled on the header by a ResizeObserver (see
+  // `initCompactOverflow` in Main.ts) independently of the `isDesktop`
+  // media query, so entering/leaving compact mode at a desktop viewport
+  // width wouldn't otherwise resync these mobile-only attrs.
+  if (header !== null && syncFns.length > 0) {
+    new MutationObserver(() => syncFns.forEach(sync => sync()))
+      .observe(header, { attributes: true, attributeFilter: ['class'] });
+  }
 };

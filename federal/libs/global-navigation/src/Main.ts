@@ -5,16 +5,16 @@ import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
-import { wirePopups, initLightDismiss } from "./PostRendering/PopupWiring";
+import { wirePopups, initLightDismiss, IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks";
 import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
+
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons } from "./Utils/Utils";
-import { IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -74,24 +74,98 @@ export type Input = {
   loadBrandConcierge?: LoadBrandConcierge;
 };
 
+// Detaches the brand-concierge-global block from the nav (so it isn't parsed
+// as a nav item) and returns it for separate loading into `.feds-bc-wrapper`,
+// mirroring c1 where the block never enters the page. The block may be
+// authored inline, as a `#_inline` fragment (already expanded upstream), or as
+// a plain fragment link — either inside a `.brand-concierge-global` block or,
+// when enabled, as a bare link.
+const resolveBrandConciergeBlock = async (
+  mainNav: HTMLElement,
+): Promise<HTMLElement | null> => {
+  const brandConciergeEnabled = getMetadata('gnav-brand-concierge') === 'on';
+  let brandConciergeBlock
+    = mainNav.querySelector<HTMLElement>('.brand-concierge-global');
+
+  const brandConciergeLink = brandConciergeEnabled
+    ? (brandConciergeBlock ?? mainNav).querySelector<HTMLAnchorElement>(
+      'a[href*="/fragments/"][href*="brand-concierge"]',
+    )
+    : null;
+  // Element stripped from the nav so the block/link isn't parsed as a nav item.
+  let brandConciergeWrapper: HTMLElement | null
+    = brandConciergeBlock ?? brandConciergeLink;
+
+  // brandConciergeLink is only set when enabled, so no extra guard is needed.
+  if (brandConciergeLink) {
+    try {
+      const fragmentBody = await fetchAndProcessPlainHTML(
+        new URL(brandConciergeLink.href.split('#')[0]),
+      );
+      if (!(fragmentBody instanceof IrrecoverableError)) {
+        const inner = fragmentBody.querySelector<HTMLElement>('.brand-concierge-global')
+          ?? fragmentBody;
+        // A bare link has no block wrapper; synthesize one for the host loader.
+        if (!brandConciergeBlock) {
+          brandConciergeBlock = document.createElement('div');
+          brandConciergeBlock.className = 'brand-concierge-global';
+        }
+        brandConciergeBlock.replaceChildren(...inner.children);
+      }
+    } catch (error) {
+      lanaLog(`Failed to resolve brand concierge fragment: ${error}`);
+    }
+  }
+
+  while (brandConciergeWrapper?.parentElement
+    && brandConciergeWrapper.parentElement !== mainNav) {
+    brandConciergeWrapper = brandConciergeWrapper.parentElement;
+  }
+  brandConciergeWrapper?.remove();
+
+  return brandConciergeBlock;
+};
+
+// Runtime guard for callers crossing the JS boundary, where the compile-time
+// `Input` typing isn't enforced. Validates the required fields have the right
+// runtime shape; optional fields are left to their call sites.
+const validateInput = (input: Input): IrrecoverableError | null => {
+  if (!(input.gnavSource instanceof URL)) {
+    return new IrrecoverableError('gnavSource needs to be a URL object');
+  }
+  if (!(input.mountpoint instanceof HTMLElement)) {
+    return new IrrecoverableError('mountpoint needs to be an HTMLElement');
+  }
+  if (typeof input.isLocalNav !== 'boolean') {
+    return new IrrecoverableError('isLocalNav needs to be a boolean');
+  }
+  if (typeof input.unavEnabled !== 'boolean') {
+    return new IrrecoverableError('unavEnabled needs to be a boolean');
+  }
+  if (!(input.placeholders instanceof Promise)) {
+    return new IrrecoverableError('placeholders needs to be a Promise');
+  }
+  if (typeof input.personalization !== 'object' || input.personalization === null) {
+    return new IrrecoverableError('personalization needs to be an object');
+  }
+  return null;
+};
+
 export const main = async (
   input: Input
 ): Promise<GlobalNavigation | IrrecoverableError> => {
-  // TODO: implement a function that verifies that Input
-  // is the correct type up front.
+  const inputError = validateInput(input);
+  if (inputError !== null) {
+    lanaLog(inputError.message);
+    throw inputError;
+  }
 
   const {
-    gnavSource,
     mountpoint,
     unavEnabled,
     miloConfig,
     personalization
   } = input;
-
-  if (!(gnavSource instanceof URL)) {
-    lanaLog(`gnavSource is invalid: ${gnavSource}`)
-    throw new IrrecoverableError("gnavSource needs to be a URL object");
-  }
 
   try {
     setMiloConfig(miloConfig);
@@ -137,18 +211,7 @@ export const main = async (
     throw mainNav;
   }
 
-  // Detach the brand-concierge-global block before parsing so its authored
-  // rows aren't rendered as a nav item; it's loaded separately into
-  // `.feds-bc-wrapper`, mirroring c1 where the block never enters the page.
-  const brandConciergeBlock
-    = mainNav.querySelector<HTMLElement>('.brand-concierge-global');
-
-  let brandConciergeWrapper = brandConciergeBlock;
-  while (brandConciergeWrapper?.parentElement
-    && brandConciergeWrapper.parentElement !== mainNav) {
-    brandConciergeWrapper = brandConciergeWrapper.parentElement;
-  }
-  brandConciergeWrapper?.remove();
+  const brandConciergeBlock = await resolveBrandConciergeBlock(mainNav);
 
   const gnavData = parseNavigation(
     mainNav,
@@ -211,16 +274,15 @@ mountpoint: HTMLElement
   });
   const megaMenuComponents = data.components.filter(com => com.type === "MegaMenu");
   const mmPromises = megaMenuComponents.map(com => com.content);
-  const _errors_ = await Promise.all(mmPromises.map(async (mmPromise, idx) => {
+  await Promise.all(mmPromises.map(async (mmPromise, idx) => {
     try {
-      const [content, errors] = await mmPromise;
+      const [content] = await mmPromise;
       const extraData: MegaMenuExtraData = { type: "MegaMenuExtraData", breadcrumbs: data.breadcrumbs };
       megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, extraData);
-      return errors;
     } catch (error) {
-      return [error];
+      lanaLog(`Failed to render mega menu: ${error}`);
     }
-  }).flat());
+  }));
 
   const smallMenus = [
     ...mountpoint.querySelectorAll('button.small-menu ~ .feds-popup')
@@ -262,21 +324,19 @@ export const renderGnavString = ({
     : null;
   // The sibling's label lives in a different field per component type:
   // MegaMenu/SmallMenu use `title`, Link/CTAs use `text`, Text uses `content`.
-  const localnavBarLabel = localnavBarSibling === null
-    ? ''
-    : 'title' in localnavBarSibling
-      ? localnavBarSibling.title
-      : 'text' in localnavBarSibling
-        ? localnavBarSibling.text
-        : 'content' in localnavBarSibling
-          ? localnavBarSibling.content
-          : '';
+  const localnavBarLabel = ((): string => {
+    if (localnavBarSibling === null) return '';
+    if ('title' in localnavBarSibling) return localnavBarSibling.title;
+    if ('text' in localnavBarSibling) return localnavBarSibling.text;
+    if ('content' in localnavBarSibling) return localnavBarSibling.content;
+    return '';
+  })();
   // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
   // stays visible beside the hamburger, not only inside the drawer.
   const ctaComponents = components.filter(
     (c) => c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA'
   );
-  const trailingCta = ctaComponents[ctaComponents.length - 1];
+  const [trailingCta] = ctaComponents.slice(-1);
   const pinnedCtaHTML = trailingCta !== undefined
     ? `<div class="feds-pinned-cta">${component(trailingCta)}</div>`
     : '';
@@ -388,22 +448,22 @@ export const postRenderingTasks = async (
 
   // Runs before `await loadUnav` so a slow/failed UNAV load can't delay it.
   initEventRegistrationGating(input.mountpoint);
-  const unav = await loadUnav(input.mountpoint, {
-    countryCode: input.countryCode,
-    imsReady: input.imsReady,
-  });
-  if (unav instanceof RecoverableError) {
-    errors.add(unav);
-    lanaLog(unav.message);
+  let reloadUnav = (): void => {};
+  if (input.unavEnabled) {
+    const unav = await loadUnav(input.mountpoint, {
+      countryCode: input.countryCode,
+      imsReady: input.imsReady,
+    });
+    if (unav instanceof RecoverableError) {
+      errors.add(unav);
+      lanaLog(unav.message);
+    }
+    else {
+      unav.errors.forEach((error: RecoverableError) => errors.add(error));
+      reloadUnav = unav.reloadUnav;
+    }
+    initPopoverCloseOnUnavInteraction(input.mountpoint);
   }
-  else
-    unav.errors.forEach((error: RecoverableError) => errors.add(error));
-  initPopoverCloseOnUnavInteraction(input.mountpoint);
-
-  const reloadUnav
-    = unav instanceof RecoverableError
-    ? (): void => {}
-    : unav.reloadUnav;
 
   const localnavMarginTop = 8;
   const breadcrumbs = input.mountpoint.querySelector('nav > ul.feds-breadcrumbs');
@@ -545,8 +605,7 @@ const initHeaderScrollState = (mountpoint: HTMLElement): void => {
   ): void => {
     cancelPendingAdd();
     if (isMenuOpen() || !scrolledPast) {
-      header.classList.remove("feds-header-scrolled");
-      header.classList.remove("feds-localnav-closing");
+      header.classList.remove("feds-header-scrolled", "feds-localnav-closing");
       return;
     }
     header.classList.add("feds-header-scrolled");
@@ -646,8 +705,7 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
     const mobile = !isDesktop.matches;
 
     // Strip both classes first so measurements read natural (all-shown) widths.
-    header.classList.remove('is-compact');
-    header.classList.remove('feds-cta-overflow');
+    header.classList.remove('is-compact', 'feds-cta-overflow');
 
     // Stage 1: is-compact (desktop overflow collapse; mobile uses the drawer).
     if (!mobile) {

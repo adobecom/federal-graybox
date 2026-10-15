@@ -105,7 +105,7 @@ function resolveNow(): number {
   const instantStr = new URL(window.location.href).searchParams.get('instant');
   if (instantStr === null) return Date.now();
   const instant = parseLocalDateTime(instantStr);
-  return instant !== null ? instant : Date.now();
+  return instant ?? Date.now();
 }
 
 /**
@@ -222,7 +222,7 @@ export function initPromoCountdown(
   if (iconEl !== null) wrapper.append(iconEl);
   wrapper.append(cdtEl);
 
-  inner.insertBefore(wrapper, insertBeforeEl);
+  insertBeforeEl.before(wrapper);
 
   // Polite live region for the scheduled screen-reader announcements. It lives
   // on `inner` (not the wrapper) so it survives teardown and can announce the
@@ -264,7 +264,7 @@ export function initPromoCountdown(
     },
     () => {
       liveEl.textContent = withPromo('has ended');
-      if (iconEl !== null) inner.insertBefore(iconEl, wrapper);
+      if (iconEl !== null) wrapper.before(iconEl);
       wrapper.remove();
     },
   );

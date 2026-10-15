@@ -361,7 +361,11 @@ header.global-navigation nav:has(> .feds-breadcrumbs):not(:has(.feds-popup.is-op
   --feds-popup-bg-height: calc(100% + var(--feds-breadcrumbs-height));
 }
 
-header.global-navigation nav:not(:has(> .feds-breadcrumbs)):not(:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)) {
+/* Localnav is excluded: its bar stands in for breadcrumbs even when no
+   breadcrumbs element exists, so the bump is owned by localnav.css. Without
+   this `:not(.localnav)`, a breadcrumb-less localnav would be forced to 100%
+   here (higher specificity) and the bar would spill outside nav::after. */
+header.global-navigation nav:not(.localnav):not(:has(> .feds-breadcrumbs)):not(:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open)) {
   --feds-popup-bg-height: 100%;
 }
 
@@ -1327,7 +1331,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     max-height: calc(100dvh - var(--feds-nav-total-height) - var(--feds-banner-extra-offset));
   }
 
-  .feds-gnav-items > li > .feds-link:first-child {
+  header.global-navigation:not(.is-compact) .feds-gnav-items > li > .feds-link:first-child {
     outline-offset: var(--s2a-spacing-sm);
   }
 

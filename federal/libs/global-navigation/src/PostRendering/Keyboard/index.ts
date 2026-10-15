@@ -82,7 +82,7 @@ const popupFocusables = (popup: HTMLElement): HTMLElement[] => {
     + ' [tabindex]:not([tabindex="-1"]),'
     + ' input:not([disabled]), [role="tab"]';
   return [...popup.querySelectorAll<HTMLElement>(selector)]
-    .filter((el) => el.offsetParent !== null);
+    .filter((el) => el.offsetParent !== null && el.closest('[inert]') === null);
 };
 
 const ARROW_DELTA: Record<string, 1 | -1> = {

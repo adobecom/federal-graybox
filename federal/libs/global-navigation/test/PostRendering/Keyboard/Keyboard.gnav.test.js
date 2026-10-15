@@ -4,6 +4,7 @@
 import { expect } from '@esm-bundle/chai';
 import sinon from 'sinon';
 import { initKeyboardNav } from '../../../src/PostRendering/Keyboard';
+import { initClickListeners } from '../../../src/PostRendering/ClickListeners';
 import { isDesktop } from '../../../src/Utils/Utils';
 import { IS_OPEN_CLASS } from '../../../src/PostRendering/PopupWiring';
 
@@ -100,6 +101,89 @@ describe('Gnav keyboard init', () => {
   function forceDesktop() {
     isDesktopStub = sinon.stub(isDesktop, 'matches').get(() => true);
   }
+
+  describe('collapsed links-card focus', () => {
+    function buildCard() {
+      gnav = document.createElement('header');
+      gnav.className = 'global-navigation';
+      gnav.innerHTML = buildLocalnavGnav().innerHTML;
+      gnav.querySelector('#mega-a').innerHTML = `
+        <article class="links-card closed">
+          <div>
+            <div class="links-card-title-container"><h2>Links</h2></div>
+            <ul class="links-card-links"><li><a href="#card-link">Link</a></li></ul>
+          </div>
+          <div class="links-card-footer">
+            <a href="#footer-link">Footer link</a><button>CTA</button>
+          </div>
+        </article>
+        <a href="#next" id="after-card">Next</a>
+      `;
+      document.body.appendChild(gnav);
+      cleanup = initClickListeners(gnav);
+      return gnav.querySelector('.links-card-title-container');
+    }
+
+    function expectContentsInert(expected) {
+      gnav.querySelectorAll('.links-card-links, .links-card-footer').forEach(content => {
+        expect(content.inert).to.equal(expected);
+      });
+    }
+
+    it('blocks focus inside a closed mobile card and restores it when opened', () => {
+      forceMobile();
+      const title = buildCard();
+      title.focus();
+      expectContentsInert(true);
+      gnav.querySelector('a[href="#card-link"]').focus();
+      expect(document.activeElement).to.equal(title);
+      title.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      expectContentsInert(false);
+      gnav.querySelector('a[href="#card-link"]').focus();
+      expect(document.activeElement).to.equal(gnav.querySelector('a[href="#card-link"]'));
+      title.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+      expectContentsInert(true);
+    });
+
+    it('restores card focusability when switching from mobile to desktop', () => {
+      forceMobile();
+      buildCard();
+      expectContentsInert(true);
+      isDesktopStub.restore();
+      forceDesktop();
+      isDesktop.dispatchEvent(new Event('change'));
+      expectContentsInert(false);
+    });
+
+    it('syncs closed card focusability when entering and leaving compact mode', async () => {
+      forceDesktop();
+      buildCard();
+      expectContentsInert(false);
+      gnav.classList.add('is-compact');
+      await Promise.resolve();
+      expectContentsInert(true);
+      gnav.classList.remove('is-compact');
+      await Promise.resolve();
+      expectContentsInert(false);
+    });
+
+    it('tabs past collapsed content in the localnav popup trap', () => {
+      forceMobile();
+      const title = buildCard();
+      const cleanupClicks = cleanup;
+      const cleanupKeyboard = initKeyboardNav(gnav);
+      cleanup = () => { cleanupClicks(); cleanupKeyboard(); };
+      gnav.querySelector('#feds-menu-wrapper').classList.add(IS_OPEN_CLASS);
+      gnav.querySelector('#mega-a').classList.add(IS_OPEN_CLASS);
+      title.focus();
+      title.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+      expect(document.activeElement).to.equal(gnav.querySelector('#after-card'));
+      gnav.querySelector('#after-card').dispatchEvent(new KeyboardEvent('keydown', {
+        key: 'Tab', shiftKey: true, bubbles: true,
+      }));
+      expect(document.activeElement).to.equal(title);
+    });
+  });
 
   it('returns a cleanup function', () => {
     gnav = document.createElement('nav');

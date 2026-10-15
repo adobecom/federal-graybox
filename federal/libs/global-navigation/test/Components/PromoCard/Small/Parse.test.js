@@ -1,15 +1,22 @@
 import { expect } from '@esm-bundle/chai';
 import { parsePromoCardSmall } from '../../../../src/Components/PromoCard/Small/Parse';
+import { promoCardSmall } from '../../../../src/Components/PromoCard/Small/Render';
+import { initMerchLinks } from '../../../../src/PostRendering/MerchLinks';
+import { setMerchDecorators } from '../../../../src/Utils/Utils';
 
 const MAS = (field) =>
   `https://mas.adobe.com/studio.html#content-type=merch-card&path=acom-cc&field=${field}`;
+const MAS_IMAGE = 'https://mas.adobe.com/studio.html#content-type=merch-card&page=content&path=acom-cc&query=fe3d78d4-14c6-41d3-8c81-dcc0171b7421&field=backgroundImage';
 const OST = 'https://www.adobe.com/tools/ost?osi=abc&type=price';
 
-const build = (contentHtml) => {
+const build = (
+  contentHtml,
+  backgroundHtml = '<picture><img src="/bg.png" alt="decorative"></picture>',
+) => {
   const container = document.createElement('div');
   container.innerHTML = `
     <div class="promo-card-small">
-      <div><picture><img src="/bg.png" alt="decorative"></picture></div>
+      <div>${backgroundHtml}</div>
       <div>${contentHtml}</div>
     </div>
   `;
@@ -17,6 +24,70 @@ const build = (contentHtml) => {
 };
 
 describe('parsePromoCardSmall — M@S / OST link preservation', () => {
+  afterEach(() => setMerchDecorators({}));
+
+  it('preserves a MAS background image field through rendering and late decoration', async () => {
+    const el = build(
+      '<p>Creative Cloud</p><p>Get all apps</p>',
+      `<div><a href="${MAS_IMAGE}">MAS background image</a></div>`,
+    );
+    const [{ card }, errors] = parsePromoCardSmall(el);
+    expect(errors).to.have.lengthOf(0);
+    expect(card.bgImageSrc).to.equal('');
+    expect(card.bgImageFieldHtml).to.contain('field=backgroundImage');
+
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = promoCardSmall({ type: 'PromoCardSmall', card });
+    document.body.append(mountpoint);
+    setMerchDecorators({
+      merch: (link) => {
+        const field = document.createElement('mas-field');
+        link.replaceWith(field);
+        return field;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+      const background = mountpoint.querySelector('.promo-card-small__bg');
+      const field = background.querySelector('mas-field');
+      expect(field).to.not.equal(null);
+      expect(mountpoint.querySelector('.promo-card-small__title').textContent.trim())
+        .to.equal('Creative Cloud');
+
+      field.innerHTML = '<picture data-role="mas-field-content"><img src="/mas-bg.png" alt="Sale"></picture>';
+      field.dispatchEvent(new CustomEvent('mas:ready', { bubbles: true }));
+      expect(background.querySelector('picture img').getAttribute('src'))
+        .to.equal('/mas-bg.png');
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
+  it('continues to use an authored picture in preference to a MAS field', () => {
+    const el = build(
+      '<p>Creative Cloud</p>',
+      `<picture><img src="/bg.png" alt="Static"></picture>
+       <a href="${MAS('backgroundImage')}">MAS background image</a>`,
+    );
+    const [{ card }, errors] = parsePromoCardSmall(el);
+    expect(errors).to.have.lengthOf(0);
+    expect(card.bgImageSrc).to.equal('/bg.png');
+    expect(card.bgImageFieldHtml).to.equal(null);
+    expect(promoCardSmall({ type: 'PromoCardSmall', card })).to.contain('src="/bg.png"');
+  });
+
+  it('reports a missing background when the field is not an image field', () => {
+    const el = build(
+      '<p>Creative Cloud</p>',
+      `<a href="${MAS('cardTitle')}">Not a background image</a>`,
+    );
+    const [{ card }, errors] = parsePromoCardSmall(el);
+    expect(card.bgImageFieldHtml).to.equal(null);
+    expect(errors.some((error) => error.message.includes('missing background image')))
+      .to.equal(true);
+  });
+
   it('preserves an inline M@S field title/description as live anchors', () => {
     const el = build(`
       <p><a href="${MAS('cardTitle')}">mas-field: CC → Title</a></p>

@@ -15,6 +15,7 @@ export type PromoCardSmallData = {
   ctaHtml: string | null;
   bgImageAlt: string;
   bgImageSrc: string;
+  bgImageFieldHtml: string | null;
 };
 
 const isCommerceHref = (href: string): boolean =>
@@ -51,15 +52,22 @@ export const parsePromoCardSmall = (
   // alongside the actual background image); the last is the bg image.
   const bgPictures = [...bgImageSection.querySelectorAll(':scope picture:not(:scope p picture)')];
   const bgImageElement: HTMLImageElement | null = bgPictures[bgPictures.length - 1]?.querySelector('img') ?? null;
-  if (bgImageElement === null)
+  const bgImageFieldLink = bgImageElement === null
+    ? [...bgImageSection.querySelectorAll<HTMLAnchorElement>('a[href]')]
+      .find((link) =>
+        isMasLink(link.href)
+        && new URLSearchParams(link.hash.slice(1)).get('field') === 'backgroundImage'
+      ) ?? null
+    : null;
+  if (bgImageElement === null && bgImageFieldLink === null)
     errors.add(new RecoverableError(ERRORS.MissingBackgroundImage));
 
   const bgImageAlt = bgImageElement?.getAttribute('alt') ?? "";
-  if (bgImageAlt === "")
+  if (bgImageAlt === "" && bgImageFieldLink === null)
     errors.add(new RecoverableError(ERRORS.MissingBackgroundImageAlt));
 
   const bgImageSrc = bgImageElement?.getAttribute('src') ?? "";
-  if (bgImageSrc === "")
+  if (bgImageSrc === "" && bgImageFieldLink === null)
     errors.add(new RecoverableError(ERRORS.MissingBackgroundImageSrc));
 
   if (contentSection === undefined)
@@ -121,6 +129,7 @@ export const parsePromoCardSmall = (
         ctaHtml,
         bgImageAlt,
         bgImageSrc,
+        bgImageFieldHtml: bgImageFieldLink?.outerHTML ?? null,
       },
     },
     [...errors],

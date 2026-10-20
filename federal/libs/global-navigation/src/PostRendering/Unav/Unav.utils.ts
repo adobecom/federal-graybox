@@ -31,6 +31,7 @@ const SIGN_IN_BUTTON_WIDTH_PX = 92;
  * Language to country code mapping for locale normalization
  */
 export const LANGMAP = {
+  ar: ['ara'],
   cs: ['cz'],
   da: ['dk'],
   de: ['at'],

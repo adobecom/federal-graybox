@@ -54,7 +54,7 @@ nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup .feds-popup-header {
 
      The product entry CTA renders outside .feds-gnav-items (direct child of
      <nav>) and is intentionally untouched. */
-  .global-navigation nav.localnav .feds-gnav-items > li:first-child > .feds-link {
+  .global-navigation nav.localnav:not(.localnav--without-mega-menu) .feds-gnav-items > li:first-child > .feds-link {
     display: none;
   }
 
@@ -338,7 +338,7 @@ nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup .feds-popup-header {
    is-compact: mirrors @media (max-width: 1023px) localnav mobile behaviour
    ========================================= */
 
-header.global-navigation.is-compact nav.localnav .feds-gnav-items > li:first-child > .feds-link {
+header.global-navigation.is-compact nav.localnav:not(.localnav--without-mega-menu) .feds-gnav-items > li:first-child > .feds-link {
   display: none;
 }
 

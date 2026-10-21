@@ -5,6 +5,7 @@ import { GnavCards, GnavColumn } from "../MegaMenu/Parse";
 export type SmallMenu = {
   type: "SmallMenu";
   title: string;
+  mobileTitle?: string;
   content: Parsed<GnavCards, RecoverableError>;
 };
 

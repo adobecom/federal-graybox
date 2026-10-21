@@ -1,5 +1,5 @@
 import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
-import { component } from "./Components/Component";
+import { Component, component } from "./Components/Component";
 import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
@@ -14,10 +14,11 @@ import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
+import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, getLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
+import { withLocalnavOverviewLabel } from "./Utils/Localnav";
 import { popup } from "./Components/MegaMenu/Render";
 import { smallMenuPopup } from "./Components/SmallMenu/Render";
 import { MegaMenuExtraData } from "./Components/MegaMenu/Parse";
@@ -87,17 +88,19 @@ const resolveBrandConciergeBlock = async (
   let brandConciergeBlock
     = mainNav.querySelector<HTMLElement>('.brand-concierge-global');
 
-  const brandConciergeLink = brandConciergeEnabled
-    ? (brandConciergeBlock ?? mainNav).querySelector<HTMLAnchorElement>(
+  // Detected regardless of metadata so a disabled BC link is still stripped
+  // from the nav below rather than rendered as a stray item.
+  const brandConciergeLink = (brandConciergeBlock ?? mainNav)
+    .querySelector<HTMLAnchorElement>(
       'a[href*="/fragments/"][href*="brand-concierge"]',
-    )
-    : null;
+    );
   // Element stripped from the nav so the block/link isn't parsed as a nav item.
   let brandConciergeWrapper: HTMLElement | null
     = brandConciergeBlock ?? brandConciergeLink;
 
-  // brandConciergeLink is only set when enabled, so no extra guard is needed.
-  if (brandConciergeLink) {
+  // Only resolve/populate the block's content when enabled; when disabled the
+  // link is still stripped below so it never renders.
+  if (brandConciergeEnabled && brandConciergeLink) {
     try {
       const fragmentBody = await fetchAndProcessPlainHTML(
         new URL(brandConciergeLink.href.split('#')[0]),
@@ -180,6 +183,17 @@ export const main = async (
     const anchors = [...body.querySelectorAll<HTMLAnchorElement>('a')];
     anchors.forEach((anchor) => input.appendHtmlToLink?.(anchor));
     await input.decorateBody?.(body);
+    // Localize before stage conversion so cross-domain prod links (helpx/
+    // business) carry a locale prefix convertStageLinks preserves; at render
+    // the host is already rewritten to *.stage and no longer matches
+    // prodDomains. Skipped when the host localized the body itself (e.g. the
+    // lingo decorateBody) to avoid re-processing regionalized links.
+    if (!input.decorateBody) {
+      const localize = getLocalizeLink();
+      anchors.forEach((a) => {
+        if (!a.href.includes('#_dnt')) a.href = localize(a.href);
+      });
+    }
     input.convertStageLinks?.({
       anchors,
       hostname: window.location.hostname,
@@ -319,18 +333,28 @@ export const renderGnavString = ({
   const firstMegaMenu = localnav
     ? menuComponents.find((c) => c.type === "MegaMenu") ?? null
     : null;
-  const localnavBarSibling = firstMegaMenu !== null
-    ? menuComponents[menuComponents.indexOf(firstMegaMenu) + 1] ?? null
-    : null;
-  // The sibling's label lives in a different field per component type:
+  // Like milo, a localnav without a mega menu has no hamburger: the bar is
+  // labeled by the first item, which stays in the list relabeled "Overview".
+  const isLocalnavWithoutMegaMenu = localnav && firstMegaMenu === null;
+  const localnavBarItem = ((): Component | null => {
+    if (firstMegaMenu !== null)
+      return menuComponents[menuComponents.indexOf(firstMegaMenu) + 1] ?? null;
+    return isLocalnavWithoutMegaMenu ? menuComponents[0] ?? null : null;
+  })();
+  // The bar item's label lives in a different field per component type:
   // MegaMenu/SmallMenu use `title`, Link/CTAs use `text`, Text uses `content`.
   const localnavBarLabel = ((): string => {
-    if (localnavBarSibling === null) return '';
-    if ('title' in localnavBarSibling) return localnavBarSibling.title;
-    if ('text' in localnavBarSibling) return localnavBarSibling.text;
-    if ('content' in localnavBarSibling) return localnavBarSibling.content;
+    if (localnavBarItem === null) return '';
+    if ('title' in localnavBarItem) return localnavBarItem.title;
+    if ('text' in localnavBarItem) return localnavBarItem.text;
+    if ('content' in localnavBarItem) return localnavBarItem.content;
     return '';
   })();
+  const renderMenuComponent = (c: Component, index: number): HTML => (
+    c === localnavBarItem
+      ? component(withLocalnavOverviewLabel(c, placeholders), index)
+      : component(c, index)
+  );
   // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
   // stays visible beside the hamburger, not only inside the drawer.
   const ctaComponents = components.filter(
@@ -342,7 +366,7 @@ export const renderGnavString = ({
     : '';
 
   return `
-<nav class="${localnav ? "localnav" : ""}">
+<nav class="${localnav ? "localnav" : ""}${isLocalnavWithoutMegaMenu ? " localnav--without-mega-menu" : ""}">
   <div class="feds-backdrop" aria-hidden="true"></div>
   <a href="#main-content" class="feds-skip-link"><span class="feds-skip-link-text">${placeholders.get('skip-to-main') ?? 'Skip to main content'}</span>${icons.chevronRightBold}</a>
   <ul role="presentation">
@@ -375,7 +399,7 @@ export const renderGnavString = ({
 
       const menuItemsHTMLList = ((): HTML[] => {
         const lis = menuComponents
-                       .map((c, index) => `<li>${component(c, index)}</li>`);
+                       .map((c, index) => `<li>${renderMenuComponent(c, index)}</li>`);
         const [first, ...rest] = lis;
         return localnav ? [first, '<li class="divider"></li>', ...rest] : lis;
       })();
@@ -383,7 +407,7 @@ export const renderGnavString = ({
 
       return `
         <li class="feds-brand-wrapper">
-          ${toggleButton}
+          ${isLocalnavWithoutMegaMenu ? '' : toggleButton}
           ${brandHTML}
         </li>
         <li

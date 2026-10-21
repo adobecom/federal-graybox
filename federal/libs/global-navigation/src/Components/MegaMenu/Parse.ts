@@ -16,6 +16,7 @@ import { Breadcrumbs } from "../Breadcrumbs/Parse";
 export type MegaMenu = {
   type: "MegaMenu";
   title: string;
+  mobileTitle?: string;
   content: Promise<Parsed<MegaMenuContent, RecoverableError>>;
 };
 

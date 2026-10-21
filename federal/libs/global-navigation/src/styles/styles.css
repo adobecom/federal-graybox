@@ -492,8 +492,6 @@ header.global-navigation.feds-header-scrolled nav::after {
   color: var(--s2a-color-gray-1000);
 }
 
-
-
 /* =========================================
    Nav Toggle (Hamburger)
    ========================================= */
@@ -865,6 +863,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   background-color: var(--s2a-color-button-background-primary-transparent-on-light-hover, rgba(0, 0, 0, 0.08));
 }
 
+ .global-navigation.is-compact .feds-menu-wrapper:has(.feds-localnav-bar) .feds-gnav-items > li > .feds-link {
+    white-space: normal;
+  }
+  
 /* =========================================
    Responsive: Desktop (min-width: 1024px)
    ========================================= */
@@ -986,9 +988,9 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     border-bottom: 2px var(--s2a-color-gray-1000) solid;
   }
 
-   header.global-navigation.is-compact .unav-comp-app-switcher-popover {
+  header.global-navigation.is-compact .unav-comp-app-switcher-popover {
     z-index: 4;
-   }
+  }
 }
 
 /* =========================================
@@ -1012,6 +1014,10 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     width: 100%;
     justify-content: space-between;
     text-align: left;
+  }
+
+  .global-navigation .feds-menu-wrapper:has(.feds-localnav-bar) .feds-gnav-items > li > .feds-link{
+    white-space: normal;
   }
 
   [dir="rtl"] .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {

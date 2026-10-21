@@ -6,6 +6,7 @@ import { MegaMenu, MegaMenuContent, MegaMenuExtraData } from "./Parse";
 
 export const megaMenu = ({
   title,
+  mobileTitle,
 }: MegaMenu, index = 0): HTML => `
   <button type="button"
           aria-controls="${sanitize(title)}"
@@ -14,7 +15,9 @@ export const megaMenu = ({
           class="mega-menu feds-link"
           ${getAnalyticsAttrs(`${title}-${index + 1}`, 'header|Open')}
   >
-    ${title}${icons.chevronDown}
+    ${mobileTitle === undefined
+      ? title
+      : `<span class="feds-link__desktop-text">${title}</span><span class="feds-link__mobile-text">${mobileTitle}</span>`}${icons.chevronDown}
   </button>
   <div id="${sanitize(title)}" class="feds-popup" daa-lh="${title}">
   </div>

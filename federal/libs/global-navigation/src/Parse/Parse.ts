@@ -59,6 +59,7 @@ export const parseNavigation = (
     : null;
   const components = parsedComponents.filter(
     (c) => c.type !== "ProductEntryCTA"
+      && (c.type !== "Text" || c.content.trim() !== "")
   );
   const localnav = getMetadata('localnav') === 'true';
   const darkFont = getMetadata('gnav-dark-font') === 'true';

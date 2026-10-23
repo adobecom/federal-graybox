@@ -91,6 +91,24 @@ export function replacePlaceholders(
   });
 };
 
+export function replacePlaceholdersInElement(
+  element: HTMLElement,
+  placeholders: Map<string, string>,
+): void {
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+  while (node) {
+    node.nodeValue = replacePlaceholders(node.nodeValue ?? '', placeholders);
+    node = walker.nextNode();
+  }
+
+  [element, ...element.querySelectorAll<HTMLElement>('*')].forEach((el) => {
+    [...el.attributes].forEach(({ name, value }) => {
+      el.setAttribute(name, replacePlaceholders(value, placeholders));
+    });
+  });
+}
+
 type PlaceholdersStateFunctions = [
   (p: Promise<Map<string, string>>) => void,
   () => Promise<Map<string, string>>,

@@ -26,18 +26,27 @@ import { parseProductList } from '../../src/Components/ProductList/Parse';
  */
 describe('MEP replace command feeding an inline product-card fragment', () => {
   before(() => {
-    setPlaceholders(Promise.resolve(new Map()));
+    setPlaceholders(Promise.resolve(new Map([['free-trials', 'Free trials']])));
     setLocalizeLink((link) => link);
 
     setPersonalizationConfig({
       commands: [
         { action: 'replace', selector: '.product-card-slot', content: '/fragments/photoshop-card' },
+        {
+          action: 'replace',
+          selector: '.mep-button-slot',
+          content: '<a class="con-button" daa-ll="{{free-trials}}">{{free-trials}}</a>',
+        },
       ],
       handleCommands: async (commands, rootEl) => {
-        commands.forEach(({ action, selector }) => {
+        commands.forEach(({ action, selector, content }) => {
           if (action !== 'replace') return;
           const target = rootEl.querySelector(selector);
           if (!target) return;
+          if (content.startsWith('<')) {
+            target.innerHTML = content;
+            return;
+          }
           const fragment = document.createElement('div');
           fragment.innerHTML = `
             <div>
@@ -84,6 +93,25 @@ describe('MEP replace command feeding an inline product-card fragment', () => {
       expect(result.categories[0].links).to.have.lengthOf(1);
       expect(result.categories[0].links[0].type).to.equal('ProductCardLink');
       expect(result.categories[0].links[0].title).to.equal('Adobe Photoshop');
+    } finally {
+      window.fetch = originalFetch;
+    }
+  });
+
+  it('resolves placeholders in MEP-inserted button text and attributes', async () => {
+    const originalFetch = window.fetch;
+    window.fetch = async () => ({
+      ok: true,
+      text: async () => '<div class="mep-button-slot"></div>',
+    });
+
+    try {
+      const source = new URL('https://main--federal--adobecom.aem.page/federal/site-redesign/gnav');
+      const body = await fetchAndProcessPlainHTML(source);
+      const button = body.querySelector('.mep-button-slot a');
+
+      expect(button.textContent).to.equal('Free trials');
+      expect(button.getAttribute('daa-ll')).to.equal('Free trials');
     } finally {
       window.fetch = originalFetch;
     }

@@ -2,12 +2,17 @@
    Panels Container
    ========================================= */
 
+.panels {
+  display: grid;
+  grid-template-rows: var(--feds-panel-grid-rows);
+  grid-template-columns: var(--feds-panel-grid-columns);
+}
+
 .global-navigation .panels {
   list-style: none;
   margin: 0 auto;
   padding: 36px clamp(var(--s2a-spacing-lg), 4vw, 56px) var(--s2a-spacing-40);
   gap: var(--s2a-spacing-xl);
-  width: min(1200px, 100%);
   box-sizing: border-box;
   color: var(--s2a-color-gray-1000);
   width: 100%;
@@ -259,9 +264,9 @@
 
 @media (width < 1024px) {
   .panels {
-    display: block !important;
-    grid-template-columns: none !important;
-    grid-template-rows: none !important;
+    display: block;
+    grid-template-columns: none;
+    grid-template-rows: none;
     padding: 22px var(--s2a-spacing-md) 28px;
   }
 
@@ -284,9 +289,9 @@
    ========================================= */
 
 header.global-navigation.is-compact .panels {
-  display: block !important;
-  grid-template-columns: none !important;
-  grid-template-rows: none !important;
+  display: block;
+  grid-template-columns: none;
+  grid-template-rows: none;
   padding: 22px var(--s2a-spacing-md) 28px;
 }
 

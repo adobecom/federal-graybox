@@ -42,7 +42,7 @@ export const popup = (
         </button>
   `
   const productLink = data.type === "ProductList" && data.links.length > 0
-    ? data.links[data.links.length - 1]
+    ? data.links.at(-1)
     : null;
   const popupHeader = `
     <div class="feds-popup-header">

@@ -6,9 +6,8 @@ import { localizeHref } from "../../Utils/Utils";
 
 export const panels = ({ layout, panels }: Panels): HTML => {
   const gridCSS = `
-    display: grid;
-    grid-template-rows: ${layout.gridRows.join(' ')};
-    grid-template-columns: ${layout.gridColumns.join(' ')};
+    --feds-panel-grid-rows: ${layout.gridRows.join(' ')};
+    --feds-panel-grid-columns: ${layout.gridColumns.join(' ')};
   `;
   return `
     <ul class="panels" style="${gridCSS}">

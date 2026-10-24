@@ -40,7 +40,7 @@
     "@nx/workspace": "^22.0.2",
     "@storybook/addon-a11y": "^10.2.0",
     "@storybook/addon-docs": "^10.2.0",
-    "@storybook/addon-vitest": "^10.2.0",
+    "@storybook/addon-vitest": "^10.6.2",
     "@storybook/react": "^10.2.0",
     "@storybook/web-components-vite": "^10.2.0",
     "@tpitre/story-ui": "^4.12.0",

@@ -41,6 +41,10 @@ export type Input = {
   unavEnabled: boolean;
   // Host IMS readiness; only UNAV waits, not the navigation shell.
   imsReady?: Promise<void>;
+  // Host-owned AUP SDK (e.g. Milo's, which also renders AUP dialogs and
+  // publishes readiness for merch CTAs). When provided, UNAV uses it and
+  // federal does not load or configure its own SDK instance.
+  fetchAUPSDKInstance?: () => Promise<unknown>;
   placeholders: Promise<Map<string, string>>;
   miloConfig?: MiloConfig;
   // Geo-validated market for the unav and drives the cart. String or a
@@ -154,6 +158,13 @@ const validateInput = (input: Input): IrrecoverableError | null => {
   return null;
 };
 
+// Non-function values from JS callers are ignored.
+const getHostFetchAUPSDKInstance = (
+  input: Input,
+): (() => Promise<unknown>) | undefined => (
+  typeof input.fetchAUPSDKInstance === 'function' ? input.fetchAUPSDKInstance : undefined
+);
+
 export const main = async (
   input: Input
 ): Promise<GlobalNavigation | IrrecoverableError> => {
@@ -212,7 +223,8 @@ export const main = async (
   // Kick off AUP SDK init in parallel with gnav fetch/parse/render and the
   // UniversalNav.js download when the host has no pending IMS initialization.
   // Otherwise loadUnav() starts AUP after the host's readiness promise settles.
-  if (unavEnabled && input.imsReady === undefined) preloadAupSdk();
+  if (unavEnabled && input.imsReady === undefined
+    && getHostFetchAUPSDKInstance(input) === undefined) preloadAupSdk();
 
   const initial = await getInitialHTML(input)
   if (initial instanceof IrrecoverableError) {
@@ -477,6 +489,7 @@ export const postRenderingTasks = async (
     const unav = await loadUnav(input.mountpoint, {
       countryCode: input.countryCode,
       imsReady: input.imsReady,
+      fetchAUPSDKInstance: getHostFetchAUPSDKInstance(input),
     });
     if (unav instanceof RecoverableError) {
       errors.add(unav);

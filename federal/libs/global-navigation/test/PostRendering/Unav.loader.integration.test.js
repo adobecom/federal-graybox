@@ -6,7 +6,7 @@ import {
   __resetAupSdkForTests,
 } from '../../src/PostRendering/Unav/Unav.loader';
 import { RecoverableError } from '../../src/Error/Error';
-import { setMiloConfig } from '../../src/Utils/Utils';
+import { setMiloConfig, getMiloConfig } from '../../src/Utils/Utils';
 
 /**
  * UNAV Loader Integration Tests
@@ -910,6 +910,72 @@ describe('UNAV Loader Integration Tests', () => {
       expect(getAupSdkInstance()).to.not.equal(undefined);
     });
 
+    describe('host-provided AUP SDK', () => {
+      const aupScriptUrl = /shared-components\..*\.adobe\.com\/aup-sdk\//;
+      const aupScripts = () => appendedElements.filter(
+        (el) => el.tagName === 'SCRIPT' && aupScriptUrl.test(el.src)
+      );
+      let hostInstance;
+      let fetchAUPSDKInstance;
+      let capturedConfig;
+
+      beforeEach(() => {
+        hostInstance = { host: true };
+        fetchAUPSDKInstance = () => Promise.resolve(hostInstance);
+        window.UniversalNav = (config) => {
+          capturedConfig = config;
+          return Promise.resolve();
+        };
+      });
+
+      afterEach(() => {
+        capturedConfig = undefined;
+      });
+
+      it('should hand the host SDK to UNAV without loading its own', async () => {
+        const result = await loadUnav(navElement, {
+          imsReady: Promise.resolve(),
+          fetchAUPSDKInstance,
+        });
+
+        expect(result).to.not.be.instanceOf(RecoverableError);
+        expect(capturedConfig.fetchAUPSDKInstance).to.equal(fetchAUPSDKInstance);
+        expect(await capturedConfig.fetchAUPSDKInstance()).to.equal(hostInstance);
+        expect(getAupSdkInstance()).to.equal(undefined);
+        expect(aupScripts()).to.have.length(0);
+      });
+
+      it('should not expose the host SDK to signed-out UNAV', async () => {
+        window.adobeIMS.isSignedInUser = () => false;
+        await loadUnav(navElement, { imsReady: Promise.resolve(), fetchAUPSDKInstance });
+
+        expect(capturedConfig.fetchAUPSDKInstance).to.equal(undefined);
+        expect(getAupSdkInstance()).to.equal(undefined);
+        expect(aupScripts()).to.have.length(0);
+      });
+
+      it('should use the host SDK after late IMS readiness', async () => {
+        let resolveInitialized;
+        const initialized = new Promise((resolve) => { resolveInitialized = resolve; });
+        window.UniversalNav = (config) => {
+          capturedConfig = config;
+          resolveInitialized();
+          return Promise.resolve();
+        };
+        await loadUnav(navElement, {
+          imsReady: Promise.reject(new Error('IMS timeout')),
+          fetchAUPSDKInstance,
+        });
+        window.adobeIMS.initialized = true;
+        window.dispatchEvent(new CustomEvent('onImsLibInstance'));
+        await initialized;
+
+        expect(capturedConfig.fetchAUPSDKInstance).to.equal(fetchAUPSDKInstance);
+        expect(getAupSdkInstance()).to.equal(undefined);
+        expect(aupScripts()).to.have.length(0);
+      });
+    });
+
     it('should report IMS failures without initializing UNAV or AUP', async () => {
       const result = await loadUnav(navElement, {
         imsReady: Promise.reject(new Error('Missing IMS Client ID')),
@@ -1031,6 +1097,69 @@ describe('UNAV Loader Integration Tests', () => {
           (el) => el.tagName === 'SCRIPT' && aupScriptUrl.test(el.src)
         )
       ).to.equal(true);
+    });
+
+    [
+      { env: 'stage', url: 'https://shared-components.stage.adobe.com/aup-sdk/stable/main.js' },
+      { env: 'prod', url: 'https://shared-components.adobe.com/aup-sdk/stable/main.js' },
+    ].forEach(({ env, url }) => {
+      it(`should load the ${env} SDK from the stable channel`, () => {
+        // MiloConfig can only be set once per page, so switch its env in place.
+        const config = getMiloConfig();
+        const previousEnv = config.env.name;
+        config.env.name = env;
+        try {
+          preloadAupSdk();
+        } finally {
+          config.env.name = previousEnv;
+        }
+
+        const sources = appendedElements
+          .filter((el) => el.tagName === 'SCRIPT' && el.src.includes('/aup-sdk/'))
+          .map((el) => el.src);
+        expect(sources).to.deep.equal([url]);
+      });
+    });
+
+    describe('existing host instance', () => {
+      const aupScriptUrl = /shared-components\..*\.adobe\.com\/aup-sdk\//;
+      let hostInstance;
+      let updateConfigCalls;
+
+      beforeEach(() => {
+        updateConfigCalls = 0;
+        hostInstance = {
+          updateConfig: () => {
+            updateConfigCalls += 1;
+            return Promise.resolve();
+          },
+        };
+        window.AUPSDK = {
+          preloadSDK: () => Promise.reject(new Error('federal SDK must not be created')),
+        };
+      });
+
+      it('should reuse window.aupsdk without loading or reconfiguring the SDK', async () => {
+        window.aupsdk = hostInstance;
+        preloadAupSdk();
+
+        expect(await getAupSdkInstance()).to.equal(hostInstance);
+        expect(updateConfigCalls).to.equal(0);
+        expect(
+          appendedElements.some(
+            (el) => el.tagName === 'SCRIPT' && aupScriptUrl.test(el.src)
+          )
+        ).to.equal(false);
+      });
+
+      it('should keep a host instance created while the SDK bundle was loading', async () => {
+        preloadAupSdk();
+        window.aupsdk = hostInstance;
+
+        expect(await getAupSdkInstance()).to.equal(hostInstance);
+        expect(window.aupsdk).to.equal(hostInstance);
+        expect(updateConfigCalls).to.equal(0);
+      });
     });
   });
 });

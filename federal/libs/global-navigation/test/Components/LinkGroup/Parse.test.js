@@ -4,6 +4,31 @@ import { IrrecoverableError, RecoverableError } from '../../../src/Error/Error';
 
 describe('ProductCard Parse', () => {
   describe('parseProductCardLink', () => {
+    for (const href of [
+      'https://www.adobe.com/tools/ost?type=price&offer=creative-cloud',
+      'https://mas.adobe.com/studio.html#content=offer&field=price',
+    ]) {
+      it(`preserves the commerce URL and markup in a non-anchor placeholder: ${href}`, () => {
+        const container = document.createElement('div');
+        container.innerHTML = `
+          <div class="product-card"><div><div></div><div>
+            <p><a href="https://www.adobe.com/products.html">All products</a></p>
+            <p>From <a href="${href}"><strong>US$9.99</strong></a> per month</p>
+          </div></div></div>
+        `;
+        const [result, errors] = parseProductCard(container.querySelector('.product-card'));
+        const subtitle = document.createElement('div');
+        subtitle.innerHTML = result.subtitle;
+        const placeholder = subtitle.querySelector('.feds-commerce-placeholder');
+        expect(placeholder.tagName).to.equal('SPAN');
+        expect(placeholder.getAttribute('data-commerce-href')).to.equal(href);
+        expect(placeholder.innerHTML).to.equal('<strong>US$9.99</strong>');
+        expect(subtitle.querySelector('a')).to.equal(null);
+        expect(subtitle.textContent).to.equal('From US$9.99 per month');
+        expect(errors).to.have.lengthOf(0);
+      });
+    }
+
     it('should parse a valid link group with icon', () => {
       const html = `
         <div class="product-card">

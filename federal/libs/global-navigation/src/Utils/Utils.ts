@@ -1,6 +1,10 @@
 import { IrrecoverableError } from "../Error/Error";
 import { lanaLog } from "./Log";
-import { getPlaceholders, replacePlaceholders } from "./Placeholders";
+import {
+  getPlaceholders,
+  replacePlaceholders,
+  replacePlaceholdersInElement,
+} from "./Placeholders";
 import { IS_OPEN_CLASS, closePopup } from "../PostRendering/PopupWiring";
 
 export const isDesktop = window.matchMedia('(min-width: 1024px)');
@@ -408,6 +412,7 @@ export const fetchAndProcessPlainHTML = async (
     try {
       const { handleCommands, commands } = getPersonalizationConfig();
       await handleCommands(commands, body, true, true);
+      replacePlaceholdersInElement(body, resolvedPlaceholders);
       // Milo-provided async link decoration (lingo regionalization + QI +
       // mep-lingo prefix). Runs pre-parse on the raw body so localizeLinkAsync
       // resolves before parseNavigation reads hrefs. Non-fatal — shares this

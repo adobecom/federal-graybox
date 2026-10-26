@@ -1,5 +1,9 @@
 import { expect } from '@esm-bundle/chai';
-import { replacePlaceholders, combineWithFederalPlaceholders } from '../../src/Utils/Placeholders';
+import {
+  replacePlaceholders,
+  replacePlaceholdersInElement,
+  combineWithFederalPlaceholders,
+} from '../../src/Utils/Placeholders';
 import { setMiloConfig } from '../../src/Utils/Utils';
 
 /**
@@ -30,6 +34,21 @@ describe('Geo-IP placeholders on the gnav (federal consumption)', () => {
     it('falls back to the bare key when the geo-ip key is absent', () => {
       expect(replacePlaceholders('{{missing-geo-ip}}', new Map()))
         .to.equal('missing-geo-ip');
+    });
+  });
+
+  describe('replacePlaceholdersInElement', () => {
+    it('resolves placeholders in text and attributes without parsing replacement HTML', () => {
+      const element = document.createElement('div');
+      element.innerHTML = '<a daa-ll="{{free-trials}}">{{free-trials}}</a>';
+      const value = '<strong>Free trials</strong>';
+
+      replacePlaceholdersInElement(element, new Map([['free-trials', value]]));
+
+      const anchor = element.querySelector('a');
+      expect(anchor.textContent).to.equal(value);
+      expect(anchor.getAttribute('daa-ll')).to.equal(value);
+      expect(anchor.querySelector('strong')).to.equal(null);
     });
   });
 

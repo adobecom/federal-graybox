@@ -30,12 +30,6 @@ import {
 import { getUnavComponents } from './Unav.config';
 
 // ============================================================================
-// Constants
-// ============================================================================
-
-const AUP_SDK_VERSION = '1.0.756';
-
-// ============================================================================
 // AUP SDK eager initialization
 // ============================================================================
 
@@ -54,11 +48,19 @@ let aupSdkPromise: Promise<unknown> | undefined;
  * promise) when prerequisites aren't met — signed-out, MiloConfig not ready,
  * or ARP disabled — so a later call can retry. The defensive call inside
  * loadUnav() covers the late-IMS case.
+ *
+ * An existing `window.aupsdk` belongs to the host: it is reused as-is,
+ * without loading another SDK bundle or overwriting its configuration.
  */
 export const preloadAupSdk = (): void => {
   if (aupSdkPromise) return;
 
   if (window.adobeIMS?.isSignedInUser() !== true) return;
+
+  if (window.aupsdk) {
+    aupSdkPromise = Promise.resolve(window.aupsdk);
+    return;
+  }
 
   let config: MiloConfig;
   try {
@@ -78,11 +80,13 @@ export const preloadAupSdk = (): void => {
   : `shared-components.${environment}.adobe.com`;
 
   aupSdkPromise = loadScript(
-    `https://${aupHost}/aup-sdk/${AUP_SDK_VERSION}/main.js`,
+    `https://${aupHost}/aup-sdk/stable/main.js`,
     undefined,
     { mode: 'async' },
   ).then(async (): Promise<unknown> => {
-    window.aupsdk = window.aupsdk ?? await window.AUPSDK?.preloadSDK('adobe-com-stable', {
+    // The host may have created its instance while this bundle was loading.
+    if (window.aupsdk) return window.aupsdk;
+    window.aupsdk = await window.AUPSDK?.preloadSDK('adobe-com-stable', {
       appId: 'adobe_com',
       apiKey: clientId,
       getAccessToken: (): Promise<string | undefined> =>
@@ -184,6 +188,8 @@ const setProfileSignUpRequired = (
  *   `imsReady` lets the host defer authentication-dependent initialization
  *   until IMS has restored the session. An IMS timeout lets GNav initialization
  *   finish and resumes UNAV separately on the late `onImsLibInstance` event.
+ *   `fetchAUPSDKInstance` lets the host own the AUP SDK; when provided it is
+ *   handed to UNAV as-is and federal skips its own SDK preload.
  * @returns Promise resolving to Unav object or RecoverableError
  */
 export const loadUnav = async (
@@ -191,6 +197,7 @@ export const loadUnav = async (
   options?: {
     countryCode?: string | Promise<string | undefined>;
     imsReady?: Promise<void>;
+    fetchAUPSDKInstance?: () => Promise<unknown>;
   }
 ): Promise<Unav | RecoverableError> => {
   if (!(nav.querySelector('.feds-utilities') instanceof HTMLElement)) {
@@ -232,7 +239,10 @@ export const loadUnav = async (
 
 const initializeUnav = async (
   nav: HTMLElement,
-  options?: { countryCode?: string | Promise<string | undefined> }
+  options?: {
+    countryCode?: string | Promise<string | undefined>;
+    fetchAUPSDKInstance?: () => Promise<unknown>;
+  }
 ): Promise<Unav | RecoverableError> => {
   try {
     // ========================================================================
@@ -324,7 +334,9 @@ const initializeUnav = async (
 
     // Start AUP after IMS readiness, including deferred timeout recovery.
     // Called before Promise.all so AUP and UNAV scripts download in parallel.
-    preloadAupSdk();
+    // Skipped when the host owns the SDK (see fetchAUPSDKInstance below).
+    const hostFetchAUPSDKInstance = options?.fetchAUPSDKInstance;
+    if (hostFetchAUPSDKInstance === undefined) preloadAupSdk();
 
     // Load JS and CSS in parallel. AUP SDK was already kicked off above
     // (or from main() at IMS-ready time); see preloadAupSdk above.
@@ -449,13 +461,14 @@ const initializeUnav = async (
             },
           }),
           ...(!currentSignedOut && {
-            fetchAUPSDKInstance: (): Promise<unknown> => {
-              // If the user was signed-out at init time, preloadAupSdk() was a
-              // no-op. Trigger it now so the AUP SDK is available for the
-              // signed-in reload initiated by an external login system.
-              preloadAupSdk();
-              return getAupSdkInstance() ?? Promise.resolve(undefined);
-            },
+            fetchAUPSDKInstance: hostFetchAUPSDKInstance
+              ?? ((): Promise<unknown> => {
+                // If the user was signed-out at init time, preloadAupSdk() was
+                // a no-op. Trigger it now so the AUP SDK is available for the
+                // signed-in reload initiated by an external login system.
+                preloadAupSdk();
+                return getAupSdkInstance() ?? Promise.resolve(undefined);
+              }),
           }),
         }),
       };

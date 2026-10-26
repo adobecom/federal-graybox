@@ -68,6 +68,27 @@ One of the maintainers will look at the pull request within one week. Feedback o
 
 # Release Management
 
+## Stage to Main release PR
+
+In GitHub Actions, select **Create Stage to Main PR** and choose **Run workflow**.
+The workflow creates a PR from `stage` to `main` titled `[Release] Stage to Main`,
+or refreshes the title and description of an existing open PR for those branches.
+The description lists links to merged PRs targeting `stage` whose merge commits
+are in the `main...stage` comparison, sorted by PR number without duplicates.
+If stage has no commits ahead of main, the workflow skips creating a PR.
+Direct commits have no PR link; if no merged PRs are found, the workflow warns
+and includes an explanatory description so the release diff can be reviewed.
+The workflow does not merge the release PR.
+
+The workflow must be present on the repository's default branch for manual runs.
+Under **Settings > Actions > General > Workflow permissions**, enable
+**Allow GitHub Actions to create and approve pull requests**. Repository or
+organization policies must also permit the workflow's `pull-requests: write`
+permission. PRs created with `GITHUB_TOKEN` do not trigger other PR workflows;
+required checks may need a separate trusted trigger before merging.
+
+## Package releases
+
 The project's committers will release to the [Adobe organization on npmjs.org](https://www.npmjs.com/org/adobe).
 Please contact the [Adobe Open Source Advisory Board](https://git.corp.adobe.com/OpenSourceAdvisoryBoard/discuss/issues) to get access to the npmjs organization.
 

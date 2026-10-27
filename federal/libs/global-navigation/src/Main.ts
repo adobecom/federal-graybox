@@ -237,6 +237,15 @@ export const main = async (
     throw mainNav;
   }
 
+  const breadcrumbAnchors = [
+    ...document.querySelectorAll<HTMLAnchorElement>('.breadcrumbs ul > li > a')
+  ];
+  input.convertStageLinks?.({
+    anchors: breadcrumbAnchors,
+    hostname: window.location.hostname,
+    href: window.location.href,
+  });
+
   const brandConciergeBlock = await resolveBrandConciergeBlock(mainNav);
 
   const gnavData = parseNavigation(

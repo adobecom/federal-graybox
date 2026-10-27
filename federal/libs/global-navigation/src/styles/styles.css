@@ -976,16 +976,12 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
   }
 
   header.global-navigation:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
-    border-bottom: 2px var(--s2a-color-gray-25) solid;
+    box-shadow: inset 0 -2px 0 var(--s2a-color-gray-25);
   }
-  header.global-navigation:not(.is-compact):has(.feds-popup.is-open:not(.small-menu)) nav.localnav ul.feds-gnav-items > li.active-element {
-    border-bottom: 2px var(--s2a-color-gray-1000) solid;
-  }
-  header.global-navigation.feds-header-scrolled:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
-    border-bottom: 2px var(--s2a-color-gray-1000) solid;
-  }
+  header.global-navigation:not(.is-compact):has(.feds-popup.is-open:not(.small-menu)) nav.localnav ul.feds-gnav-items > li.active-element,
+  header.global-navigation.feds-header-scrolled:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element,
   header.global-navigation.dark-font:not(.is-compact) nav.localnav ul.feds-gnav-items > li.active-element {
-    border-bottom: 2px var(--s2a-color-gray-1000) solid;
+    box-shadow: inset 0 -2px 0 var(--s2a-color-gray-1000);
   }
 
   header.global-navigation.is-compact .unav-comp-app-switcher-popover {

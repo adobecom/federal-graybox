@@ -31,9 +31,12 @@ declare global {
     adobeIMS?: {
       initialized?: boolean;
       signIn: (context: object) => void;
+      signOut: (options?: { redirect_uri?: string }) => void;
       isSignedInUser: () => boolean;
       getAccessToken: () => { token?: string } | null;
       getProfile: () => Promise<unknown>;
+      getOrganizations: () => Promise<unknown>;
+      initialized?: boolean;
     };
     
     /** IMS Client Configuration */

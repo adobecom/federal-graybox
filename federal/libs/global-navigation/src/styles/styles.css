@@ -36,6 +36,7 @@
 @import "../Components/CountdownTimer/cdt.css";
 @import "../Components/CTA/cta.css";
 @import "../PostRendering/Unav/unav.css";
+@import "../PostRendering/Profile/profile.css";
 
 .global-navigation ul.feds-gnav-items > li > [data-feds-merch-pending] {
   display: none !important;

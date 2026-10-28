@@ -70,13 +70,13 @@ export const split = <T>(
 ) => (arr: T[]): T[][] => {
   const splitArrays = [];
   let currSubArray = [];
-  for (let i = 0; i < arr.length; i++) {
-    if (predicate(arr[i])) {
+  for (const item of arr) {
+    if (predicate(item)) {
       splitArrays.push(currSubArray);
       currSubArray = [];
       continue;
     }
-    currSubArray.push(arr[i]);
+    currSubArray.push(item);
   }
   splitArrays.push(currSubArray);
   return splitArrays;
@@ -86,9 +86,7 @@ export const zip = <T, R>(
   xs: T[],
   ys: R[]
 ): Array<[T, R]> => {
-  const len = xs.length < ys.length
-            ? xs.length
-            : ys.length;
+  const len = Math.min(xs.length, ys.length);
   const result = new Array(len) as Array<[T, R]>;
   for (let i = 0; i < len; i = i + 1) {
     result[i] = [xs[i], ys[i]];
@@ -556,7 +554,7 @@ export const inlineNestedFragments = async <T extends Element>(
           } catch {
             return;
           }
-        }, [] as Array<[HTMLAnchorElement, URL]>)
+        })
       await Promise.all(inlineLinks);
       return currentElem
     } catch (error) {
@@ -582,8 +580,8 @@ export const sanitize = (str: string): string => {
     .trim()
     // Replace any run of non-letter/number characters with a single hyphen.
     .replace(/[^\p{L}\p{N}\p{M}]+/gu, '-')
-    // Remove leading/trailing hyphens.
-    .replace(/^-+|-+$/g, '');
+    // Normalization above leaves at most one hyphen at either edge.
+    .replace(/^-|-$/g, '');
 
   if (sanitized === '') return 'id';
 
@@ -662,6 +660,8 @@ type LoadLinkOptions<T> = {
   fetchpriority?: string;
 }
 
+const DEFAULT_LINK_OPTIONS = { rel: 'stylesheet' };
+
 /**
  * Dynamically loads a link element into the document head.
  * Prevents duplicate loading by checking if a link
@@ -688,7 +688,7 @@ export function loadLink<T>(
     crossorigin,
     rel,
     fetchpriority,
-  }: LoadLinkOptions<T> = { rel: 'stylesheet' }
+  }: LoadLinkOptions<T> = DEFAULT_LINK_OPTIONS
 ): HTMLLinkElement {
   // Check if link already exists to prevent duplicates
   const existingLink = document.head.querySelector(`link[href="${href}"]`);
@@ -843,7 +843,7 @@ export function getMetadata(
 ): string | null {
   // Use 'property' for namespaced metadata (e.g., Open Graph), 'name'
   // for standard metadata
-  const attr = name && name.includes(':') ? 'property' : 'name';
+  const attr = name?.includes(':') ? 'property' : 'name';
   const meta = doc.head.querySelector(`meta[${attr}="${name}"]`);
   return meta instanceof HTMLMetaElement ? meta.content : null;
 }
@@ -913,62 +913,42 @@ export type MiloConfig = {
   signInContext?: object;          // IMS sign-in context for UNAV
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  value !== null && typeof value === 'object';
+
+const isValidUnavProfile = (profile: unknown): boolean => {
+  if (profile === undefined) return true;
+  if (!isRecord(profile)) return false;
+
+  return (profile.signInCtaStyle === undefined
+    || profile.signInCtaStyle === 'primary'
+    || profile.signInCtaStyle === 'secondary')
+    && (profile.messageEventListener === undefined
+      || typeof profile.messageEventListener === 'function');
+};
+
+const isValidUnavConfig = (unav: unknown): boolean =>
+  unav === undefined
+  || (isRecord(unav) && isValidUnavProfile(unav.profile));
+
+const isValidJarvisConfig = (jarvis: unknown): boolean =>
+  jarvis === undefined
+  || (isRecord(jarvis) && typeof jarvis.id === 'string');
+
 /**
  * Validates MiloConfig structure at runtime
  * @param config - Configuration object to validate
  * @returns true if valid, false otherwise
  */
 const isValidMiloConfig = (config: unknown): config is MiloConfig => {
-  const cfg = config as MiloConfig;
+  if (!isRecord(config)) return false;
 
-  const invalid = (x: unknown): boolean => x === null || x === undefined || typeof x !== 'object';
-
-  if (invalid(cfg)) return false;
-
-  // Validate locale structure
-  if (invalid(cfg.locale)) return false;
-  const locale = cfg.locale as Record<string, unknown>;
-  if (typeof locale.prefix !== 'string') return false;
-
-  // Validate env structure
-  if (invalid(cfg.env)) return false;
-  const env = cfg.env as Record<string, unknown>;
-  if (typeof env.name !== 'string') return false;
-
-  // Validate optional unav structure
-  if (cfg.unav !== undefined) {
-    if (typeof cfg.unav !== 'object' || cfg.unav === null) return false;
-    const unav = cfg.unav as Record<string, unknown>;
-
-    // Validate unav.profile if present
-    if (unav.profile !== undefined) {
-      if (typeof unav.profile !== 'object' || unav.profile === null) return false;
-      const profile = unav.profile as Record<string, unknown>;
-
-      // Validate signInCtaStyle if present
-      if (profile.signInCtaStyle !== undefined) {
-        if (profile.signInCtaStyle !== 'primary' && profile.signInCtaStyle !== 'secondary') {
-          return false;
-        }
-      }
-
-      // Validate messageEventListener if present
-      if (profile.messageEventListener !== undefined && typeof profile.messageEventListener !== 'function') {
-        return false;
-      }
-    }
-  }
-
-  // Validate optional jarvis structure
-  if (cfg.jarvis !== undefined) {
-    if (typeof cfg.jarvis !== 'object' || cfg.jarvis === null) return false;
-    const jarvis = cfg.jarvis as Record<string, unknown>;
-
-    // id is required if jarvis object exists
-    if (typeof jarvis.id !== 'string') return false;
-  }
-
-  return true;
+  return isRecord(config.locale)
+    && typeof config.locale.prefix === 'string'
+    && isRecord(config.env)
+    && typeof config.env.name === 'string'
+    && isValidUnavConfig(config.unav)
+    && isValidJarvisConfig(config.jarvis);
 };
 
 /**

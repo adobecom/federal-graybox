@@ -542,6 +542,13 @@ export const postRenderingTasks = async (
     return 0;
   };
 
+  const fedsWindow = window as unknown as {
+    feds?: { nav?: Partial<Pick<GlobalNavigation, "getGnavHeight">> };
+  };
+  fedsWindow.feds ??= {};
+  fedsWindow.feds.nav ??= {};
+  fedsWindow.feds.nav.getGnavHeight = getGnavHeight;
+
   return {
     closeEverything: () => closePopovers(input.mountpoint),
     reloadUnav,

@@ -16,6 +16,12 @@ import { Lana } from '../Utils/Log';
 
 declare global {
   interface Window {
+    feds?: {
+      nav?: {
+        getGnavHeight?: () => number;
+      };
+    };
+
     /** User Profile Service */
     adobeProfile?: {
       getUserProfile: () => Promise<unknown>;

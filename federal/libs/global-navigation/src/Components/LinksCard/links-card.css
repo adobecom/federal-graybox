@@ -207,14 +207,7 @@ nav.localnav .feds-popup:not(.small-menu) .links-card {
     min-width: 0;
   }
 
-  /* In the narrow two-column layout, let long labels wrap to the next line
-     inside their column instead of overflowing into the adjacent one. The
-     min-width: 0 releases the default flex min-content floor so the link can
-     shrink below its single-line width. */
-  header.global-navigation:not(.is-compact) .feds-popup .links-card .links-card-links:is(
-      :not(:has(> li.links-card-links__item--has-description)):has(> li:nth-child(7)),
-      :has(> li.links-card-links__item--has-description):has(> li:nth-child(10))
-    ) .feds-link {
+  header.global-navigation:not(.is-compact) .feds-popup .links-card .feds-link {
     min-width: 0;
     white-space: normal;
     overflow-wrap: anywhere;

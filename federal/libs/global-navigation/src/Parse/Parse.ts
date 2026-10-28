@@ -14,6 +14,7 @@ export type GlobalNavigationData = {
   darkFont: boolean;
   errors: Array<RecoverableError>;
   unavEnabled: boolean;
+  profileEnabled: boolean;
   placeholders: Map<string, string>;
   brandConciergeEnabled: boolean;
   notificationsEnabled: boolean;
@@ -22,6 +23,7 @@ export type GlobalNavigationData = {
 export const parseNavigation = (
   mainNav: HTMLElement,
   unavEnabled: boolean,
+  profileEnabled: boolean,
   placeholders: Map<string, string> = new Map(),
   promoBarEl: Promise<HTMLElement | null> = Promise.resolve(null),
 ): GlobalNavigationData | IrrecoverableError => {
@@ -79,6 +81,7 @@ export const parseNavigation = (
     darkFont,
     errors,
     unavEnabled,
+    profileEnabled,
     placeholders,
     brandConciergeEnabled,
     notificationsEnabled,

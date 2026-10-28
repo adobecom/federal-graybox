@@ -99,3 +99,84 @@ describe('PromoBar regression', () => {
     expect(parseHtml(html).querySelectorAll('a, img, picture, h2')).to.have.lengthOf(0);
   });
 });
+
+describe('PromoBar M@S field copy', () => {
+  const MAS_FIELD = (field) =>
+    `https://mas.adobe.com/studio.html#content-type=merch-card&page=content&path=acom-cc&query=201bf3df&field=${field}`;
+  const OFFERS = 'https://www.adobe.com/products/special-offers.html?promoid=MH16SFKV';
+
+  it('renders a plain (unbolded) M@S field link as the promo copy', () => {
+    const [data] = parsePromoBar(createPromo([`
+      <p><a href="${MAS_FIELD('cardTitle')}">mas-field &#8594; Title</a></p>
+      <p><strong><a href="${OFFERS}">See offers</a></strong></p>
+    `]));
+    const { content } = data.slots[0];
+    expect(content.headline).to.contain('field=cardTitle');
+    const output = parseHtml(promoBar(data));
+    expect(output.querySelectorAll('a[href*="mas.adobe.com"]')).to.have.lengthOf(1);
+    expect(content.primaryCta.text).to.equal('See offers');
+  });
+
+  it('keeps the CTA when the copy is a plain field link', () => {
+    const [data] = parsePromoBar(createPromo([`
+      <p><a href="${MAS_FIELD('cardTitle')}">mas-field &#8594; Title</a></p>
+      <p><strong><a href="${OFFERS}">See offers</a></strong></p>
+    `]));
+    const output = parseHtml(promoBar(data));
+    expect(output.textContent).to.contain('See offers');
+  });
+
+  it('still renders an inline bold headline mixed with M@S fields', () => {
+    const [data] = parsePromoBar(createPromo([`
+      <p>
+        <a href="${MAS_FIELD('description')}">mas-field &#8594; Description</a>
+        <strong>Save</strong>
+        <a href="${MAS_FIELD('promoText')}">mas-field &#8594; Promo Text</a>
+      </p>
+      <p><strong><a href="${OFFERS}">See offers</a></strong></p>
+    `]));
+    const { content } = data.slots[0];
+    expect(content.headline).to.contain('Save');
+    const output = parseHtml(promoBar(data));
+    expect(output.querySelectorAll('a[href*="mas.adobe.com"]')).to.have.lengthOf(2);
+    expect(content.primaryCta.text).to.equal('See offers');
+  });
+
+  it('does not treat a background-image field as copy', () => {
+    const [data] = parsePromoBar(createPromo([`
+      <p><a href="${MAS_FIELD('backgroundImage')}">mas-field &#8594; Background</a></p>
+      <p><strong><a href="${OFFERS}">See offers</a></strong></p>
+    `]));
+    expect(data.slots[0].content.headline).to.equal(null);
+    const output = parseHtml(promoBar(data));
+    expect(output.querySelectorAll('a[href*="mas.adobe.com"]')).to.have.lengthOf(0);
+  });
+
+  ['maximized', 'maximized-release'].forEach((variant) => {
+    it(`maps a title field to headline and a description field to body (${variant})`, () => {
+      const [data] = parsePromoBar(createPromo([`
+        <p><a href="${MAS_FIELD('cardTitle')}">mas-field &#8594; Title</a></p>
+        <p><a href="${MAS_FIELD('description')}">mas-field &#8594; Description</a></p>
+        <p><strong><a href="${OFFERS}">See offers</a></strong></p>
+      `], variant));
+      const { content } = data.slots[0];
+      expect(content.headline).to.contain('field=cardTitle');
+      expect(content.body).to.contain('field=description');
+      const output = parseHtml(promoBar(data));
+      expect(output.querySelectorAll('a[href*="mas.adobe.com"]')).to.have.lengthOf(2);
+      expect(content.primaryCta.text).to.equal('See offers');
+    });
+  });
+
+  it('prefers a bold headline over an earlier plain field paragraph', () => {
+    const [data] = parsePromoBar(createPromo([`
+      <p><a href="${MAS_FIELD('description')}">mas-field &#8594; Description</a></p>
+      <p><strong>Big Sale</strong></p>
+      <p><strong><a href="${OFFERS}">See offers</a></strong></p>
+    `], 'maximized'));
+    const { content } = data.slots[0];
+    expect(content.headline).to.contain('Big Sale');
+    expect(content.headline).not.to.contain('field=description');
+    expect(content.primaryCta.text).to.equal('See offers');
+  });
+});

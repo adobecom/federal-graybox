@@ -1,0 +1,263 @@
+/**
+ * Legacy (non-UniversalNav) profile styles.
+ *
+ * Ported from milo's global-navigation.css / features/profile/dropdown.css and
+ * retokenized to federal's Spectrum-2 (`--s2a-*`) design tokens (milo's
+ * `--feds-*` vars don't exist in this repo). The top-level "Sign in" button is
+ * styled to match the UNAV signed-out sign-in CTA — see the
+ * `.profile-signed-out button` overrides in styles.css.
+ */
+
+:root {
+  --feds-color-profile-heading: var(--s2a-color-gray-500);
+  --feds-color-profile: var(--s2a-color-gray-800);
+  --feds-color-profile--emphasis: var(--s2a-color-gray-1000);
+  --feds-border-profile: var(--s2a-border-width-sm) solid var(--s2a-color-gray-200);
+}
+
+.feds-profile-new {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-right: var(--s2a-spacing-sm);
+}
+
+/* Profile button / avatar */
+.feds-profile-new-img {
+  max-height: 30px;
+  max-width: 30px;
+  display: block;
+}
+
+.feds-profile-new-button {
+  padding: 5px var(--s2a-spacing-sm);
+  border-radius: var(--s2a-border-radius-round);
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* Button reset shared by the top-level and in-dropdown sign-in buttons. */
+.feds-signIn {
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* -----------------------------------------------------------------------
+ * Top-level "Sign in" — matches the UNAV signed-out sign-in CTA (see the
+ * `.universal-nav-container .profile-signed-out button` overrides in
+ * styles.css). Default: white solid pill / dark text, for the transparent
+ * gnav over imagery.
+ * ----------------------------------------------------------------------- */
+.feds-profile-new > .feds-signIn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 40px;
+  padding: 0 var(--s2a-spacing-lg);
+  border: var(--s2a-border-width-sm) solid var(--s2a-color-gray-25);
+  border-radius: var(--s2a-border-radius-round);
+  font-family: var(--body-font-family);
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  font-size: var(--s2a-typography-font-size-label);
+  line-height: var(--s2a-typography-line-height-label);
+  letter-spacing: var(--s2a-typography-letter-spacing-label);
+  text-align: center;
+  text-decoration: none;
+  background-color: var(--s2a-color-gray-25);
+  color: var(--s2a-color-gray-1000);
+}
+
+/* Dark-font, or any popup / drawer open: transparent outline. */
+.global-navigation.dark-font .feds-profile-new > .feds-signIn,
+.global-navigation:has(.feds-popup.is-open:not(.small-menu), .feds-menu-wrapper.is-open) .feds-profile-new > .feds-signIn {
+  color: inherit;
+  border-color: var(--s2a-color-gray-1000);
+  background-color: transparent;
+}
+
+/* Scrolled: dark outline on a transparent fill; hover / focus fills white. */
+.global-navigation.feds-header-scrolled .feds-profile-new > .feds-signIn {
+  color: var(--s2a-color-gray-1000);
+  border-color: var(--s2a-color-gray-1000);
+  background-color: transparent;
+}
+
+.global-navigation.feds-header-scrolled .feds-profile-new > .feds-signIn:hover,
+.global-navigation.feds-header-scrolled .feds-profile-new > .feds-signIn:focus-visible {
+  color: var(--s2a-color-gray-1000);
+  background-color: var(--s2a-color-gray-25);
+}
+
+/* -----------------------------------------------------------------------
+ * Sign-in dropdown (authored)
+ * ----------------------------------------------------------------------- */
+.feds-signIn-dropdown {
+  position: absolute;
+  display: none;
+  right: 12px;
+  top: 120%;
+  background-color: var(--s2a-color-background-default);
+  overflow: hidden;
+  box-shadow: 0 3px 3px 0 rgb(0 0 0 / 20%);
+  line-height: 1.4;
+  white-space: nowrap;
+  z-index: 1;
+  transform: translate3d(0, 0, 0); /* Fix Safari issues w/ position: sticky */
+}
+
+.feds-profile-new > .feds-signIn[aria-expanded="true"] + .feds-signIn-dropdown {
+  display: block;
+}
+
+[dir="rtl"] .feds-signIn-dropdown {
+  right: initial;
+  left: 0;
+}
+
+.feds-signIn-dropdown ul {
+  margin: 0;
+  padding: 12px 0;
+  list-style: none;
+}
+
+.feds-signIn-dropdown li > a,
+.feds-signIn-dropdown .feds-signIn {
+  display: block;
+  width: 100%;
+  padding: 6px 32px;
+  text-align: start;
+  color: var(--s2a-color-content-default);
+  text-decoration: none;
+}
+
+.feds-signIn-dropdown li > a:hover,
+.feds-signIn-dropdown .feds-signIn:hover {
+  background-color: var(--s2a-color-gray-100);
+}
+
+/* -----------------------------------------------------------------------
+ * Profile dropdown menu (signed-in)
+ * ----------------------------------------------------------------------- */
+.feds-profile-new-menu {
+  position: absolute;
+  width: 320px;
+  right: 0;
+  top: 100%;
+  border: var(--feds-border-profile);
+  border-radius: 0 0 4px 4px;
+  background: var(--s2a-color-background-default);
+  overflow: hidden;
+  box-shadow: 0 2px 6px -1px rgb(0 0 0 / 10%);
+  display: none;
+  line-height: 1;
+  white-space: nowrap;
+  z-index: 1;
+  transform: translate3d(0, 0, 0); /* Fix Safari issues w/ position: sticky */
+}
+
+[dir="rtl"] .feds-profile-new-menu {
+  right: initial;
+  left: 0;
+}
+
+.feds-profile-new-button[aria-expanded="true"] + .feds-profile-new-menu {
+  display: block;
+}
+
+.feds-profile-new-header {
+  padding: 20px;
+  display: flex;
+  flex-direction: row;
+  outline-offset: -3px;
+  column-gap: 15px;
+  text-decoration: none;
+}
+
+.feds-profile-new-header .feds-profile-new-img {
+  max-height: 64px;
+  max-width: 64px;
+}
+
+.feds-profile-new-details {
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+.feds-profile-new-name,
+.feds-profile-new-email {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.feds-profile-new-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: var(--s2a-font-weight-adobe-clean-bold);
+  color: var(--feds-color-profile--emphasis);
+}
+
+.feds-profile-new-email {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: var(--feds-color-profile-heading);
+}
+
+.feds-profile-new-account {
+  margin: 0;
+  font-size: 14px;
+  text-decoration: underline;
+  color: var(--feds-color-profile);
+}
+
+.feds-local-menu {
+  border-top: var(--feds-border-profile);
+  padding: 6px 0;
+}
+
+.feds-local-menu h5 {
+  margin: 0;
+  padding: 8px 20px;
+  color: var(--feds-color-profile-heading);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.feds-local-menu p {
+  margin: 0;
+}
+
+.feds-local-menu a,
+.feds-profile-new-actions a {
+  display: block;
+  color: var(--s2a-color-content-default);
+  text-decoration: none;
+}
+
+.feds-local-menu a:hover,
+.feds-profile-new-actions a:hover {
+  background-color: var(--s2a-color-gray-100);
+}
+
+.feds-local-menu a {
+  padding: 6px 20px;
+  line-height: 1.4;
+  outline-offset: -1px;
+}
+
+.feds-profile-new-actions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feds-profile-new-action {
+  padding: 14px 20px;
+  border-top: var(--feds-border-profile);
+}

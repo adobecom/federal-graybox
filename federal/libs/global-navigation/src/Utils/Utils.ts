@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import { IrrecoverableError } from "../Error/Error";
 import { lanaLog } from "./Log";
 import {
@@ -587,6 +588,39 @@ export const sanitize = (str: string): string => {
 
   // Ensure IDs do not start with a number in any script.
   return /^\p{N}/u.test(sanitized) ? `id-${sanitized}` : sanitized;
+};
+
+const SANITIZE_CONFIG = {
+  // Analytics attributes and `target` (authored `#_blank` links) aren't in
+  // DOMPurify's default allow-list.
+  ADD_ATTR: ['daa-lh', 'daa-ll', 'target', 'focusable'],
+  // Popup IDs are derived from authored titles via `sanitize()`, so a menu
+  // titled e.g. "Fonts" or "Images" yields an id that shadows a `document`
+  // property. DOM-clobbering protection would strip those IDs and break the
+  // aria-controls wiring.
+  SANITIZE_DOM: false,
+};
+
+/**
+ * Assigns HTML to an element after stripping script-capable markup (script
+ * tags, event handlers, javascript: URLs, ...). Every gnav render path
+ * interpolates authored/page-derived content into HTML strings, so all
+ * innerHTML writes must go through here.
+ */
+export const setSanitizedHTML = (element: Element, html: string): void => {
+  element.innerHTML = DOMPurify.sanitize(html, SANITIZE_CONFIG);
+};
+
+// Accepts absolute or relative http(s) URLs only, rejecting script-capable
+// schemes such as `javascript:` or `data:`.
+export const isHttpUrl = (href: string): boolean => {
+  if (href.trim() === '') return false;
+  try {
+    const { protocol } = new URL(href, window.location.href);
+    return protocol === 'https:' || protocol === 'http:';
+  } catch {
+    return false;
+  }
 };
 
 export const getAnalyticsAttrs = (

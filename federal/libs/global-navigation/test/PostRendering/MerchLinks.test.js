@@ -70,6 +70,22 @@ describe('initMerchLinks — commerce link routing', () => {
     }
   });
 
+  it('does not rehydrate a placeholder whose href uses a script-capable scheme', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <span class="feds-commerce-placeholder" data-commerce-href="javascript:alert(1)">x</span>
+    `;
+    document.body.appendChild(mountpoint);
+
+    try {
+      await initMerchLinks(mountpoint);
+
+      expect(mountpoint.querySelector('a')).to.equal(null);
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
   it('resolves a MAS link CTA in authored paragraph context and applies Federal classes', async () => {
     const mountpoint = document.createElement('div');
     mountpoint.innerHTML = `

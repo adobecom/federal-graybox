@@ -15,7 +15,7 @@ import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { loadProfile } from "./PostRendering/Profile/Profile";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, setLocalizeLink, getLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
+import { sanitize, setSanitizedHTML, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, getLocalizeLink, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -293,14 +293,14 @@ mountpoint: HTMLElement
 ): Promise<HTMLElement> => {
   const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
-  mountpoint.innerHTML = navHTML;
+  setSanitizedHTML(mountpoint, navHTML);
   const promoBar = await data.promoBar;
   if (promoBar !== null) {
     const promoWrapper = document.querySelector<HTMLElement>(
       '.feds-promo-aside-wrapper',
     );
     if (promoWrapper !== null) {
-      promoWrapper.innerHTML = renderPromoBar(promoBar);
+      setSanitizedHTML(promoWrapper, renderPromoBar(promoBar));
       promoWrapper.style.display = 'none';
       promoWrapper.classList.add(`feds-promo-bar--${promoBar.theme}`);
 
@@ -318,7 +318,7 @@ mountpoint: HTMLElement
     ...mountpoint.querySelectorAll('.mega-menu:not(.small-menu) ~ .feds-popup:not(.small-menu)')
   ]
   megaMenus.forEach(mm => {
-    mm.innerHTML = '';
+    mm.replaceChildren();
   });
   const megaMenuComponents = data.components.filter(com => com.type === "MegaMenu");
   const mmPromises = megaMenuComponents.map(com => com.content);
@@ -326,7 +326,10 @@ mountpoint: HTMLElement
     try {
       const [content] = await mmPromise;
       const extraData: MegaMenuExtraData = { type: "MegaMenuExtraData", breadcrumbs: data.breadcrumbs };
-      megaMenus[idx].innerHTML = popup(content, megaMenus[idx].id, extraData);
+      setSanitizedHTML(
+        megaMenus[idx],
+        popup(content, megaMenus[idx].id, extraData),
+      );
     } catch (error) {
       lanaLog(`Failed to render mega menu: ${error}`);
     }
@@ -338,7 +341,10 @@ mountpoint: HTMLElement
   const smallMenuComponents = data.components.filter(com => com.type === "SmallMenu");
   smallMenuComponents.forEach((com, idx) => {
     const [content] = com.content;
-    smallMenus[idx].innerHTML = smallMenuPopup(content, smallMenus[idx].id);
+    setSanitizedHTML(
+      smallMenus[idx],
+      smallMenuPopup(content, smallMenus[idx].id),
+    );
   });
 
   return mountpoint;
@@ -925,7 +931,9 @@ const waitUntilVisible = (callback: () => void): void => {
 
   const check = (): void => {
     if (isBodyVisible()) {
-      setTimeout(callback, 1000);
+      // Inline arrow so the timer can only ever receive a function, never a
+      // string that would be evaluated as code.
+      setTimeout(() => callback(), 1000);
     } else {
       requestAnimationFrame(check);
     }

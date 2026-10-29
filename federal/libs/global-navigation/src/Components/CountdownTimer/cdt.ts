@@ -156,7 +156,7 @@ function startTimer(
   }
 
   tick();
-  handle.id = setInterval(tick, ONE_SECOND_MS);
+  handle.id = setInterval(() => tick(), ONE_SECOND_MS);
   return stop;
 }
 

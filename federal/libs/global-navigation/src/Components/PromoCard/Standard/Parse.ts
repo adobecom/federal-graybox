@@ -47,7 +47,7 @@ export const parsePromoCard = (
     // A section may contain more than one <picture> (e.g. a decorative one
     // alongside the actual background image); the last is the bg image.
     const bgPictures = [...bgImageSection.querySelectorAll(':scope picture:not(:scope p picture)')];
-    const bgImageElement: HTMLImageElement | null = bgPictures[bgPictures.length - 1]?.querySelector('img') ?? null;
+    const bgImageElement: HTMLImageElement | null = bgPictures.at(-1)?.querySelector('img') ?? null;
     if (bgImageElement === null)
       errors.add(new RecoverableError(ERRORS.MissingBackgroundImage));
 

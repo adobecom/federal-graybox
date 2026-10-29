@@ -89,7 +89,6 @@
 }
 
 .global-navigation .feds-gnav-cards .promo-card__cta .feds-secondary-cta {
-  letter-spacing: 0;
   border: none;
   background: var(--s2a-color-gray-25);
   color: var(--s2a-color-gray-1000);

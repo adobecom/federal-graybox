@@ -88,7 +88,7 @@ const parseCard = (
             const placeholder = document.createElement('span');
             placeholder.className = 'feds-commerce-placeholder';
             placeholder.setAttribute('data-commerce-href', href);
-            placeholder.replaceChildren(...descAnchor.childNodes);
+            placeholder.innerHTML = descAnchor.innerHTML;
             descAnchor.replaceWith(placeholder);
           });
           link.description = nextSibling.innerHTML.trim();

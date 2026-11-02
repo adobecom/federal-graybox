@@ -16,12 +16,7 @@ const renderCard = ({
   priceHref,
   isPriceMerchLink,
   isPriceMasLink,
-}: PromoCardData): HTML => {
-  const merchClass = isPriceMerchLink ? ' class="merch"' : '';
-  const priceDescribedBy = isPriceMerchLink || isPriceMasLink
-    ? ` price-${sanitize(title)}` : '';
-  const ctaDescribedBy = `title-${sanitize(title)}${priceDescribedBy}`;
-  return `
+}: PromoCardData): HTML => `
   <article class="promo-card" daa-lh="promo-card">
     ${
       bgImageSrc
@@ -43,7 +38,7 @@ const renderCard = ({
       )}
       <div class="promo-card__text-content">
         ${priceHref && (isPriceMerchLink || isPriceMasLink) ? `<p id="price-${sanitize(title)}" class="promo-card__price">
-          <a href="${localizeHref(priceHref)}"${merchClass}>${priceText}</a>
+          <a href="${localizeHref(priceHref)}"${isPriceMerchLink ? ' class="merch"' : ''}>${priceText}</a>
         </p>` : ''}
         <h2 id="title-${sanitize(title)}" class="promo-card__title" role="heading" aria-level="2">
           ${title}
@@ -52,12 +47,11 @@ const renderCard = ({
           cta === null
             ? ""
             : `<div class="promo-card__cta">
-                 ${secondaryCTA({...cta, ariaAttrs: { 'aria-describedby': ctaDescribedBy }})}
+                 ${secondaryCTA({...cta, ariaAttrs: { 'aria-describedby': `title-${sanitize(title)}${(isPriceMerchLink || isPriceMasLink) ? ` price-${sanitize(title)}` : ''}` }})}
                </div>`
         }
       </div>
     </div>
   </article>
 `.trim();
-}
 

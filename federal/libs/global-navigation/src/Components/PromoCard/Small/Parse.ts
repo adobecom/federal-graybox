@@ -43,12 +43,6 @@ export const parsePromoCardSmall = (
   element: Element
 ): Parsed<PromoCardSmall, RecoverableError> => {
   const errors = new Set<RecoverableError>();
-
-  const requireFields = (inValid: boolean, message: string): void => {
-    if (!inValid) return;
-    errors.add(new RecoverableError(message));
-  };
-
   const [bgImageSection, contentSection] = element.querySelectorAll(':scope > div');
 
   if (bgImageSection === undefined)
@@ -57,7 +51,7 @@ export const parsePromoCardSmall = (
   // A section may contain more than one <picture> (e.g. a decorative one
   // alongside the actual background image); the last is the bg image.
   const bgPictures = [...bgImageSection.querySelectorAll(':scope picture:not(:scope p picture)')];
-  const bgImageElement: HTMLImageElement | null = bgPictures.at(-1)?.querySelector('img') ?? null;
+  const bgImageElement: HTMLImageElement | null = bgPictures[bgPictures.length - 1]?.querySelector('img') ?? null;
   const bgImageFieldLink = bgImageElement === null
     ? [...bgImageSection.querySelectorAll<HTMLAnchorElement>('a[href]')]
       .find((link) =>
@@ -65,20 +59,16 @@ export const parsePromoCardSmall = (
         && new URLSearchParams(link.hash.slice(1)).get('field') === 'backgroundImage'
       ) ?? null
     : null;
-  const hasFieldLink = bgImageFieldLink === null;
-  requireFields(
-    bgImageElement === null && hasFieldLink, ERRORS.MissingBackgroundImage,
-  );
+  if (bgImageElement === null && bgImageFieldLink === null)
+    errors.add(new RecoverableError(ERRORS.MissingBackgroundImage));
 
   const bgImageAlt = bgImageElement?.getAttribute('alt') ?? "";
-  requireFields(
-    bgImageAlt === "" && hasFieldLink, ERRORS.MissingBackgroundImageAlt,
-  );
+  if (bgImageAlt === "" && bgImageFieldLink === null)
+    errors.add(new RecoverableError(ERRORS.MissingBackgroundImageAlt));
 
   const bgImageSrc = bgImageElement?.getAttribute('src') ?? "";
-  requireFields(
-    bgImageSrc === "" && hasFieldLink, ERRORS.MissingBackgroundImageSrc,
-  );
+  if (bgImageSrc === "" && bgImageFieldLink === null)
+    errors.add(new RecoverableError(ERRORS.MissingBackgroundImageSrc));
 
   if (contentSection === undefined)
     throw new IrrecoverableError(ERRORS.MissingContentSection);

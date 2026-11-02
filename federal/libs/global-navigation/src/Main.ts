@@ -12,6 +12,7 @@ import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks
 import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
 
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
+import { isUnavEnabled } from "./PostRendering/Unav/Unav.config";
 import { loadProfile } from "./PostRendering/Profile/Profile";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
@@ -178,7 +179,6 @@ export const main = async (
 
   const {
     mountpoint,
-    unavEnabled,
     miloConfig,
     personalization
   } = input;
@@ -189,6 +189,9 @@ export const main = async (
     lanaLog(`Failed to initialize MiloConfig: ${error}`);
     throw new IrrecoverableError(`Failed to initialize MiloConfig: ${error}`);
   }
+
+  input = { ...input, unavEnabled: isUnavEnabled(input.unavEnabled) };
+  const { unavEnabled } = input;
 
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));

@@ -54,15 +54,49 @@
     display: flex;
   }
 
+  /* Pinned telephone — `tel:` clone shown beside the pinned CTA at
+     compact/mobile as plain text (no pill). Mirrors pinned-CTA visibility. */
+  & .feds-pinned-tel {
+    display: none;
+    align-items: center;
+    flex-shrink: 0;
+    /* Right-align when it is the only pinned item (drawer is out of flow). */
+    margin-left: auto;
+    margin-right: var(--s2a-spacing-sm);
+
+    @media (max-width: 1023px) {
+      display: flex;
+    }
+  }
+
+  &.is-compact .feds-pinned-tel {
+    display: flex;
+  }
+
+  /* A preceding pinned CTA owns the auto margin; the telephone just needs a gap. */
+  & .feds-pinned-cta + .feds-pinned-tel {
+    margin-left: 0;
+  }
+
+  [dir="rtl"] & .feds-pinned-tel {
+    margin-left: var(--s2a-spacing-sm);
+    margin-right: auto;
+  }
+
+  [dir="rtl"] & .feds-pinned-cta + .feds-pinned-tel {
+    margin-right: 0;
+  }
+
   /* Dynamic reflow: JS adds .feds-cta-overflow when the brand + CTAs +
      utilities can't all fit, hiding both toolbar CTAs so they never overlap
      the hamburger (they stay reachable in the drawer). */
-  &.feds-cta-overflow :is(.feds-pinned-cta, .feds-product-entry-cta) {
+  &.feds-cta-overflow :is(.feds-pinned-cta, .feds-pinned-tel, .feds-product-entry-cta) {
     display: none;
   }
 
-  /* Pinned CTA owns the right-align margin; product CTA just needs a gap */
-  & .feds-pinned-cta + .feds-product-entry-cta {
+  /* Pinned CTA owns the right-align margin; the following slots just need a gap */
+  & .feds-pinned-cta + .feds-product-entry-cta,
+  & .feds-pinned-tel + .feds-product-entry-cta {
     margin-left: 0;
   }
 
@@ -71,12 +105,13 @@
     margin-right: auto;
   }
 
-  [dir="rtl"] & .feds-pinned-cta + .feds-product-entry-cta {
+  [dir="rtl"] & .feds-pinned-cta + .feds-product-entry-cta,
+  [dir="rtl"] & .feds-pinned-tel + .feds-product-entry-cta {
     margin-right: 0;
   }
 
-  /* Drawer open: pinned copy hidden, drawer's own copy shows instead */
-  &:has(.feds-menu-wrapper.is-open) .feds-pinned-cta {
+  /* Drawer open: pinned copies hidden, drawer's own copies show instead */
+  &:has(.feds-menu-wrapper.is-open) :is(.feds-pinned-cta, .feds-pinned-tel) {
     display: none;
   }
 

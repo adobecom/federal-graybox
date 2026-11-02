@@ -50,4 +50,21 @@ describe('parseNavigation', () => {
     expect(result.errors.map((error) => error.message))
       .to.deep.equal(['Element has no href']);
   });
+
+  it('flags a tel: link as the pinned telephone without lifting it from the menu', () => {
+    const result = parse('<li><strong><a href="/buy">Buy now</a></strong></li><li><a href="tel:1800 102 5567">1800 102 5567</a></li>');
+
+    expect(result.telephone).to.not.equal(null);
+    expect(result.telephone.href).to.equal('tel:1800 102 5567');
+    expect(result.telephone.text).to.equal('1800 102 5567');
+    // Still present in the menu list so it remains reachable in the drawer.
+    expect(result.components).to.include(result.telephone);
+    expect(result.errors).to.deep.equal([]);
+  });
+
+  it('has no telephone when no tel: link is authored', () => {
+    const result = parse('<li><a href="/support">Support</a></li>');
+
+    expect(result.telephone).to.equal(null);
+  });
 });

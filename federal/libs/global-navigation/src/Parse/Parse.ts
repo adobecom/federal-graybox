@@ -3,12 +3,16 @@ import { Component, parseComponent } from "../Components/Component";
 import { ProductEntryCTA } from "../Components/CTA/Parse";
 import { PromoBar, parsePromoBar } from "../Components/PromoBar/Parse";
 import { IrrecoverableError, RecoverableError } from "../Error/Error";
-import { getMetadata, parseListAndAccumulateErrors } from "../Utils/Utils";
+import { getMetadata, isTelephoneLink, parseListAndAccumulateErrors } from "../Utils/Utils";
+
+// Components that carry a navigable href and can therefore be a telephone link.
+export type HrefComponent = Extract<Component, { href: string }>;
 
 export type GlobalNavigationData = {
   breadcrumbs: Breadcrumbs | null;
   components: Array<Component>;
   productCTA: ProductEntryCTA | null;
+  telephone: HrefComponent | null;
   promoBar: Promise<PromoBar | null>;
   localnav: boolean;
   darkFont: boolean;
@@ -63,6 +67,10 @@ export const parseNavigation = (
     (c) => c.type !== "ProductEntryCTA"
       && (c.type !== "Text" || c.content.trim() !== "")
   );
+  // Surfaced for the pinned toolbar slot; also kept in the menu list (drawer).
+  const telephone = components.find(
+    (c): c is HrefComponent => "href" in c && isTelephoneLink(c.href)
+  ) ?? null;
   const localnav = getMetadata('localnav') === 'true';
   const darkFont = getMetadata('gnav-dark-font') === 'true';
   const brandConciergeEnabled = getMetadata('gnav-brand-concierge') === 'on';
@@ -76,6 +84,7 @@ export const parseNavigation = (
     breadcrumbs,
     components,
     productCTA,
+    telephone,
     promoBar,
     localnav,
     darkFont,

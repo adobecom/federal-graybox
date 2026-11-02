@@ -2,6 +2,7 @@ import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Rende
 import { Component, component } from "./Components/Component";
 import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
 import { productEntryCTA } from "./Components/CTA/Render";
+import { link } from "./Components/Link/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
 import { initClickListeners } from "./PostRendering/ClickListeners";
@@ -358,6 +359,7 @@ export const renderGnavString = ({
   components,
   breadcrumbs,
   productCTA,
+  telephone,
   unavEnabled,
   profileEnabled,
   placeholders,
@@ -399,14 +401,24 @@ export const renderGnavString = ({
       ? component(withLocalnavOverviewLabel(c, placeholders), index)
       : component(c, index)
   );
-  // Clone the trailing CTA (last CTA-typed column) into a toolbar slot so it
-  // stays visible beside the hamburger, not only inside the drawer.
+  // Clone the trailing CTA into a toolbar slot so it stays by the hamburger.
+  // The telephone has its own pinned slot, so exclude it from the trailing CTA.
   const ctaComponents = components.filter(
-    (c) => c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA'
+    (c) => (c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA') && c !== telephone
   );
   const [trailingCta] = ctaComponents.slice(-1);
   const pinnedCtaHTML = trailingCta !== undefined
     ? `<div class="feds-pinned-cta">${component(trailingCta)}</div>`
+    : '';
+  // Pin the telephone beside the hamburger as a plain link (no CTA pill).
+  const pinnedTelHTML = telephone !== null
+    ? `<div class="feds-pinned-tel">${link({
+        type: 'Link',
+        text: telephone.text,
+        href: telephone.href,
+        daaLl: telephone.daaLl,
+        ariaLabel: telephone.ariaLabel,
+      })}</div>`
     : '';
 
   return `
@@ -476,6 +488,7 @@ export const renderGnavString = ({
   </ul>
   ${brandConciergeEnabled ? '<div class="feds-bc-wrapper"></div>' : ''}
   ${pinnedCtaHTML}
+  ${pinnedTelHTML}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
   ${profileEnabled
@@ -780,6 +793,7 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
   const bcWrapper = mountpoint.querySelector<HTMLElement>('.feds-bc-wrapper, .feds-profile-new');
   const pinnedCta = mountpoint.querySelector<HTMLElement>('.feds-pinned-cta');
   const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
+  const pinnedTel = mountpoint.querySelector<HTMLElement>('.feds-pinned-tel');
 
   const check = (): void => {
     // Skip re-measuring while a menu/popup is open. Stripping the state classes
@@ -821,10 +835,11 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
     // Stage 2: when collapsed, hide both toolbar CTAs if they'd overlap the
     // hamburger (they stay reachable in the drawer).
     const collapsed = mobile || header.classList.contains('is-compact');
-    if (!collapsed || (!pinnedCta && !productCta)) return;
+    if (!collapsed || (!pinnedCta && !productCta && !pinnedTel)) return;
     const needed = (brandWrapper?.offsetWidth ?? 0)
       + (bcWrapper?.offsetWidth ?? 0)
       + (pinnedCta?.offsetWidth ?? 0)
+      + (pinnedTel?.offsetWidth ?? 0)
       + (productCta?.offsetWidth ?? 0)
       + (utilities?.offsetWidth ?? 0) + CTA_OVERFLOW_GAP;
     const available = nav?.clientWidth ?? header.clientWidth;

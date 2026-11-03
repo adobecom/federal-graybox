@@ -41,7 +41,7 @@ export const initEventRegistrationGating = (mountpoint: HTMLElement): void => {
 
   // Hide up front; reveal or remove once status resolves.
   gatedLinks.forEach(link => link.setAttribute(REGISTRATION_PENDING_ATTR, ''));
-  const safetyTimer = setTimeout(reveal, REGISTRATION_TIMEOUT);
+  const safetyTimer = setTimeout(() => reveal(), REGISTRATION_TIMEOUT);
 
   const applyGate = (status: RegistrationStatus | undefined): void => {
     clearTimeout(safetyTimer);

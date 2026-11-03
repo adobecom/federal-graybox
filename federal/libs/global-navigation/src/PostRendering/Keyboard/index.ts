@@ -272,13 +272,14 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     // When the menu-wrapper closes via the localnav bar flow, focus should
     // return to the bar button (not the hamburger). The hamburger remains
     // the right target for the non-localnav mobile drawer.
-    const trigger = popup
-      ? triggerForPopupId(gnav, target.id)
-      : (
-          isLocalnavMobile(gnav)
-            ? gnav.querySelector<HTMLElement>('.feds-localnav-bar')
-            : gnav.querySelector<HTMLElement>('.feds-nav-toggle')
-        );
+    let trigger: HTMLElement | null;
+    if (popup) {
+      trigger = triggerForPopupId(gnav, target.id);
+    } else if (isLocalnavMobile(gnav)) {
+      trigger = gnav.querySelector<HTMLElement>('.feds-localnav-bar');
+    } else {
+      trigger = gnav.querySelector<HTMLElement>('.feds-nav-toggle');
+    }
     trigger?.focus();
     event.preventDefault();
     return true;
@@ -413,6 +414,38 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     return false;
   }
 
+  function panelArrows (
+    items: HTMLElement[], index: number, panel: HTMLElement,
+    popup: HTMLElement, key: string, event: KeyboardEvent,
+  ): boolean {
+    const nextIndex = gridNextIndex(items, index, key, panel);
+    if (nextIndex !== null) {
+      focusAndPrevent(items[nextIndex], event);
+      return true;
+    }
+    if (key !== 'ArrowUp') return false;
+    setTabindex(panel, 'a', false);
+    focusAndPrevent(selectedTab(popup) ?? items[0], event);
+    return true;
+  }
+
+  function panelShiftTab (
+    items: HTMLElement[], index: number, panel: HTMLElement,
+    popup: HTMLElement, event: KeyboardEvent,
+  ): boolean{
+    if (index > 0) {
+      focusAndPrevent(items[index - 1], event);
+    }
+    setTabindex(panel, 'a', false);
+    const target = selectedTab(popup)
+      ?? $$(popup, '.tabs :is([role="tab"], .product-links a)')[0];
+    // eslint is disabled because it complains that nextTarget
+    // is always true, but it could be nullish sometimes
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (target) focusAndPrevent(target, event);
+    return true;
+  }
+
   function handlePanel(
     el: HTMLElement, popup: HTMLElement, key: string, event: KeyboardEvent,
   ): boolean {
@@ -423,42 +456,16 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     if (index < 0) return false;
 
     if (ARROW_DELTA[key]) {
-      const nextIndex = gridNextIndex(items, index, key, panel);
-      if (nextIndex !== null) {
-        focusAndPrevent(items[nextIndex], event);
-        return true;
-      }
-      if (key === 'ArrowUp') {
-        setTabindex(panel, 'a', false);
-        focusAndPrevent(selectedTab(popup) ?? items[0], event);
-        return true;
-      }
-      return false;
+      return panelArrows(items, index, panel, popup, key, event);
     }
+    if (key !== 'Tab') return false;
 
-    if (key === 'Tab' && !event.shiftKey) {
-      if (index + 1 < items.length) {
-        focusAndPrevent(items[index + 1], event);
-      } else return false;
-      return true;
+    if (event.shiftKey) {
+      return panelShiftTab(items, index, panel, popup, event);
     }
-
-    if (key === 'Tab' && event.shiftKey) {
-      if (index > 0) {
-        focusAndPrevent(items[index - 1], event);
-      } else {
-        setTabindex(panel, 'a', false);
-        const target = selectedTab(popup)
-          ?? $$(popup, '.tabs :is([role="tab"], .product-links a)')[0];
-        // eslint is disabled because it complains that nextTarget
-        // is always true, but it could be nullish sometimes
-        // eslint-disable-next-line
-        if (target) focusAndPrevent(target, event);
-      }
-      return true;
-    }
-
-    return false;
+    if(index + 1 >= items.length) return false;
+    focusAndPrevent(items[index + 1], event);
+    return true;
   }
 
   function handleCards(
@@ -484,6 +491,21 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     return true;
   }
 
+  function handleOpenPopup (
+    el: HTMLElement, key: string, event: KeyboardEvent,
+  ): boolean {
+    const popup = openPopup();
+    if (!popup) return false;
+    if (popup.matches(':has(.product-list)')) {
+      if (handleTabs(el, popup, key, event)) return true;
+      if (handlePanel(el, popup, key, event)) return true;
+    }
+    if (popup.matches(':has(.feds-gnav-cards)')) {
+      return handleCards(el, popup, key, event);
+    }
+    return false;
+  }
+
   function onKeydown(event: KeyboardEvent): void {
     const el = (document.activeElement ?? event.target) as HTMLElement;
     if (event.key === 'Escape') { handleEscape(event); return; }
@@ -495,16 +517,7 @@ export function initKeyboardNav(gnav: HTMLElement): () => void {
     if (handleBarTrap(el, event.key, event.shiftKey, event)) return;
     if (handleBarArrows(el, event.key, event)) return;
 
-    const popup = openPopup();
-    if (popup) {
-      if (popup.matches(':has(.product-list)')) {
-        if (handleTabs(el, popup, event.key, event)) return;
-        if (handlePanel(el, popup, event.key, event)) return;
-      }
-      if (popup.matches(':has(.feds-gnav-cards)')) {
-        if (handleCards(el, popup, event.key, event)) return;
-      }
-    }
+    if(handleOpenPopup(el, event.key, event)) return;
     handleTopBar(el, event.key, event);
   }
 

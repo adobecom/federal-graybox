@@ -3,6 +3,7 @@ import {
   isMerchLink,
   isMasLink,
   isMasFieldLink,
+  isHttpUrl,
   getMerchDecorators,
 } from '../Utils/Utils';
 import { RecoverableError } from '../Error/Error';
@@ -224,10 +225,10 @@ export const initMerchLinks = async (
   mountpoint.querySelectorAll<HTMLElement>('.feds-commerce-placeholder')
     .forEach((placeholder) => {
       const href = placeholder.getAttribute('data-commerce-href') ?? '';
-      if (href === '') return;
+      if (!isHttpUrl(href)) return;
       const link = document.createElement('a');
       link.href = href;
-      link.innerHTML = placeholder.innerHTML;
+      link.replaceChildren(...placeholder.childNodes);
       if (isMerchLink(href)) link.classList.add('merch');
       placeholder.replaceWith(link);
     });

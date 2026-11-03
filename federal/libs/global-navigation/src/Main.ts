@@ -11,6 +11,7 @@ import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks";
 import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
+import { initActiveLink, isCurrentPageHref } from "./PostRendering/ActiveLink";
 
 import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
 import { isUnavEnabled } from "./PostRendering/Unav/Unav.config";
@@ -500,9 +501,7 @@ export const postRenderingTasks = async (
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
 
-  const activeLink = findActiveLink(input.mountpoint);
-  const activeDropDown = activeLink?.closest('ul.feds-gnav-items > li');
-  activeDropDown?.classList.add('active-element');
+  initActiveLink(input.mountpoint, input.gnavSource);
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
   initPromoBarHeight(input.mountpoint);
@@ -848,27 +847,6 @@ const initCompactOverflow = (mountpoint: HTMLElement): void => {
   isDesktop.addEventListener('change', check);
   mountpoint.addEventListener(MERCH_RESOLVED_EVENT, check);
   check();
-};
-
-const isCurrentPageHref = (href: string): boolean => {
-  const url = `${window.location.origin}${window.location.pathname}`;
-  return href === url
-      || href.startsWith(`${url}?`)
-      || href.startsWith(`${url}#`);
-};
-
-const findActiveLink = (
-  mountpoint: HTMLElement
-): HTMLAnchorElement | null => {
-  // In localnav the first top-level <li> (before the divider) is the mega
-  // menu whose title also labels the localnav bar — it represents the
-  // section itself rather than a sibling destination, so it's excluded here
-  // and only links after the divider are eligible to be marked active.
-  const isLocalnav = mountpoint.querySelector('nav.localnav') !== null;
-  return [...mountpoint.querySelectorAll<HTMLAnchorElement>('a:not(.feds-skip-link)')]
-    .filter(a => !a.closest('.feds-breadcrumbs'))
-    .filter(a => !isLocalnav || a.closest('ul.feds-gnav-items > li:first-child') === null)
-    .find(a => isCurrentPageHref(a.href)) ?? null;
 };
 
 /**

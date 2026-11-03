@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { getUnavComponents } from '../../src/PostRendering/Unav/Unav.config';
+import { getUnavComponents, isUnavEnabled } from '../../src/PostRendering/Unav/Unav.config';
 import { setMiloConfig, getMetadata } from '../../src/Utils/Utils';
 
 describe('UNAV Config', () => {
@@ -61,6 +61,70 @@ describe('UNAV Config', () => {
     createdMetaTags.push(meta);
     return meta;
   };
+
+  describe('isUnavEnabled matches C1 metadata', () => {
+    const cases = [
+      [null, false],
+      ['', false],
+      ['off', false],
+      ['OFF', false],
+      ['unknown', false],
+      ['unknown, off', false],
+      [' , ', false],
+      ['on', true],
+      ['ON', true],
+      ['profile', true],
+      ['appswitcher', true],
+      ['notifications', true],
+      ['help', true],
+      ['jarvis', true],
+      ['cart', true],
+      ['signup', true],
+      [' PROFILE , Help ', true],
+      ['unknown, profile', true],
+      ['off, profile', true],
+      [' on ', false],
+    ];
+
+    cases.forEach(([value, expected]) => {
+      it(`returns ${expected} for ${JSON.stringify(value)} with the host enabled`, () => {
+        if (value !== null) createMetaTag('universal-nav', value);
+        expect(isUnavEnabled(true)).to.equal(expected);
+      });
+    });
+
+    for (const value of ['on', 'profile', 'off']) {
+      it(`respects the host opt-out with metadata ${value}`, () => {
+        createMetaTag('universal-nav', value);
+        expect(isUnavEnabled(false)).to.equal(false);
+      });
+    }
+
+    for (const override of ['off', 'OFF', ' off ']) {
+      for (const value of ['on', 'profile, appswitcher', 'off, profile']) {
+        it(`unav=${JSON.stringify(override)} overrides host true and universal-nav=${value}`, () => {
+          createMetaTag('unav', override);
+          createMetaTag('universal-nav', value);
+          expect(isUnavEnabled(true)).to.equal(false);
+        });
+      }
+    }
+
+    for (const value of ['', 'on']) {
+      it(`unav=${JSON.stringify(value)} preserves normal enablement`, () => {
+        createMetaTag('unav', value);
+        createMetaTag('universal-nav', 'on');
+        expect(isUnavEnabled(true)).to.equal(true);
+        expect(isUnavEnabled(false)).to.equal(false);
+      });
+    }
+
+    it('unav=on does not enable UNAV without universal-nav metadata', () => {
+      createMetaTag('unav', 'on');
+      expect(isUnavEnabled(true)).to.equal(false);
+    });
+
+  });
 
   describe('getUnavComponents', () => {
     describe('basic structure', () => {

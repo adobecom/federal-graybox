@@ -354,6 +354,10 @@ export const getRegistrationGateAttrs = (
   return { href, hideWhenRegistered: false };
 };
 
+// A `tel:` link, pinned beside the hamburger on compact (not just the drawer).
+export const isTelephoneLink = (href: string): boolean =>
+  typeof href === 'string' && href.trim().toLowerCase().startsWith('tel:');
+
 /**
  * Lingo locale config — federal-specific locale data derived from the milo
  * lingo region that may override the milo config locale for downstream

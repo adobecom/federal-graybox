@@ -12,6 +12,18 @@ import type {
 import { setUserProfile } from './Unav.utils';
 import { getMiloConfig, getMetadata } from '../../Utils/Utils';
 
+export const isUnavEnabled = (hostEnabled: boolean): boolean => {
+  if (!hostEnabled) return false;
+  if (getMetadata('unav')?.trim().toLowerCase() === 'off') return false;
+  const meta = getMetadata('universal-nav')?.toLowerCase();
+  if (meta === 'on') return true;
+  const components = Object.keys(getUnavComponents());
+  return meta?.split(',').some((option) => {
+    const component = option.trim();
+    return components.includes(component) || component === 'signup';
+  }) ?? false;
+};
+
 // ============================================================================
 // Helper functions
 // ============================================================================

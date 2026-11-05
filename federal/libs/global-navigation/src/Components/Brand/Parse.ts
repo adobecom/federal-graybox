@@ -14,6 +14,8 @@ export type ImageData = {
   scrollThemeImageAlt: string;
   mobileScrollThemeImageSrc: string;
   mobileScrollThemeImageAlt: string;
+  desktopMinWidth?: number;
+  mobileMinWidth?: number;
 };
 
 export type Brand = {
@@ -32,6 +34,28 @@ const ERRORS = {
     "Error when parsing Brand. Missing mobile or desktop image section",
   missingThemeImages:
     "Error when parsing Brand. Missing mobile or desktop image section",
+};
+
+const parseMinWidth = (
+  images: NodeListOf<Element> | undefined,
+  errors: Set<RecoverableError>,
+): number | undefined => {
+  let minWidth: number | undefined;
+  images?.forEach(image => {
+    const value = image.textContent?.split('|')[2]?.trim();
+    if (value === undefined || value === '') return;
+
+    const width = Number(value);
+    if (!/^\d+(?:\.\d+)?$/.test(value)
+      || !Number.isFinite(width) || width <= 0) {
+      errors.add(new RecoverableError(
+        `Error when parsing Brand. Invalid logo width "${value}" for "${image.getAttribute('href')}". Expected a positive number in pixels.`,
+      ));
+      return;
+    }
+    minWidth = Math.max(minWidth ?? 0, width);
+  });
+  return minWidth;
 };
 
 export const parseBrand = (
@@ -129,6 +153,8 @@ export const parseBrand = (
         scrollThemeImageAlt: scrollThemeDesktopImageAlt,
         mobileScrollThemeImageSrc: scrollThemeMobileImageSrc,
         mobileScrollThemeImageAlt: scrollThemeMobileImageAlt,
+        desktopMinWidth: parseMinWidth(desktopImages, errors),
+        mobileMinWidth: parseMinWidth(mobileImages, errors),
       },
     },
   }, [...errors]]

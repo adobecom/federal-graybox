@@ -55,10 +55,12 @@ header.global-navigation.feds-header-scrolled nav .feds-brand-image svg {
 
 .feds-brand-image.desktop-brand {
   display: none;
+  min-width: 67px;
 }
 
 .feds-brand-image.mobile-brand {
   display: inherit;
+  min-width: 18px;
 }
 
 .feds-brand-image.mobile-brand svg {

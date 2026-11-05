@@ -30,6 +30,37 @@ import {
 import { getUnavComponents } from './Unav.config';
 
 // ============================================================================
+// Width reservation
+// ============================================================================
+
+/**
+ * Reserves the UNAV slot's width on `.feds-utilities` before UNAV loads so the
+ * compact-overflow measurement counts the final row width up front (210874).
+ * Idempotent; no-op when the container is absent.
+ */
+export const reserveUnavWidth = (mountpoint: HTMLElement): void => {
+  const utilitiesContainer = mountpoint.querySelector<HTMLElement>('.feds-utilities');
+  if (utilitiesContainer === null) return;
+
+  const meta = document.head.querySelector('meta[name="universal-nav"]');
+  const rawValue = meta instanceof HTMLMetaElement ? meta.content ?? '' : '';
+  const unavComponents = rawValue
+    .split(',')
+    .map((option) => option.trim())
+    .filter(
+      (component) =>
+        Object.keys(getUnavComponents()).includes(component) ||
+        component === 'signup',
+    );
+
+  const initialSignedOut = window.adobeIMS?.isSignedInUser() !== true;
+  utilitiesContainer.style.setProperty(
+    'min-width',
+    getUnavWidthCSS(unavComponents, initialSignedOut),
+  );
+};
+
+// ============================================================================
 // AUP SDK eager initialization
 // ============================================================================
 

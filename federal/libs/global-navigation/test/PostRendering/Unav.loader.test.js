@@ -1,5 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import { loadUnav } from '../../src/PostRendering/Unav/Unav.loader';
+import { loadUnav, reserveUnavWidth } from '../../src/PostRendering/Unav/Unav.loader';
 import { setMiloConfig } from '../../src/Utils/Utils';
 
 /**
@@ -80,6 +80,47 @@ describe('UNAV Loader', () => {
       }
 
       expect(errorThrown).to.be.false;
+    });
+  });
+
+  // ============================================================================
+  // Width reservation (MWPW-210874)
+  // ============================================================================
+
+  describe('reserveUnavWidth', () => {
+    let meta;
+
+    afterEach(() => {
+      meta?.remove();
+      meta = undefined;
+    });
+
+    const addMeta = (content) => {
+      meta = document.createElement('meta');
+      meta.name = 'universal-nav';
+      meta.content = content;
+      document.head.append(meta);
+    };
+
+    it('reserves a min-width on .feds-utilities before UNAV loads', () => {
+      addMeta('appswitcher, help, profile');
+      const nav = document.createElement('nav');
+      nav.innerHTML = '<div class="feds-utilities"></div>';
+      createdElements.push(nav);
+      document.body.append(nav);
+
+      reserveUnavWidth(nav);
+
+      const utilities = nav.querySelector('.feds-utilities');
+      expect(utilities.style.minWidth).to.match(/^calc\(/);
+    });
+
+    it('no-ops when the .feds-utilities container is absent', () => {
+      addMeta('appswitcher, help');
+      const nav = document.createElement('nav');
+      createdElements.push(nav);
+
+      expect(() => reserveUnavWidth(nav)).to.not.throw();
     });
   });
 });

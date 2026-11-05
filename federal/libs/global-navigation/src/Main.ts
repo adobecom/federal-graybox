@@ -9,11 +9,11 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss, IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
-import { initMerchLinks, MERCH_RESOLVED_EVENT } from "./PostRendering/MerchLinks";
-import { getIntrinsicItemsWidth } from "./PostRendering/CompactOverflow";
+import { initMerchLinks } from "./PostRendering/MerchLinks";
+import { initCompactOverflow } from "./PostRendering/CompactOverflow";
 import { initActiveLink, isCurrentPageHref } from "./PostRendering/ActiveLink";
 
-import { loadUnav, preloadAupSdk } from "./PostRendering/Unav/Unav";
+import { loadUnav, preloadAupSdk, reserveUnavWidth } from "./PostRendering/Unav/Unav";
 import { isUnavEnabled } from "./PostRendering/Unav/Unav.config";
 import { loadProfile } from "./PostRendering/Profile/Profile";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
@@ -299,6 +299,8 @@ mountpoint: HTMLElement
   const navHTML = renderGnavString(data);
   document.querySelector('main')?.setAttribute('id', 'main-content');
   setSanitizedHTML(mountpoint, navHTML);
+  reserveUnavWidth(mountpoint);
+  initCompactOverflow(mountpoint);
   const promoBar = await data.promoBar;
   if (promoBar !== null) {
     const promoWrapper = document.querySelector<HTMLElement>(
@@ -521,7 +523,6 @@ export const postRenderingTasks = async (
   initPopoverCloseOnResize(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
-  initCompactOverflow(input.mountpoint);
   initPromoCountdownInPromoBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
@@ -776,83 +777,6 @@ const initHeaderAnalytics = (
   const header = mountpoint.closest("header");
   if (header === null) return;
   header.setAttribute('daa-lh', `gnav|${getExperienceName()}${mepMartech}`);
-};
-
-// Min gap (px) between the brand/hamburger and the trailing CTA group.
-const CTA_OVERFLOW_GAP = 32;
-
-const initCompactOverflow = (mountpoint: HTMLElement): void => {
-  const header = mountpoint.closest<HTMLElement>('header.global-navigation');
-  if (!header) return;
-
-  const nav = mountpoint.querySelector<HTMLElement>('nav');
-  const brandWrapper = mountpoint.querySelector<HTMLElement>('.feds-brand-wrapper');
-  const gnavItems = mountpoint.querySelector<HTMLElement>('.feds-gnav-items');
-  const utilities = mountpoint.querySelector<HTMLElement>('.feds-utilities');
-  const bcWrapper = mountpoint.querySelector<HTMLElement>('.feds-bc-wrapper, .feds-profile-new');
-  const pinnedCta = mountpoint.querySelector<HTMLElement>('.feds-pinned-cta');
-  const productCta = mountpoint.querySelector<HTMLElement>('.feds-product-entry-cta');
-  const pinnedTel = mountpoint.querySelector<HTMLElement>('.feds-pinned-tel');
-
-  const check = (): void => {
-    // Skip re-measuring while a menu/popup is open. Stripping the state classes
-    // below (even momentarily) drops the compact-scoped body scroll-lock (see
-    // `body:has(header.global-navigation.is-compact ...)` in styles.css), which
-    // lets the scrollbar flash back in and changes `header`'s width — the very
-    // thing this function's ResizeObserver watches — retriggering check() in an
-    // infinite loop that resets the gnav reveal animation mid-flight. Nothing
-    // about open/closed state changes whether the content overflows, so just
-    // wait for the next real resize or breakpoint change.
-    if (header.querySelector('.feds-menu-wrapper.is-open, .feds-popup.is-open')) return;
-
-    const mobile = !isDesktop.matches;
-
-    // Strip both classes first so measurements read natural (all-shown) widths.
-    header.classList.remove('is-compact', 'feds-cta-overflow');
-
-    // Stage 1: is-compact (desktop overflow collapse; mobile uses the drawer).
-    if (!mobile) {
-      // The flex list's offsetWidth can be smaller than its content.
-      const brandWidth = brandWrapper === null
-        ? 0
-        : Math.max(brandWrapper.offsetWidth, brandWrapper.scrollWidth);
-      const itemsWidth = getIntrinsicItemsWidth(gnavItems);
-      const utilitiesWidth = utilities === null
-        ? 0
-        : Math.max(utilities.offsetWidth, utilities.scrollWidth);
-      const ctaWidth = productCta === null
-        ? 0
-        : Math.max(productCta.offsetWidth, productCta.scrollWidth);
-      const bcWidth = bcWrapper === null
-        ? 0
-        : Math.max(bcWrapper.offsetWidth, bcWrapper.scrollWidth);
-      const contentWidth = brandWidth + itemsWidth +
-        utilitiesWidth + ctaWidth + bcWidth + 40;
-      header.classList.toggle('is-compact', contentWidth > header.clientWidth);
-    }
-
-    // Stage 2: when collapsed, hide both toolbar CTAs if they'd overlap the
-    // hamburger (they stay reachable in the drawer).
-    const collapsed = mobile || header.classList.contains('is-compact');
-    if (!collapsed || (!pinnedCta && !productCta && !pinnedTel)) return;
-    const needed = (brandWrapper?.offsetWidth ?? 0)
-      + (bcWrapper?.offsetWidth ?? 0)
-      + (pinnedCta?.offsetWidth ?? 0)
-      + (pinnedTel?.offsetWidth ?? 0)
-      + (productCta?.offsetWidth ?? 0)
-      + (utilities?.offsetWidth ?? 0) + CTA_OVERFLOW_GAP;
-    const available = nav?.clientWidth ?? header.clientWidth;
-    header.classList.toggle('feds-cta-overflow', needed > available);
-  };
-
-  const observer = new ResizeObserver(check);
-  observer.observe(header);
-  // UNAV can resize without changing the header's border box.
-  if (utilities !== null) observer.observe(utilities);
-  if (bcWrapper !== null) observer.observe(bcWrapper);
-  isDesktop.addEventListener('change', check);
-  mountpoint.addEventListener(MERCH_RESOLVED_EVENT, check);
-  check();
 };
 
 /**

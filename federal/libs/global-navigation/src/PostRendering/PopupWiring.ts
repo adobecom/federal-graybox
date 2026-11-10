@@ -44,7 +44,7 @@ const dispatchToggle = (el: HTMLElement, opening: boolean): void => {
 };
 
 export const isPopupOpen = (el: HTMLElement | null | undefined): boolean =>
-  el !== null && el !== undefined && el.classList.contains(IS_OPEN_CLASS);
+  el?.classList.contains(IS_OPEN_CLASS) ?? false;
 
 const openPopup = (el: HTMLElement | null | undefined): void => {
   if (el === null || el === undefined) return;
@@ -64,6 +64,19 @@ export const togglePopup = (el: HTMLElement | null | undefined): void => {
   if (el === null || el === undefined) return;
   if (el.classList.contains(IS_OPEN_CLASS)) closePopup(el);
   else openPopup(el);
+};
+
+const getToggleAnalyticsLabel = (
+  trigger: HTMLElement,
+  open: boolean,
+): string => {
+  if (trigger.classList.contains('feds-nav-toggle')) {
+    return `hamburgermenu|${open ? 'close' : 'open'}`;
+  }
+  const prefix = trigger.classList.contains('feds-localnav-bar')
+    ? 'localnav-bar'
+    : 'header';
+  return `${prefix}|${open ? 'Close' : 'Open'}`;
 };
 
 // Click-to-toggle + aria reflection for every popup. Mutual exclusion only
@@ -98,17 +111,8 @@ export const wirePopups = (mountpoint: HTMLElement): void => {
     popup.addEventListener('toggle', () => {
       const open = isPopupOpen(popup);
       triggers.forEach(trigger => {
-        const isHamburger = trigger.classList.contains('feds-nav-toggle');
-        const isLocalnavBar = trigger.classList.contains('feds-localnav-bar');
         trigger.setAttribute('aria-expanded', String(open));
-        trigger.setAttribute(
-          'daa-ll',
-          isHamburger
-            ? (open ? 'hamburgermenu|close' : 'hamburgermenu|open')
-            : isLocalnavBar
-              ? (open ? 'localnav-bar|Close' : 'localnav-bar|Open')
-              : (open ? 'header|Close' : 'header|Open'),
-        );
+        trigger.setAttribute('daa-ll', getToggleAnalyticsLabel(trigger, open));
       });
       popup.classList.toggle('feds-menu-active');
     });

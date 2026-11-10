@@ -201,7 +201,7 @@ const setProfileSignUpRequired = (
 
 /**
  * Loads and initializes Universal Navigation
- * 
+ *
  * This is the main orchestration function that:
  * 1. Validates the container element exists
  * 2. Parses configuration from meta tags
@@ -209,7 +209,7 @@ const setProfileSignUpRequired = (
  * 4. Builds component configuration
  * 5. Initializes UNAV with proper context
  * 6. Sets up responsive listeners
- * 
+ *
  * @param nav - Navigation element containing .feds-utilities container
  * @param options - Optional overrides. `countryCode` (string or a promise
  *   resolving to one) lets the host pass a geo-validated market so the unav
@@ -328,7 +328,7 @@ const initializeUnav = async (
     // ========================================================================
     // Step 4: Gather analytics and environment data
     // ========================================================================
-    
+
     // Get configuration with error handling
     let config: MiloConfig;
     try {
@@ -337,7 +337,7 @@ const initializeUnav = async (
       throw new Error('MiloConfig not available for UNAV initialization');
     }
 
-    // Resolve the host-provided market override once. 
+    // Resolve the host-provided market override once.
     const overrideCountryCode = await Promise.resolve(options?.countryCode)
       .catch(() => undefined);
 
@@ -352,7 +352,7 @@ const initializeUnav = async (
     // ========================================================================
     // Step 5: Load UNAV assets from CDN
     // ========================================================================
-    
+
     // Get version from URL parameter or use default
     let unavVersion: string | null = new URLSearchParams(
       window.location.search
@@ -371,15 +371,13 @@ const initializeUnav = async (
 
     // Load JS and CSS in parallel. AUP SDK was already kicked off above
     // (or from main() at IMS-ready time); see preloadAupSdk above.
-    await Promise.all([
-      loadScript(
-        `https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.js`
-      ),
-      loadStyles(
-        `https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.css`,
-        true
-      ),
-    ]);
+    loadStyles(
+      `https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.css`,
+      true
+    );
+    await loadScript(
+      `https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.js`
+    );
 
     // ========================================================================
     // Step 6 + 7: Build component children and UNAV configuration object
@@ -449,7 +447,7 @@ const initializeUnav = async (
           overrideCountryCode
           ?? (getMiloLocaleSettings(config?.locale)?.country || 'US'),
         imsClientId: (window as WindowWithAdobeId)?.adobeid?.client_id,
-        theme: 'light', // TODO: Add toggle based on site theme
+        theme: 'light',
         analyticsContext: {
           consumer: {
             name: 'adobecom',
@@ -508,7 +506,7 @@ const initializeUnav = async (
     // ========================================================================
     // Step 8: Initialize UNAV
     // ========================================================================
-    
+
     await window?.UniversalNav?.(getConfiguration());
 
     if (!initialSignedOut) {
@@ -538,7 +536,7 @@ const initializeUnav = async (
         getConfiguration()
       );
     };
-    
+
     // Reinitialize UNAV when viewport changes (desktop/mobile switch)
     isDesktop.addEventListener('change', () => {
       reloadUnav();
@@ -547,7 +545,7 @@ const initializeUnav = async (
     // ========================================================================
     // Return success with accumulated errors
     // ========================================================================
-    
+
     return {
       reloadUnav,
       errors,

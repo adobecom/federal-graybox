@@ -1,5 +1,10 @@
 Make sure to run `npm i` in the root of the project to get the pre-commit hook installed.
 
+Component click handlers live in `src/PostRendering/ClickListeners/`, split into
+skip-link, tabs, popup animations, and links-card modules.
+`src/PostRendering/ClickListeners.ts` remains the initialization entry point and
+combines the skip-link and tab cleanup callbacks.
+
 `npm run build` and `npm run dev` stop with an error if dependencies are
 missing or out of date. Use Node 22 and run `npm ci` to update them.
 

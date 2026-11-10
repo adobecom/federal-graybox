@@ -11,6 +11,7 @@ import type {
 } from './Unav.types';
 import { setUserProfile } from './Unav.utils';
 import { getMiloConfig, getMetadata } from '../../Utils/Utils';
+import { lanaLog } from '../../Utils/Log';
 
 export const isUnavEnabled = (hostEnabled: boolean): boolean => {
   if (!hostEnabled) return false;
@@ -35,7 +36,7 @@ export const isUnavEnabled = (hostEnabled: boolean): boolean => {
 const getSignInContext = (): object => {
   try {
     const config = getMiloConfig();
-    return config.signInContext || {};
+    return config.signInContext ?? {};
   } catch {
     return {};
   }
@@ -84,10 +85,10 @@ const getMessageEventListener = (): ((
           .catch(() => { setUserProfile({}); });
         break;
       case 'SignOut':
-        executeDefaultAction();
+        void executeDefaultAction();
         break;
       case 'ProfileSwitch':
-        Promise.resolve(executeDefaultAction()).then((profile) => {
+        void Promise.resolve(executeDefaultAction()).then((profile) => {
           if (profile !== null && profile !== undefined) {
             window.location.reload();
           }
@@ -139,20 +140,12 @@ export const getUnavComponents = (): UnavComponents => {
                 trace: (): void => {},
                 debug: (): void => {},
                 info: (): void => {},
-                // TODO: Integrate with lanaLog for proper logging
-                // warn: (e) => lanaLog({
-                //   message: 'Profile Menu warning',
-                //   e,
-                //   tags: 'universalnav,warn',
-                // }),
-                // error: (e) => lanaLog({
-                //   message: 'Profile Menu error',
-                //   e,
-                //   tags: 'universalnav',
-                //   errorType: 'e',
-                // }),
-                warn: (): void => {},
-                error: (): void => {},
+                warn: (message: string): void => {
+                  lanaLog(`Profile Menu warning: ${message}`, 'universalnav,warn');
+                },
+                error: (message: string): void => {
+                  lanaLog(`Profile Menu error: ${message}`, 'universalnav', 'e');
+                },
               },
             },
             managePeopleConfig: {

@@ -824,6 +824,7 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
       const target = event.currentTarget as HTMLAnchorElement;
       if (!target.matches('ul.feds-gnav-items > li > a')) return;
       if (target.closest('nav')?.classList.contains('localnav') !== true) return;
+      if (target.target === '_blank') return;
 
       const href = target.href;
       const url = `${window.location.origin}${window.location.pathname}`;

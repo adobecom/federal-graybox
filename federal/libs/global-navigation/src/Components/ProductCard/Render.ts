@@ -1,5 +1,5 @@
 import { ProductCard, ProductCardBlue, ProductCardHeader, ProductCardLink } from "./Parse";
-import { getAnalyticsAttrs, localizeHref } from "../../Utils/Utils";
+import { getAnalyticsAttrs, getTargetAttrs, localizeHref } from "../../Utils/Utils";
 import { svgIcon } from "../SvgIcon/Render";
 
 export const productCard = (card: ProductCard): HTML => {
@@ -41,6 +41,7 @@ const productCardLink = ({
   daaLl,
   daaLh
 }: ProductCardLink): HTML => {
+  const { href: strippedHref, target } = getTargetAttrs(href);
   const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? title);
   const visibleIcons = icons.filter(
     ({ iconHref }) => iconHref !== null && iconHref !== ""
@@ -71,7 +72,7 @@ const productCardLink = ({
     : `<div class="feds-product-card__subtitle">${subtitle}</div>`;
 
   return `
-    <a class="feds-product-card" href="${localizeHref(href)}"${analyticsAttrs}>
+    <a class="feds-product-card" href="${localizeHref(strippedHref)}"${target !== '' ? ` target="${target}"` : ''}${analyticsAttrs}>
       <div class="feds-product-card-header">
         ${iconsMarkup}
         ${badgesMarkup}
@@ -90,9 +91,10 @@ const productCardBlue = ({
   daaLl,
   daaLh
 }: ProductCardBlue): HTML => {
+  const { href, target } = getTargetAttrs(link.href);
   const analyticsAttrs = getAnalyticsAttrs(daaLh, daaLl ?? link.text);
   return `
-  <a href="${localizeHref(link.href)}" class="feds-product-card feds-product-card--blue"${analyticsAttrs}>
+  <a href="${localizeHref(href)}"${target !== '' ? ` target="${target}"` : ''} class="feds-product-card feds-product-card--blue"${analyticsAttrs}>
     <div class="feds-product-card__content">
         <div class="feds-product-card__title">${link.text}</div>
       </div>

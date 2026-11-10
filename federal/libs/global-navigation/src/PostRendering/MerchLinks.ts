@@ -126,13 +126,18 @@ const decorateTopLevelMasField = async (
     stagingObserver?.disconnect();
     masFieldStagingContainer.remove();
   };
+  const getResolvedLink = (
+    candidate: unknown,
+  ): HTMLAnchorElement | null => {
+    if (candidate instanceof HTMLAnchorElement) return candidate;
+    if (candidate instanceof Element) {
+      return candidate.querySelector<HTMLAnchorElement>('a');
+    }
+    return masFieldStagingContainer.querySelector<HTMLAnchorElement>('a');
+  };
   const finalizeResolvedLink = (resolvedCandidate: unknown): boolean => {
     if (isResolutionComplete) return true;
-    const resolvedLink = resolvedCandidate instanceof HTMLAnchorElement
-      ? resolvedCandidate
-      : resolvedCandidate instanceof Element
-        ? resolvedCandidate.querySelector<HTMLAnchorElement>('a')
-        : masFieldStagingContainer.querySelector<HTMLAnchorElement>('a');
+    const resolvedLink = getResolvedLink(resolvedCandidate);
     if (resolvedLink === null || resolvedLink === stagedMasFieldLink) {
       return false;
     }
@@ -206,6 +211,37 @@ const decorateTopLevelMasField = async (
   }
 };
 
+const decorateMasCards = async (
+  masLinks: HTMLAnchorElement[],
+  injectedDecorators: ReturnType<typeof getMerchDecorators>,
+  base: string,
+  errors: Set<RecoverableError>,
+): Promise<void> => {
+  try {
+    const decorateMasLink = injectedDecorators.masCard
+      ?? (await import(
+        `${base}/blocks/merch-card-autoblock/merch-card-autoblock.js`
+      ) as MerchModule).default;
+    if (decorateMasLink === undefined) {
+      errors.add(new RecoverableError('default export not found in merch-card-autoblock module'));
+    } else {
+      masLinks.forEach((link) => {
+        try {
+          void Promise.resolve(decorateMasLink(link)).catch((error) => {
+            lanaLog(`Failed to decorate M@S card: ${String(error)}`);
+          });
+        } catch (error) {
+          lanaLog(`Failed to decorate M@S card: ${String(error)}`);
+        }
+      });
+    }
+  } catch (error) {
+    errors.add(
+      new RecoverableError(`Error initializing M@S cards: ${error}`)
+    );
+  }
+};
+
 /**
  * Loads the relevant Milo commerce block for each link in the nav:
  * - `a.merch` (OST / miniplans): Milo `merch` block
@@ -224,7 +260,7 @@ export const initMerchLinks = async (
   // them in place.
   mountpoint.querySelectorAll<HTMLElement>('.feds-commerce-placeholder')
     .forEach((placeholder) => {
-      const href = placeholder.getAttribute('data-commerce-href') ?? '';
+      const href = placeholder.dataset.commerceHref ?? '';
       if (!isHttpUrl(href)) return;
       const link = document.createElement('a');
       link.href = href;
@@ -303,29 +339,7 @@ export const initMerchLinks = async (
 
     // Full M@S cards: Milo `merch-card-autoblock` block
     if (masLinks.length > 0) {
-      try {
-        const decorateMasLink = injectedDecorators.masCard
-          ?? (await import(
-            `${base}/blocks/merch-card-autoblock/merch-card-autoblock.js`
-          ) as MerchModule).default;
-        if (decorateMasLink === undefined) {
-          errors.add(new RecoverableError('default export not found in merch-card-autoblock module'));
-        } else {
-          masLinks.forEach((link) => {
-            try {
-              void Promise.resolve(decorateMasLink(link)).catch((error) => {
-                lanaLog(`Failed to decorate M@S card: ${String(error)}`);
-              });
-            } catch (error) {
-              lanaLog(`Failed to decorate M@S card: ${String(error)}`);
-            }
-          });
-        }
-      } catch (error) {
-        errors.add(
-          new RecoverableError(`Error initializing M@S cards: ${error}`)
-        );
-      }
+      await decorateMasCards(masLinks, injectedDecorators, base, errors);
     }
   } catch (error) {
     removeFailedMerchItems(mountpoint, stagedMasFieldLinks);

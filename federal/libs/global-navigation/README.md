@@ -30,3 +30,10 @@ active-link detection, as are pinned and product-entry CTAs in the toolbar.
 Inside dropdowns and mega-menus, matching links (including CTAs, promo-card
 CTAs, and image-panel buttons) can mark their containing menu active.
 Ordinary navigation links remain eligible.
+
+Open C2 navigation menus close when the page scrolls, including when already
+past the header's scroll threshold. Scrolling inside a dropdown or compact
+navigation drawer does not dismiss it.
+The expanded localnav bar also closes on page scroll. It does not lock page
+scrolling unless a submenu is open; full navigation drawers and submenus
+retain their scroll lock.

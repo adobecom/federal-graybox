@@ -1071,7 +1071,7 @@ header.global-navigation:has(.feds-popup.is-open) .unav-comp-tooltip {
     border-radius: var(--s2a-border-radius-24);
   }
 
-  body:has(.feds-popup.is-open, .feds-menu-wrapper.is-open) {
+  body:has(.feds-popup.is-open, nav:not(.localnav) .feds-menu-wrapper.is-open) {
     overflow: hidden;
     scrollbar-gutter: stable;
   }
@@ -1666,7 +1666,7 @@ header.global-navigation.is-compact .feds-popup .feds-popup-header {
 
 /* Scroll lock (mirrors line 988-991) */
 body:has(header.global-navigation.is-compact .feds-popup.is-open),
-body:has(header.global-navigation.is-compact .feds-menu-wrapper.is-open) {
+body:has(header.global-navigation.is-compact nav:not(.localnav) .feds-menu-wrapper.is-open) {
   overflow: hidden;
   scrollbar-gutter: stable;
 }

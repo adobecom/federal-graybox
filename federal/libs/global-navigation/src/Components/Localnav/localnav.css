@@ -188,8 +188,11 @@ nav.localnav:has(.feds-menu-wrapper.is-open) .feds-popup .feds-popup-header {
 
   .global-navigation.feds-header-scrolled nav.localnav .feds-localnav-bar,
   .global-navigation:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) nav.localnav .feds-localnav-bar {
-    border-top-color: rgba(0, 0, 0, 0.12);
     color: var(--s2a-color-content-default);
+  }
+
+  .global-navigation nav.localnav .feds-localnav-bar[aria-expanded="true"] {
+    border-top: 0;
   }
 
   /* Chevron indicator on the right of the bar. Rotates when open. */
@@ -430,8 +433,11 @@ header.global-navigation.is-compact.dark-font nav.localnav .feds-localnav-bar {
 
 header.global-navigation.is-compact.feds-header-scrolled nav.localnav .feds-localnav-bar,
 header.global-navigation.is-compact:has(.feds-menu-wrapper.is-open, .feds-popup.is-open) nav.localnav .feds-localnav-bar {
-  border-top-color: rgba(0, 0, 0, 0.12);
   color: var(--s2a-color-content-default);
+}
+
+header.global-navigation.is-compact nav.localnav .feds-localnav-bar[aria-expanded="true"] {
+  border-top: 0;
 }
 
 header.global-navigation.is-compact nav.localnav .feds-localnav-bar::after {
@@ -580,4 +586,3 @@ header.global-navigation.is-compact nav.localnav > .feds-breadcrumbs {
     text-align: center;
   }
 }
-

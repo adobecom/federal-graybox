@@ -1184,8 +1184,8 @@ export function getMiloLocaleSettings(
 
 export const closePopovers = (mountpoint: HTMLElement): void => {
   const menuPopover = mountpoint.querySelector<HTMLElement>('#feds-menu-wrapper');
-  menuPopover?.classList.remove('feds-menu-active');
   closePopup(menuPopover);
+  menuPopover?.classList.remove('feds-menu-active');
   mountpoint
     .querySelectorAll<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`)
     .forEach(closePopup);

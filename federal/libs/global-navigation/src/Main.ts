@@ -10,6 +10,7 @@ import { wirePopups, initLightDismiss, IS_OPEN_CLASS, isPopupOpen } from "./Post
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
 import { initMerchLinks } from "./PostRendering/MerchLinks";
+import { initModalLinks, ModalLinkDecorator } from "./PostRendering/ModalLinks";
 import { initCompactOverflow } from "./PostRendering/CompactOverflow";
 import { initActiveLink, isCurrentPageHref } from "./PostRendering/ActiveLink";
 import { initScrollDismiss } from "./PostRendering/ScrollDismiss";
@@ -70,6 +71,8 @@ export type Input = {
   decorateBody?: DecorateBody;
   // Host-injected Milo commerce decorators; falls back to a config.base import.
   merchDecorators?: MerchDecorators;
+  // Host-owned XF modal recognition and initialization on final rendered links.
+  decorateModalLinks?: ModalLinkDecorator;
   // Milo's appendHtmlToLink: adds `.html` to extensionless internal links
   // when config.useDotHtml is on. Runs pre-localize to mirror c1.
   appendHtmlToLink?: (link: HTMLAnchorElement) => void;
@@ -510,6 +513,7 @@ export const postRenderingTasks = async (
 ): Promise<GlobalNavigation | IrrecoverableError> => {
   const errors = new Set<RecoverableError>();
 
+  await initModalLinks(input.mountpoint, input.decorateModalLinks);
   initActiveLink(input.mountpoint, input.gnavSource);
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
@@ -816,7 +820,7 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
   const localnav = mountpoint.querySelector('nav.localnav');
   if (localnav === null) return;
   const topLevelAnchors = localnav.querySelectorAll<HTMLAnchorElement>(
-    'ul.feds-gnav-items > li > a'
+    'ul.feds-gnav-items > li > a:not([data-modal-hash])'
   );
   topLevelAnchors.forEach(anchor => {
     if (!isCurrentPageHref(anchor.href)) return;

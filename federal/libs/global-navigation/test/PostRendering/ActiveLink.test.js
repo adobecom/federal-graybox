@@ -56,6 +56,15 @@ describe('active navigation link detection', () => {
     expect(activeItem()).to.equal(matchingItem());
   });
 
+  it('does not treat a decorated modal hash as the current page', () => {
+    matchingItem().innerHTML = `
+      <div class="feds-popup">
+        <a href="#eligibility" data-modal-hash="#eligibility">Check eligibility</a>
+      </div>`;
+    initialize();
+    expect(activeItem()).to.equal(null);
+  });
+
   for (const className of [
     'feds-primary-cta',
     'feds-secondary-cta',

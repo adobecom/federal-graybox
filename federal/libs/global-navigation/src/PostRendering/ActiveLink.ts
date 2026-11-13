@@ -11,7 +11,7 @@ const findActiveLink = (
   // The first localnav item represents the section, not a sibling page.
   const isLocalnav = mountpoint.querySelector('nav.localnav') !== null;
   return [...mountpoint.querySelectorAll<HTMLAnchorElement>(
-    'a:not(.feds-skip-link)'
+    'a:not(.feds-skip-link):not([data-modal-hash])'
   )]
     .filter(a => !a.closest('.feds-breadcrumbs'))
     // Like C1, nested CTA links can activate their containing menu.

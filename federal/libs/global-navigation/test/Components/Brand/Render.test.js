@@ -37,6 +37,34 @@ describe('Brand Render', () => {
     const a = container.querySelector('a.feds-brand');
     expect(a).to.exist;
     expect(a.getAttribute('aria-label')).to.equal('Adobe');
+    expect(container.querySelector('.desktop-brand').style.minWidth).to.equal('');
+    expect(container.querySelector('.mobile-brand').style.minWidth).to.equal('');
+  });
+
+  it('should apply authored minimum widths to containers without resizing images', () => {
+    const container = document.createElement('div');
+    container.innerHTML = brand({
+      type: 'Brand',
+      data: {
+        href: '/',
+        label: 'Adobe for Business',
+        isDarkBg: false,
+        imageData: {
+          type: 'svg',
+          lightThemeImageSrc: 'https://example.com/desktop.svg',
+          mobileLightThemeImageSrc: 'https://example.com/mobile.svg',
+          desktopMinWidth: 183.5,
+          mobileMinWidth: 183,
+        },
+      },
+    });
+    expect(container.querySelector('.desktop-brand').style.minWidth).to.equal('183.5px');
+    expect(container.querySelector('.mobile-brand').style.minWidth).to.equal('183px');
+    expect(container.querySelectorAll('img').length).to.equal(6);
+    container.querySelectorAll('img').forEach(image => {
+      expect(image.hasAttribute('width')).to.equal(false);
+      expect(image.hasAttribute('height')).to.equal(false);
+    });
   });
 
   it('should apply dark background modifier class', () => {
@@ -154,5 +182,4 @@ describe('Brand Render', () => {
     expect(html).to.include('src="https://example.com/mobile-light.svg"');
   });
 });
-
 

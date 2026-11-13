@@ -277,11 +277,11 @@ export const getVisitorGuid = async (): Promise<string | undefined> => {
  * @param closeCallback - Called with `{ type: 'close' }` when the dialog
  * is dismissed
  */
-export const showAupDialog = async (
+export const showAupDialog = (
   element: HTMLElement,
   _: unknown,
   closeCallback: (result: { type: string }) => void,
-): Promise<void> => {
+): void => {
   const dialog = document.createElement('dialog');
   dialog.id = 'feds-manage-people-dialog';
   dialog.appendChild(element);

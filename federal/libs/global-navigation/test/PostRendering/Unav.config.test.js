@@ -204,6 +204,46 @@ describe('UNAV Config', () => {
         expect(() => logger.error('test')).to.not.throw();
       });
 
+      describe('profile menu logging', () => {
+        let originalLana;
+        let calls;
+
+        beforeEach(() => {
+          originalLana = window.lana;
+          calls = [];
+          window.lana = {
+            log: (message, options) => { calls.push({ message, options }); },
+          };
+          createMetaTag('gnav-source', '/test/gnav');
+        });
+
+        afterEach(() => {
+          window.lana = originalLana;
+        });
+
+        for (const [method, label, tags] of [
+          ['warn', 'warning', 'universalnav,warn'],
+          ['error', 'error', 'universalnav'],
+        ]) {
+          it(`logs ${method} messages and tags through the shared logger`, () => {
+            const result = getUnavComponents();
+            const logger = result.profile.attributes.accountMenuContext.sharedContextConfig.miniAppContext.logger;
+
+            logger[method]('Request failed');
+
+            expect(calls).to.deep.equal([{
+              message: `Profile Menu ${label}: Request failed | gnav-source: /test/gnav | href: ${window.location.href}`,
+              options: {
+                clientId: 'feds-milo',
+                sampleRate: 1,
+                tags,
+                errorType: 'e',
+              },
+            }]);
+          });
+        }
+      });
+
       it('should have complexConfig defaulting to null', () => {
         const result = getUnavComponents();
         const config = result.profile.attributes.accountMenuContext.sharedContextConfig;

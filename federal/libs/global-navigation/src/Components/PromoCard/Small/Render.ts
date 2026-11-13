@@ -14,7 +14,11 @@ const renderCard = ({
   bgImageAlt,
   bgImageSrc,
   bgImageFieldHtml,
-}: PromoCardSmallData): HTML => `
+}: PromoCardSmallData): HTML => {
+  const authoredBg = bgImageFieldHtml !== null
+    ? `<div class="promo-card-small__bg">${bgImageFieldHtml}</div>`
+    : ""
+  return `
   <article class="promo-card-small" daa-lh="promo-card-small">
   ${
     bgImageSrc
@@ -26,9 +30,7 @@ const renderCard = ({
             class="promo-card__bg-image"
           >
           </picture>`
-      : bgImageFieldHtml !== null
-        ? `<div class="promo-card-small__bg">${bgImageFieldHtml}</div>`
-        : ""
+      : authoredBg
   }
   <div class="promo-card-small__content">
       <div class="promo-card-small__text">
@@ -41,6 +43,7 @@ const renderCard = ({
     </div>
   </article>
 `.trim();
+}
 
 const renderCta = ({
   cta,

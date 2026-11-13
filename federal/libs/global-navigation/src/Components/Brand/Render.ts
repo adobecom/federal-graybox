@@ -79,16 +79,22 @@ const { href, label, isDarkBg, imageData } = data;
 
   const desktopSvg = hasDesktopLight && hasDesktopDark ? '' : DESKTOP_SVG;
   const mobileSvg = hasMobileLight && hasMobileDark ? '' : MOBILE_SVG;
+  const desktopWidthStyle = imageData.desktopMinWidth === undefined
+    ? ''
+    : ` style="min-width: ${imageData.desktopMinWidth}px"`;
+  const mobileWidthStyle = imageData.mobileMinWidth === undefined
+    ? ''
+    : ` style="min-width: ${imageData.mobileMinWidth}px"`;
 
   return `<div class="feds-brand-container${isDarkBg ? ' feds-dark-bg' : ''}">
     <a href="${localizeHref(href)}" class="feds-brand" daa-ll="Brand" aria-label="${label}">
-      <span class="feds-brand-image desktop-brand">
+      <span class="feds-brand-image desktop-brand"${desktopWidthStyle}>
         ${desktopLightImg}
         ${desktopDarkImg}
         ${desktopScrollImg}
         ${desktopSvg}
       </span>
-      <span class="feds-brand-image mobile-brand">
+      <span class="feds-brand-image mobile-brand"${mobileWidthStyle}>
         ${mobileLightImg}
         ${mobileDarkImg}
         ${mobileScrollImg}

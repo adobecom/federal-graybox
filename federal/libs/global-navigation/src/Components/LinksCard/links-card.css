@@ -8,7 +8,6 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   padding: var(--s2a-spacing-lg);
   margin-bottom: var(--s2a-spacing-sm);
 }

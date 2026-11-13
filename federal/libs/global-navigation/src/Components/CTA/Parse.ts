@@ -30,26 +30,24 @@ const parseCTA = (
   element: Element | null
 ): Parsed<CTA, RecoverableError> => {
   if (element === null)
-    throw new Error('');
+    throw new Error(`${type.type} is missing its source element`);
 
   const anchor = element.querySelector(getSelector(type));
   if (!anchor)
-    throw new Error('');
+    throw new Error(`${type.type} has no ${getSelector(type)} anchor`);
 
   const textContent = anchor.textContent ?? '';
   const [text = '', pipeAriaLabel = ''] = textContent.split('|').map((s) => s.trim());
   if (text === '')
-    throw new Error('');
+    throw new Error(`${type.type} anchor has no link text`);
 
   const href = anchor.getAttribute('href') ?? '';
   if (href === '')
-    throw new Error('');
+    throw new Error(`${type.type} anchor is missing an href`);
 
   const daaLl = anchor.getAttribute('daa-ll');
   const ariaLabelAttr = anchor.getAttribute('aria-label')?.trim() ?? '';
-  const ariaLabel = ariaLabelAttr !== ''
-    ? ariaLabelAttr
-    : (pipeAriaLabel !== '' ? pipeAriaLabel : undefined);
+  const ariaLabel = ariaLabelAttr || pipeAriaLabel || undefined;
   const es: RecoverableError[] = [];
 
   return [
@@ -85,7 +83,7 @@ const getSelector = ({ type }: Pick<CTA, 'type'>): string => {
   switch (type) {
     case "PrimaryCTA": return 'strong > a';
     case "SecondaryCTA": return 'em > a';
-    default: throw new Error('');
+    default: throw new Error(`Unsupported CTA type: ${String(type)}`);
   }
 }
 

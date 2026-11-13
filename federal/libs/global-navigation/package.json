@@ -10,7 +10,10 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
+    "check:deps": "npm ls --depth=0 >/dev/null || (echo 'global-navigation dependencies are out of date. Use Node 22 and run npm ci.' && exit 1)",
+    "prebuild": "npm run check:deps --silent",
     "build": "node build.js",
+    "predev": "npm run check:deps --silent",
     "dev": "./dev.sh",
     "clean": "rm -rf dist",
     "lint": "eslint . --ext .ts",
@@ -32,5 +35,8 @@
     "sinon": "^21.0.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.0"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.17"
   }
 }

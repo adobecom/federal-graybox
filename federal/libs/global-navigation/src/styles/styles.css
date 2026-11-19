@@ -38,7 +38,8 @@
 @import "../PostRendering/Unav/unav.css";
 @import "../PostRendering/Profile/profile.css";
 
-.global-navigation ul.feds-gnav-items > li > [data-feds-merch-pending] {
+.global-navigation ul.feds-gnav-items > li > [data-feds-merch-pending],
+.global-navigation :is(.feds-pinned-cta, .feds-product-entry-cta) > [data-feds-merch-pending] {
   display: none !important;
 }
 

@@ -2,9 +2,13 @@
    Promo Card Small
    ========================================= */
 
+/* Min height (not fixed) and in-flow content let the card grow when the
+   copy wraps on narrow screens instead of clipping it. */
 .feds-gnav-cards .promo-card-small {
   position: relative;
-  height: 199px;
+  display: flex;
+  flex-direction: column;
+  min-height: 199px;
   border-radius: var(--s2a-border-radius-24);
   overflow: hidden;
   margin-bottom: var(--s2a-spacing-sm);
@@ -54,8 +58,8 @@
 }
 
 .feds-gnav-cards .promo-card-small__content {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

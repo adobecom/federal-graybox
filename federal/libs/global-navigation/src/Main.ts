@@ -259,7 +259,7 @@ export const main = async (
   // by not authoring one). Otherwise `loadUnav` owns the utilities slot.
   const profileEnabled = !unavEnabled && rawProfileElem !== null;
   const breadcrumbAnchors = [
-    ...document.querySelectorAll<HTMLAnchorElement>('.breadcrumbs ul > li > a')
+    ...document.querySelectorAll<HTMLAnchorElement>('.breadcrumbs :is(ul, ol) > li > a')
   ];
   input.convertStageLinks?.({
     anchors: breadcrumbAnchors,

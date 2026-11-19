@@ -16,6 +16,9 @@ type MerchModule = {
 export const MERCH_RESOLVED_EVENT = 'feds:merch-resolved';
 
 const PENDING_MERCH_ATTR = 'data-feds-merch-pending';
+const TOOLBAR_CTA_SLOT_SELECTOR = '.feds-pinned-cta, .feds-product-entry-cta';
+const STAGED_MAS_FIELD_SELECTOR = 'ul.feds-gnav-items > li > a, '
+  + `:is(${TOOLBAR_CTA_SLOT_SELECTOR}) > a`;
 const MILO_VISUAL_CLASS = /^(?:con-button|outline|button-.+)$/;
 const FEDERAL_LINK_CLASSES = new Set([
   'feds-link',
@@ -59,8 +62,11 @@ const removeFailedMerchItems = (
     if (!link.isConnected || !link.hasAttribute(PENDING_MERCH_ATTR)) continue;
     const item = link.parentElement;
     if (
-      !(item instanceof HTMLLIElement)
-      || !item.matches('ul.feds-gnav-items > li')
+      item === null
+      || !(
+        (item instanceof HTMLLIElement && item.matches('ul.feds-gnav-items > li'))
+        || item.matches(TOOLBAR_CTA_SLOT_SELECTOR)
+      )
     ) continue;
     item.remove();
     removed = true;
@@ -283,7 +289,7 @@ export const initMerchLinks = async (
   const stagedMasFieldLinks = [...merchLinks]
     .filter((link) =>
       isMasFieldLink(link.href)
-      && link.matches('ul.feds-gnav-items > li > a')
+      && link.matches(STAGED_MAS_FIELD_SELECTOR)
     );
   // Keep authored labels out of the initial compact measurement.
   stagedMasFieldLinks.forEach((link) => {

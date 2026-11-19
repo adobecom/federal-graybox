@@ -2,9 +2,13 @@
    Promo Card
    ========================================= */
 
+/* Min height (not fixed) and in-flow text let the card grow when the copy
+   wraps on narrow screens instead of overflowing it. */
 .feds-gnav-cards .promo-card {
   position: relative;
-  height: 199px;
+  display: flex;
+  flex-direction: column;
+  min-height: 199px;
   margin-bottom: var(--s2a-spacing-sm);
 }
 
@@ -24,12 +28,16 @@
 }
 
 .feds-gnav-cards .promo-card__content {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  /* Keeps the text clear of the absolutely positioned icon. */
+  padding-top: calc(var(--s2a-spacing-md) + var(--s2a-spacing-lg));
   background: transparent;
   width: 100%;
-  height: 100%;
 }
 
 .feds-gnav-cards .promo-card__icon {
@@ -50,9 +58,7 @@
 }
 
 .feds-gnav-cards .promo-card__text-content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
+  position: relative;
   display: block;
   padding: var(--s2a-spacing-md);
 }

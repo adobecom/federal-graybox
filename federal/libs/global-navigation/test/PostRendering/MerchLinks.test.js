@@ -438,6 +438,90 @@ describe('initMerchLinks — commerce link routing', () => {
     }
   });
 
+  it('stages a pinned CTA so a late mas-field resolves onto the anchor, not the wrapper', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <div class="feds-pinned-cta">
+        <a class="feds-primary-cta" href="${MAS_CTA}" daa-ll="Free trial">Mas-field: Free trial - segmentation - modal</a>
+      </div>
+    `;
+    document.body.appendChild(mountpoint);
+    let masField;
+    let resolvedEvents = 0;
+    mountpoint.addEventListener('feds:merch-resolved', () => {
+      resolvedEvents += 1;
+    });
+    // Mimics Milo: late CTAs are only hoisted inside em/strong.
+    const onMasReady = (event) => {
+      if (event.target !== masField || masField.closest('em, strong') === null) return;
+      const content = masField.querySelector('[data-role="mas-field-content"]');
+      masField.replaceChildren(...content.childNodes);
+    };
+    document.addEventListener('mas:ready', onMasReady, { capture: true });
+    setMerchDecorators({
+      merch: async (link) => {
+        expect(link.closest('strong')).to.not.equal(null);
+        masField = document.createElement('mas-field');
+        link.replaceWith(masField);
+        return masField;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+
+      const pending = mountpoint.querySelector('.feds-pinned-cta > a');
+      expect(pending.hasAttribute('data-feds-merch-pending')).to.equal(true);
+
+      masField.innerHTML = `
+        <span data-role="mas-field-content"><a class="con-button blue button-resolved">Free trial</a></span>
+      `;
+      masField.dispatchEvent(new CustomEvent('mas:ready', { bubbles: true }));
+
+      const slot = mountpoint.querySelector('.feds-pinned-cta');
+      const resolved = slot.firstElementChild;
+      expect(resolved.tagName).to.equal('A');
+      expect(resolved.textContent).to.equal('Free trial');
+      expect(resolved.classList.contains('feds-primary-cta')).to.equal(true);
+      expect(resolved.classList.contains('con-button')).to.equal(false);
+      expect(resolved.classList.contains('button-resolved')).to.equal(false);
+      expect(resolved.hasAttribute('data-feds-merch-pending')).to.equal(false);
+      expect(slot.querySelector('mas-field')).to.equal(null);
+      expect(resolvedEvents).to.equal(1);
+    } finally {
+      document.removeEventListener('mas:ready', onMasReady, { capture: true });
+      mountpoint.remove();
+    }
+  });
+
+  it('removes the pinned CTA slot when its staged MAS field fails', async () => {
+    const mountpoint = document.createElement('div');
+    mountpoint.innerHTML = `
+      <div class="feds-pinned-cta">
+        <a class="feds-primary-cta" href="${MAS_CTA}">Mas-field: Free trial</a>
+      </div>
+    `;
+    document.body.appendChild(mountpoint);
+    let masField;
+    setMerchDecorators({
+      merch: async (link) => {
+        masField = document.createElement('mas-field');
+        link.replaceWith(masField);
+        return masField;
+      },
+    });
+
+    try {
+      await initMerchLinks(mountpoint);
+      masField.dispatchEvent(new CustomEvent('mas:ready', { bubbles: true }));
+
+      expect(mountpoint.querySelector('.feds-pinned-cta')).to.equal(null);
+      expect(mountpoint.textContent).to.not.include('Mas-field: Free trial');
+    } finally {
+      mountpoint.remove();
+    }
+  });
+
   it('does not await a full MAS card or dispatch a compact event', async () => {
     const mountpoint = document.createElement('div');
     mountpoint.innerHTML = `

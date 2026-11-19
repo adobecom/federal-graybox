@@ -38,7 +38,8 @@
 @import "../PostRendering/Unav/unav.css";
 @import "../PostRendering/Profile/profile.css";
 
-.global-navigation ul.feds-gnav-items > li > [data-feds-merch-pending] {
+.global-navigation ul.feds-gnav-items > li > [data-feds-merch-pending],
+.global-navigation :is(.feds-pinned-cta, .feds-product-entry-cta) > [data-feds-merch-pending] {
   display: none !important;
 }
 
@@ -289,6 +290,15 @@ header.feds-header-scrolled:not(:has(.localnav)):not(:has(.feds-popup.is-open:no
 
 .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
   cursor: pointer;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@media (width >= 768px) {
+  .global-navigation .feds-gnav-items > li > .mega-menu.feds-link {
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
 }
 
 /* Scrolled OR any popup/drawer open → backdrop is light/gray, so

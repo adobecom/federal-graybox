@@ -18,12 +18,12 @@ export const parseBreadcrumbs = (
   if (element === null)
     throw new IrrecoverableError(ERRORS.elementNull);
 
-  // The breadcrumbs block is authored as <ul> with one <li> per crumb.
-  // Most <li>s wrap an <a> (a navigable
+  // The breadcrumbs block is authored as a <ul> (or <ol>) with one <li> per
+  // crumb. Most <li>s wrap an <a> (a navigable
   // crumb), but the final crumb is typically a raw text node
   // representing the current page. Collect every <li> in document
   // order and parse it either as a Link or as a plain string.
-  const listItems = [...element.querySelectorAll('ul > li')];
+  const listItems = [...element.querySelectorAll(':is(ul, ol) > li')];
   if (listItems.length === 0)
     throw new IrrecoverableError(ERRORS.noItems);
 

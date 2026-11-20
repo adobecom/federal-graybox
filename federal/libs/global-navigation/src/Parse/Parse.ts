@@ -3,7 +3,12 @@ import { Component, parseComponent } from "../Components/Component";
 import { ProductEntryCTA } from "../Components/CTA/Parse";
 import { PromoBar, parsePromoBar } from "../Components/PromoBar/Parse";
 import { IrrecoverableError, RecoverableError } from "../Error/Error";
-import { getMetadata, isTelephoneLink, parseListAndAccumulateErrors } from "../Utils/Utils";
+import {
+  getMetadata,
+  isBlockedByLinkPolicy,
+  isTelephoneLink,
+  parseListAndAccumulateErrors,
+} from "../Utils/Utils";
 
 // Components that carry a navigable href and can therefore be a telephone link.
 export type HrefComponent = Extract<Component, { href: string }>;
@@ -22,6 +27,38 @@ export type GlobalNavigationData = {
   placeholders: Map<string, string>;
   brandConciergeEnabled: boolean;
   notificationsEnabled: boolean;
+};
+
+const createElement = (
+  tagName: 'a' | 'h2',
+  text: string,
+  href?: string,
+): HTMLElement => {
+  const element = document.createElement(tagName);
+  element.textContent = text;
+  if (href !== undefined) element.setAttribute('href', href);
+  return element;
+};
+
+// C1 checks each top-level item (dropdown title, link or CTA) before
+// rendering. Omitting blocked items here keeps menu popups, the pinned CTA
+// and localnav in step with what is rendered.
+const isBlockedItem = (c: Component): boolean => {
+  switch (c.type) {
+    case "MegaMenu":
+    case "SmallMenu":
+      return isBlockedByLinkPolicy(createElement('h2', c.title));
+    case "Link":
+    case "PrimaryCTA":
+    case "SecondaryCTA":
+      return isBlockedByLinkPolicy(createElement('a', c.text, c.href));
+    case "ProductEntryCTA":
+      return isBlockedByLinkPolicy(
+        createElement('a', c.cta.text, c.cta.href),
+      );
+    default:
+      return false;
+  }
 };
 
 export const parseNavigation = (
@@ -48,11 +85,12 @@ export const parseNavigation = (
     return parsed;
   });
 
-  const [parsedComponents, componentErrors]
+  const [parsedItems, componentErrors]
     = parseListAndAccumulateErrors(
       [...mainNav.children],
       parseComponent
     );
+  const parsedComponents = parsedItems.filter((c) => !isBlockedItem(c));
   // The product entry CTA is parsed via parseComponent but should be
   // rendered to the right of the gnav (immediately to the left of the
   // unav) rather than inside the menu list, so we lift the first

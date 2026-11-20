@@ -37,3 +37,12 @@ navigation drawer does not dismiss it.
 The expanded localnav bar also closes on page scroll. It does not lock page
 scrolling unless a submenu is open; full navigation drawers and submenus
 retain their scroll lock.
+
+Hosts can pass `shouldBlockLink(element)` to `main` to omit navigation links,
+such as Milo's KR free-trial restriction. Matching C1, top-level dropdowns
+(checked by title), links, CTAs and the product entry CTA are omitted before
+rendering, so menus, the pinned CTA and localnav only see allowed items. Links
+inside menus and promo CTAs are checked when rendered, before modal and
+commerce decoration; wrappers left empty are removed up to their list item.
+Brand, breadcrumb and promo copy links are not checked. If the policy throws,
+the element is kept.

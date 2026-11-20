@@ -20,7 +20,7 @@ import { isUnavEnabled } from "./PostRendering/Unav/Unav.config";
 import { loadProfile } from "./PostRendering/Profile/Profile";
 import { getInitialHTML } from "./PreRendering/FetchAssets";
 import { initPromoCountdown } from "./Components/CountdownTimer/cdt";
-import { sanitize, setSanitizedHTML, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, getLocalizeLink, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
+import { sanitize, setSanitizedHTML, setMiloConfig, MiloConfig, setPersonalizationConfig, PersonalizationConfig, getLocalizeLink, setLocalizeLink, LocalizeLink, setDecorateBody, DecorateBody, setMerchDecorators, MerchDecorators, setLoadBrandConcierge, getLoadBrandConcierge, LoadBrandConcierge, setLingoLocaleConfig, LingoLocaleConfig, setLinkFilter, LinkFilter, isDesktop, closePopovers, getExperienceName, icons, fetchAndProcessPlainHTML, getMetadata } from "./Utils/Utils";
 import './styles/styles.css';
 import { combineWithFederalPlaceholders, setPlaceholders, getPlaceholders } from "./Utils/Placeholders";
 import { lanaLog } from "./Utils/Log";
@@ -73,6 +73,9 @@ export type Input = {
   merchDecorators?: MerchDecorators;
   // Host-owned XF modal recognition and initialization on final rendered links.
   decorateModalLinks?: ModalLinkDecorator;
+  // Host-owned link policy (e.g. KR free-trial restriction). Applied to
+  // top-level items before render and to rendered menu links and promo CTAs.
+  shouldBlockLink?: LinkFilter;
   // Milo's appendHtmlToLink: adds `.html` to extensionless internal links
   // when config.useDotHtml is on. Runs pre-localize to mirror c1.
   appendHtmlToLink?: (link: HTMLAnchorElement) => void;
@@ -201,6 +204,7 @@ export const main = async (
 
   setPersonalizationConfig(personalization);
   setLocalizeLink(input.localizeLink ?? ((link: string): string => link));
+  setLinkFilter(input.shouldBlockLink);
   setDecorateBody(async (body): Promise<void> => {
     const anchors = [...body.querySelectorAll<HTMLAnchorElement>('a')];
     anchors.forEach((anchor) => input.appendHtmlToLink?.(anchor));

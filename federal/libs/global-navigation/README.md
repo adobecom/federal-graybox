@@ -31,6 +31,12 @@ Inside dropdowns and mega-menus, matching links (including CTAs, promo-card
 CTAs, and image-panel buttons) can mark their containing menu active.
 Ordinary navigation links remain eligible.
 
+At compact and mobile widths, all top-level primary and secondary CTAs stay
+in the toolbar alongside the pinned telephone while space permits. CTA order
+matches the authored navigation. The CTA group (including its internal gaps)
+is measured as a whole; when the toolbar no longer fits, the pinned controls
+are hidden and their original menu entries remain available.
+
 Open C2 navigation menus close when the page scrolls, including when already
 past the header's scroll threshold. Scrolling inside a dropdown or compact
 navigation drawer does not dismiss it.

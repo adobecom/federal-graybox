@@ -31,13 +31,14 @@
   }
 
   /* =========================================
-     Pinned CTA — toolbar clone of the trailing nav CTA,
+     Pinned CTAs — toolbar clones of the top-level nav CTAs,
      shown next to the hamburger at compact/mobile
      ========================================= */
 
   & .feds-pinned-cta {
     display: none;
     align-items: center;
+    gap: var(--s2a-spacing-sm);
     flex-shrink: 0;
     /* Right-align the trailing CTA group (drawer is out of flow here). */
     margin-left: auto;
@@ -88,7 +89,7 @@
   }
 
   /* Dynamic reflow: JS adds .feds-cta-overflow when the brand + CTAs +
-     utilities can't all fit, hiding both toolbar CTAs so they never overlap
+     utilities can't all fit, hiding the toolbar CTAs so they never overlap
      the hamburger (they stay reachable in the drawer). */
   &.feds-cta-overflow :is(.feds-pinned-cta, .feds-pinned-tel, .feds-product-entry-cta) {
     display: none;
@@ -396,4 +397,3 @@
     box-sizing: border-box;
   }
 }
-

@@ -1,7 +1,8 @@
 import { breadcrumbs as renderBreadcrumbs } from "./Components/Breadcrumbs/Render";
 import { Component, component } from "./Components/Component";
 import { promoBar as renderPromoBar } from "./Components/PromoBar/Render";
-import { productEntryCTA } from "./Components/CTA/Render";
+import { pinnedCTAs, productEntryCTA } from "./Components/CTA/Render";
+import { PrimaryCTA, SecondaryCTA } from "./Components/CTA/Parse";
 import { link } from "./Components/Link/Render";
 import { IrrecoverableError, RecoverableError } from "./Error/Error";
 import { GlobalNavigationData, parseNavigation } from "./Parse/Parse";
@@ -417,15 +418,12 @@ export const renderGnavString = ({
       ? component(withLocalnavOverviewLabel(c, placeholders), index)
       : component(c, index)
   );
-  // Clone the trailing CTA into a toolbar slot so it stays by the hamburger.
-  // The telephone has its own pinned slot, so exclude it from the trailing CTA.
+  // Keep the CTAs in one measured toolbar group; the telephone has its own slot.
   const ctaComponents = components.filter(
-    (c) => (c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA') && c !== telephone
+    (c): c is PrimaryCTA | SecondaryCTA =>
+      (c.type === 'PrimaryCTA' || c.type === 'SecondaryCTA') && c !== telephone
   );
-  const [trailingCta] = ctaComponents.slice(-1);
-  const pinnedCtaHTML = trailingCta !== undefined
-    ? `<div class="feds-pinned-cta">${component(trailingCta)}</div>`
-    : '';
+  const pinnedCtaHTML = pinnedCTAs(ctaComponents);
   // Pin the telephone beside the hamburger as a plain link (no CTA pill).
   const pinnedTelHTML = telephone !== null
     ? `<div class="feds-pinned-tel">${link({

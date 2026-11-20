@@ -59,3 +59,11 @@ export const productEntryCTA = (
 ): HTML => `<div class="feds-product-entry-cta">${
   cta.type === "PrimaryCTA" ? primaryCTA(cta) : secondaryCTA(cta)
 }</div>`;
+
+export const pinnedCTAs = (
+  ctas: Array<PrimaryCTA | SecondaryCTA>,
+): HTML => ctas.length === 0 ? '' : `<div class="feds-pinned-cta">${
+  ctas.map((cta) =>
+    cta.type === 'PrimaryCTA' ? primaryCTA(cta) : secondaryCTA(cta)
+  ).join('')
+}</div>`;

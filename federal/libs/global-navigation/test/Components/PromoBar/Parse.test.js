@@ -179,4 +179,38 @@ describe('PromoBar M@S field copy', () => {
     expect(content.headline).not.to.contain('field=description');
     expect(content.primaryCta.text).to.equal('See offers');
   });
+
+  describe('reveal animation', () => {
+    let stylesheet;
+    let wrapper;
+
+    before(async () => {
+      stylesheet = document.createElement('link');
+      stylesheet.rel = 'stylesheet';
+      stylesheet.href = new URL('../../../src/Components/PromoBar/promo-bar.css', import.meta.url).href;
+      await new Promise((resolve, reject) => {
+        stylesheet.onload = resolve;
+        stylesheet.onerror = reject;
+        document.head.append(stylesheet);
+      });
+    });
+
+    after(() => stylesheet.remove());
+    afterEach(() => wrapper?.remove());
+
+    [
+      ['minimized', 'none'],
+      ['maximized', 'feds-promo-bar-reveal'],
+      ['maximized-release', 'feds-promo-bar-reveal'],
+    ].forEach(([variant, animationName]) => {
+      it(`uses ${animationName === 'none' ? 'no' : 'the'} reveal animation for ${variant}`, () => {
+        const [data] = parsePromoBar(createPromo(['<p><strong>Offer</strong></p>'], variant));
+        wrapper = parseHtml(promoBar(data));
+        wrapper.className = 'feds-promo-aside-wrapper feds-promo-bar--reveal';
+        wrapper.style.position = 'absolute';
+        document.body.append(wrapper);
+        expect(getComputedStyle(wrapper).animationName).to.equal(animationName);
+      });
+    });
+  });
 });

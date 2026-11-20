@@ -9,7 +9,7 @@ import { initClickListeners } from "./PostRendering/ClickListeners";
 import { wirePopups, initLightDismiss, IS_OPEN_CLASS, isPopupOpen } from "./PostRendering/PopupWiring";
 import { initKeyboardNav } from "./PostRendering/Keyboard";
 import { initEventRegistrationGating } from "./PostRendering/EventRegistration";
-import { initMerchLinks } from "./PostRendering/MerchLinks";
+import { initMerchLinks, whenMerchLinksSettle } from "./PostRendering/MerchLinks";
 import { initModalLinks, ModalLinkDecorator } from "./PostRendering/ModalLinks";
 import { initCompactOverflow } from "./PostRendering/CompactOverflow";
 import { initActiveLink, isCurrentPageHref } from "./PostRendering/ActiveLink";
@@ -323,6 +323,11 @@ mountpoint: HTMLElement
       const barBgColor = promoBarEl?.style.backgroundColor ?? '';
       if (barBgColor !== '') promoWrapper.style.backgroundColor = barBgColor;
       await initMerchLinks(promoWrapper);
+      // Finish and reveal the promo as soon as its own content is ready,
+      // instead of after the mega menus, Brand Concierge and the other
+      // post-rendering tasks have loaded.
+      initPromoCountdownInPromoBar();
+      initPromoBarHeight(mountpoint);
     }
   }
   if (data.components.filter(c => c.type !== 'Brand').length === 0) mountpoint.classList.add('thin');
@@ -521,7 +526,6 @@ export const postRenderingTasks = async (
   initActiveLink(input.mountpoint, input.gnavSource);
   initGnavItemsStaggerIndex(input.mountpoint);
   initActiveTopLevelLinkClosesLocalnav(input.mountpoint);
-  initPromoBarHeight(input.mountpoint);
   initLanguageBannerOffset(input.mountpoint);
   initBranchBannerOffset(input.mountpoint);
   initClickListeners(input.mountpoint);
@@ -533,7 +537,6 @@ export const postRenderingTasks = async (
   initScrollDismiss(input.mountpoint);
   initHeaderScrollState(input.mountpoint);
   initHeaderAnalytics(input.mountpoint, input.mepMartech ?? '');
-  initPromoCountdownInPromoBar();
   const merchLinkErrors = await initMerchLinks(input.mountpoint);
   merchLinkErrors.forEach((error: RecoverableError) => {
     errors.add(error);
@@ -852,22 +855,34 @@ const initActiveTopLevelLinkClosesLocalnav = (mountpoint: HTMLElement): void => 
   });
 };
 
+// Maximized promo variants are revealed this long after the page becomes
+// visible; the minimized variant as soon as its commerce content is ready.
+const PROMO_REVEAL_DELAY_MS = 1000;
+
+// Longest the minimized promo waits for its commerce content; matches Milo's
+// M@S field timeout.
+const PROMO_COMMERCE_TIMEOUT_MS = 5000;
+
 // Polls (rather than listening for a `transitionend`) since the host page
 // may set body opacity via a CSS transition, an instant class toggle, or an
 // inline style — a poll catches all three without coupling to whichever
 // mechanism the host happens to use.
-const waitUntilVisible = (callback: () => void): void => {
+const waitUntilVisible = (callback: () => void, delayMs: number): void => {
   const isBodyVisible = (): boolean =>
     window.getComputedStyle(document.body).opacity === '1';
 
   const check = (): void => {
-    if (isBodyVisible()) {
-      // Inline arrow so the timer can only ever receive a function, never a
-      // string that would be evaluated as code.
-      setTimeout(() => callback(), 1000);
-    } else {
+    if (!isBodyVisible()) {
       requestAnimationFrame(check);
+      return;
     }
+    if (delayMs === 0) {
+      callback();
+      return;
+    }
+    // Inline arrow so the timer can only ever receive a function, never a
+    // string that would be evaluated as code.
+    setTimeout(() => callback(), delayMs);
   };
   check();
 };
@@ -941,11 +956,6 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   );
   if (promoWrapper === null) return;
 
-  waitUntilVisible(() => {
-    promoWrapper.style.display = '';
-    promoWrapper.classList.add('feds-promo-bar--reveal');
-  });
-
   // header.global-navigation is `position: sticky`, so it renders below the
   // promo bar and scrolls with the page natively — no JS or CSS animation
   // needed for that part. --feds-promo-bar-height only feeds the extra
@@ -953,19 +963,40 @@ const initPromoBarHeight = (mountpoint: HTMLElement): void => {
   // showing (see styles.css); re-measured on resize in case the promo
   // reflows.
   //
-  // Measure the wrapper, not the inner .feds-promo-bar: the wrapper is
-  // what the reveal animation clips via max-height, so its offsetHeight
-  // ramps up in step with the visible box. The inner bar is never
-  // height-constrained, so it reports its full natural height the instant
-  // display flips from `none` — which would snap --feds-promo-bar-height
-  // (and the body padding-top it drives) to its final value a full
-  // animation ahead of what's actually visible on screen.
+  // Measure the wrapper, not the inner .feds-promo-bar: for animated
+  // variants the wrapper is what the reveal animation clips via max-height,
+  // so its offsetHeight ramps up in step with the visible box. The inner bar
+  // is never height-constrained, so it reports its full natural height the
+  // instant display flips from `none` — which would snap
+  // --feds-promo-bar-height (and the body padding-top it drives) to its final
+  // value a full animation ahead of what's actually visible on screen.
   const updateHeight = (): void => {
     document.documentElement.style.setProperty(
       '--feds-promo-bar-height',
       `${promoWrapper.offsetHeight}px`,
     );
   };
+
+  // Maximized and maximized release variants keep a delayed, animated reveal. 
+  const isMinimized = promoBar.classList.contains('feds-promo-bar--minimized');
+  const reveal = (): void => {
+    promoWrapper.style.display = '';
+    promoWrapper.classList.add('feds-promo-bar--reveal');
+    updateHeight();
+  };
+  waitUntilVisible(() => {
+    if (!isMinimized) {
+      reveal();
+      return;
+    }
+    // Like C1, the minimized bar is shown only once its commerce content is
+    // ready, so raw M@S/OST links never flash and it appears at its final
+    // height. Showing it earlier lets unresolved labels make it taller first,
+    // shifting the page twice.
+    void whenMerchLinksSettle(promoWrapper, PROMO_COMMERCE_TIMEOUT_MS)
+      .then(reveal, reveal);
+  }, isMinimized ? 0 : PROMO_REVEAL_DELAY_MS);
+
   new ResizeObserver(updateHeight).observe(promoWrapper);
   updateHeight();
 

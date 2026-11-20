@@ -38,6 +38,12 @@ The expanded localnav bar also closes on page scroll. It does not lock page
 scrolling unless a submenu is open; full navigation drawers and submenus
 retain their scroll lock.
 
+Like C1, the minimized promo bar is shown only once its commerce (M@S/OST)
+content has resolved, with no other delay. It appears complete at its final
+height, so raw authored links never flash and the page shifts only once. After
+5 seconds it is shown anyway, and any commerce links still unresolved are
+removed. Maximized variants keep their 1-second delayed reveal.
+
 Hosts can pass `shouldBlockLink(element)` to `main` to omit navigation links,
 such as Milo's KR free-trial restriction. Matching C1, top-level dropdowns
 (checked by title), links, CTAs and the product entry CTA are omitted before

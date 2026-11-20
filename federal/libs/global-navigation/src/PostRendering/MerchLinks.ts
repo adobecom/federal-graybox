@@ -222,6 +222,7 @@ const decorateMasCards = async (
   injectedDecorators: ReturnType<typeof getMerchDecorators>,
   base: string,
   errors: Set<RecoverableError>,
+  tasks: Promise<unknown>[],
 ): Promise<void> => {
   try {
     const decorateMasLink = injectedDecorators.masCard
@@ -233,9 +234,9 @@ const decorateMasCards = async (
     } else {
       masLinks.forEach((link) => {
         try {
-          void Promise.resolve(decorateMasLink(link)).catch((error) => {
+          tasks.push(Promise.resolve(decorateMasLink(link)).catch((error) => {
             lanaLog(`Failed to decorate M@S card: ${String(error)}`);
-          });
+          }));
         } catch (error) {
           lanaLog(`Failed to decorate M@S card: ${String(error)}`);
         }
@@ -246,6 +247,53 @@ const decorateMasCards = async (
       new RecoverableError(`Error initializing M@S cards: ${error}`)
     );
   }
+};
+
+// Commerce links initMerchLinks started in each container, and when their
+// decoration settles (resolved or failed).
+const merchLinkTasks = new WeakMap<HTMLElement, {
+  links: HTMLAnchorElement[];
+  settled: Promise<unknown>;
+}>();
+
+// Removes a link that never resolved, plus wrappers it leaves empty (e.g. its
+// paragraph), so the raw authored label is never shown.
+const removeUnresolvedLink = (
+  link: HTMLAnchorElement,
+  container: HTMLElement,
+): void => {
+  let element: Element = link;
+  let parent = element.parentElement;
+  element.remove();
+  while (parent !== null && parent !== container
+    && parent.childElementCount === 0
+    && (parent.textContent ?? '').trim() === '') {
+    element = parent;
+    parent = element.parentElement;
+    element.remove();
+  }
+};
+
+/**
+ * Resolves once the commerce links initMerchLinks started in `container` have
+ * settled, or `timeoutMs` has passed. Links still unresolved then are removed,
+ * so raw authored labels never show. Resolves immediately when the container
+ * has no commerce links.
+ */
+export const whenMerchLinksSettle = async (
+  container: HTMLElement,
+  timeoutMs: number,
+): Promise<void> => {
+  const tasks = merchLinkTasks.get(container);
+  if (tasks === undefined) return;
+  await Promise.race([
+    tasks.settled,
+    new Promise((resolve) => { setTimeout(resolve, timeoutMs); }),
+  ]);
+  // A resolved link has been replaced, so any still here never resolved.
+  tasks.links
+    .filter((link) => container.contains(link))
+    .forEach((link) => removeUnresolvedLink(link, container));
 };
 
 /**
@@ -301,6 +349,7 @@ export const initMerchLinks = async (
 
   if (merchLinks.length === 0 && masLinks.length === 0) return errors;
 
+  const tasks: Promise<unknown>[] = [];
   try {
     const injectedDecorators = getMerchDecorators();
     // base is only needed for the fallback import; injected decorators skip it.
@@ -335,21 +384,26 @@ export const initMerchLinks = async (
           } catch (error) {
             merchLinkDecorationTask = Promise.reject(error);
           }
-          void merchLinkDecorationTask.catch((error) => {
+          tasks.push(merchLinkDecorationTask.catch((error) => {
             removeFailedMerchItems(mountpoint, [link]);
             lanaLog(`Failed to decorate merch link: ${String(error)}`);
-          });
+          }));
         });
       }
     }
 
     // Full M@S cards: Milo `merch-card-autoblock` block
     if (masLinks.length > 0) {
-      await decorateMasCards(masLinks, injectedDecorators, base, errors);
+      await decorateMasCards(masLinks, injectedDecorators, base, errors, tasks);
     }
   } catch (error) {
     removeFailedMerchItems(mountpoint, stagedMasFieldLinks);
     errors.add(new RecoverableError(`Error initializing merch links: ${error}`));
+  } finally {
+    merchLinkTasks.set(mountpoint, {
+      links: [...merchLinks, ...masLinks],
+      settled: Promise.allSettled(tasks),
+    });
   }
 
   return errors;

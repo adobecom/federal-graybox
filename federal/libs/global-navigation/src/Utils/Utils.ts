@@ -317,6 +317,38 @@ export const [setLoadBrandConcierge, getLoadBrandConcierge] =
     ];
   })();
 
+// Host-owned link policy (e.g. Milo's KR free-trial restriction). Receives a
+// navigation link, or a heading for a dropdown title, and returns true to omit
+// it. Defaults to keeping everything.
+export type LinkFilter = (element: HTMLElement) => boolean;
+
+type LinkFilterStateFunctions = [
+  (filter: LinkFilter | undefined) => void,
+  () => LinkFilter | undefined,
+];
+
+export const [setLinkFilter, getLinkFilter] =
+  ((): LinkFilterStateFunctions => {
+    let linkFilter: LinkFilter | undefined;
+
+    return [
+      (next: LinkFilter | undefined): void => { linkFilter = next; },
+      (): LinkFilter | undefined => linkFilter,
+    ];
+  })();
+
+// A failing host policy must not take the navigation down; keep the element.
+export const isBlockedByLinkPolicy = (element: HTMLElement): boolean => {
+  const shouldBlock = getLinkFilter();
+  if (shouldBlock === undefined) return false;
+  try {
+    return shouldBlock(element);
+  } catch (error) {
+    lanaLog(`Link policy failed: ${String(error)}`);
+    return false;
+  }
+};
+
 export const localizeHref = (href: string): string => {
   try {
     const absoluteHref = href.startsWith('/') ? `${window.location.origin}${href}` : href;
@@ -605,14 +637,50 @@ const SANITIZE_CONFIG = {
   SANITIZE_DOM: false,
 };
 
+// Like C1, the link policy skips the brand, breadcrumbs and promo copy links;
+// promo CTAs are still checked.
+const POLICY_EXEMPT_LINKS = [
+  '.feds-brand',
+  '.feds-skip-link',
+  '.trap-focus-gnav',
+  '.feds-breadcrumbs a',
+  '.feds-promo-bar a:not(.feds-primary-cta):not(.feds-secondary-cta)',
+].join(', ');
+
+const removeBlockedLinks = (root: Element): void => {
+  if (getLinkFilter() === undefined) return;
+  root.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
+    if (!root.contains(link) || link.matches(POLICY_EXEMPT_LINKS)) return;
+    const ancestors: Element[] = [];
+    let parent = link.parentElement;
+    while (parent !== null && parent !== root) {
+      ancestors.push(parent);
+      parent = parent.parentElement;
+    }
+    if (!isBlockedByLinkPolicy(link)) return;
+    link.remove();
+    // Drop wrappers left empty, up to the list item. The policy may already
+    // have removed the closest one (e.g. an <em> around a CTA).
+    for (const ancestor of ancestors) {
+      if (!root.contains(ancestor)) continue;
+      if (ancestor.childElementCount > 0
+        || (ancestor.textContent ?? '').trim() !== '') break;
+      ancestor.remove();
+      if (ancestor.tagName === 'LI') break;
+    }
+  });
+};
+
 /**
  * Assigns HTML to an element after stripping script-capable markup (script
  * tags, event handlers, javascript: URLs, ...). Every gnav render path
  * interpolates authored/page-derived content into HTML strings, so all
- * innerHTML writes must go through here.
+ * innerHTML writes must go through here. The host link policy is applied here
+ * for the same reason, before any post-render decoration.
  */
 export const setSanitizedHTML = (element: Element, html: string): void => {
   element.innerHTML = DOMPurify.sanitize(html, SANITIZE_CONFIG);
+  removeBlockedLinks(element);
 };
 
 // Accepts absolute or relative http(s) URLs only, rejecting script-capable

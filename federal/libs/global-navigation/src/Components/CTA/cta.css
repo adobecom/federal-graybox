@@ -31,13 +31,14 @@
   }
 
   /* =========================================
-     Pinned CTA — toolbar clone of the trailing nav CTA,
+     Pinned CTAs — toolbar clones of the top-level nav CTAs,
      shown next to the hamburger at compact/mobile
      ========================================= */
 
   & .feds-pinned-cta {
     display: none;
     align-items: center;
+    gap: var(--s2a-spacing-sm);
     flex-shrink: 0;
     /* Right-align the trailing CTA group (drawer is out of flow here). */
     margin-left: auto;
@@ -88,7 +89,7 @@
   }
 
   /* Dynamic reflow: JS adds .feds-cta-overflow when the brand + CTAs +
-     utilities can't all fit, hiding both toolbar CTAs so they never overlap
+     utilities can't all fit, hiding the toolbar CTAs so they never overlap
      the hamburger (they stay reachable in the drawer). */
   &.feds-cta-overflow :is(.feds-pinned-cta, .feds-pinned-tel, .feds-product-entry-cta) {
     display: none;
@@ -178,8 +179,10 @@
     }
   }
 
+  /* Localnav styles its own CTA; exclude it regardless of `.is-open` so the
+     CTA doesn't restyle while the bar collapses. */
   @media (width < 1024px) {
-    &:not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta) {
+    &:not(:has(.feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta) {
       margin: 0;
       margin-top: var(--s2a-spacing-sm);
       width: calc(100% - 2 * var(--s2a-spacing-lg));
@@ -187,20 +190,35 @@
   }
 
   @media (width <= 768px) {
-    &:not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta),
-    &.is-compact:not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta) {
+    &:not(:has(.feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta),
+    &.is-compact:not(:has(.feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta) {
       width: 100%;
     }
   }
 
-  &.is-compact:not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta) {
+  &.is-compact:not(:has(.feds-localnav-bar)) :is(ul.feds-gnav-items > li > .feds-primary-cta) {
     margin: 0;
     margin-top: var(--s2a-spacing-sm);
     width: calc(100% - 2 * var(--s2a-spacing-lg));
   }
 
+  /* Desktop localnav still uses the dark-font CTA. */
+  @media (width >= 1024px) {
+    &.dark-font:not(.is-compact):has(.feds-localnav-bar) ul.feds-gnav-items > li > .feds-primary-cta {
+      background-color: var(--s2a-color-gray-1000);
+      color: var(--s2a-color-gray-25);
+      border-color: var(--s2a-color-gray-1000);
+
+      &:hover {
+        background-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+        color: var(--s2a-color-gray-25);
+        border-color: var(--s2a-color-button-background-primary-solid-hover, rgba(0, 0, 0, 0.64));
+      }
+    }
+  }
+
   &:is(.dark-font, .is-compact) .feds-product-entry-cta .feds-primary-cta,
-  &:is(.dark-font, .is-compact):not(:has(.feds-menu-wrapper.is-open .feds-localnav-bar)) ul.feds-gnav-items > li > .feds-primary-cta {
+  &:is(.dark-font, .is-compact):not(:has(.feds-localnav-bar)) ul.feds-gnav-items > li > .feds-primary-cta {
     background-color: var(--s2a-color-gray-1000);
     color: var(--s2a-color-gray-25);
     border-color: var(--s2a-color-gray-1000);
@@ -396,4 +414,3 @@
     box-sizing: border-box;
   }
 }
-

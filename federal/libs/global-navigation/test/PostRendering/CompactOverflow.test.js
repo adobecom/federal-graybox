@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import { getIntrinsicItemsWidth, initCompactOverflow } from '../../src/PostRendering/CompactOverflow.ts';
 import { isDesktop } from '../../src/Utils/Utils.ts';
 import { MERCH_RESOLVED_EVENT } from '../../src/PostRendering/MerchLinks.ts';
+import { pinnedCTAs } from '../../src/Components/CTA/Render.ts';
 
 describe('compact overflow measurement', () => {
   it('measures the intrinsic item widths and gaps', () => {
@@ -77,6 +78,20 @@ describe('compact initialization (MWPW-210874)', () => {
   let fonts;
   let resolveFonts;
   let desktop;
+  let stylesheet;
+
+  before(async () => {
+    stylesheet = document.createElement('link');
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = new URL('../../src/Components/CTA/cta.css', import.meta.url).href;
+    await new Promise((resolve, reject) => {
+      stylesheet.onload = resolve;
+      stylesheet.onerror = reject;
+      document.head.append(stylesheet);
+    });
+  });
+
+  after(() => stylesheet.remove());
 
   beforeEach(() => {
     desktop = true;
@@ -176,4 +191,72 @@ describe('compact initialization (MWPW-210874)', () => {
     resize();
     expect(header.classList.contains('is-compact')).to.equal(true);
   });
+
+  for (const localnav of [false, true]) {
+    for (const mobile of [false, true]) {
+      it(`keeps both CTAs and the telephone until they no longer fit (${localnav ? 'LNAV' : 'GNAV'}, ${mobile ? 'mobile' : 'desktop reflow'})`, () => {
+        desktop = !mobile;
+        const nav = header.querySelector('nav');
+        nav.classList.toggle('localnav', localnav);
+        nav.style.display = 'flex';
+        header.style.cssText = `
+          width: ${headerWidth}px;
+          --s2a-spacing-sm: 8px;
+          --s2a-spacing-md: 16px;
+          --s2a-spacing-lg: 24px;
+          --s2a-border-width-sm: 1px;
+          --s2a-typography-font-size-body-sm: 14px;
+          --s2a-typography-font-size-label: 14px;
+          --s2a-typography-line-height-body-sm: 20px;
+          --s2a-typography-line-height-label: 20px;
+        `;
+        header.querySelector('.feds-menu-wrapper').style.display = 'none';
+        nav.insertAdjacentHTML('beforeend', `
+          ${pinnedCTAs([
+            { type: 'SecondaryCTA', text: 'Free trial', href: '/trial' },
+            { type: 'PrimaryCTA', text: 'Buy now', href: '/buy' },
+          ])}
+          <div class="feds-pinned-tel"><a href="tel:18001025567">1800 102 5567</a></div>
+        `);
+        Object.defineProperty(nav, 'clientWidth', { get: () => headerWidth });
+        initCompactOverflow(header);
+
+        const group = nav.querySelector('.feds-pinned-cta');
+        const telephone = nav.querySelector('.feds-pinned-tel');
+        const links = [...group.querySelectorAll('a')];
+        const groupWidth = group.getBoundingClientRect().width;
+        expect(groupWidth).to.be.closeTo(
+          links.reduce((sum, link) => sum + link.getBoundingClientRect().width, 0) + 8,
+          0.1,
+        );
+        expect(links.every((link) => link.getBoundingClientRect().width > 0)).to.equal(true);
+        expect(telephone.offsetWidth).to.be.greaterThan(0);
+        expect(header.classList.contains('feds-cta-overflow')).to.equal(false);
+
+        const needed = group.offsetWidth + telephone.offsetWidth + 32;
+        headerWidth = needed;
+        header.style.width = `${headerWidth}px`;
+        resize();
+        expect(header.classList.contains('feds-cta-overflow')).to.equal(false);
+        expect(group.offsetWidth).to.be.greaterThan(0);
+
+        headerWidth = needed - 1;
+        header.style.width = `${headerWidth}px`;
+        resize();
+        expect(header.classList.contains('feds-cta-overflow')).to.equal(true);
+        expect(group.offsetWidth).to.equal(0);
+        expect(telephone.offsetWidth).to.equal(0);
+
+        headerWidth = 1100;
+        header.style.width = `${headerWidth}px`;
+        resize();
+        expect(header.classList.contains('feds-cta-overflow')).to.equal(false);
+        expect(links.every((link) => link.getBoundingClientRect().width > 0)).to.equal(true);
+
+        header.querySelector('.feds-menu-wrapper').classList.add('is-open');
+        expect(group.offsetWidth).to.equal(0);
+        expect(telephone.offsetWidth).to.equal(0);
+      });
+    }
+  }
 });

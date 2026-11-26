@@ -1,8 +1,14 @@
 import esbuild from 'esbuild';
-import { execSync } from 'child_process';
+import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { inlineLightningCss } from './build-plugins/inline-lightning-css.js';
 
 const isWatch = process.argv.includes('--watch');
+
+const tscBin = createRequire(import.meta.url).resolve('typescript/bin/tsc');
+const typeCheck = () => {
+  execFileSync(process.execPath, [tscBin, '--noEmit'], { stdio: 'inherit' });
+};
 
 // Lightning CSS browser targets. Align with the team's supported baseline.
 // The gnav uses `:popover-open`, `adoptedStyleSheets`, CSS nesting, and
@@ -46,7 +52,7 @@ if (isWatch) {
         name: 'type-check',
         setup(build) {
           build.onStart(() => {
-            execSync('tsc --noEmit', { stdio: 'inherit' });
+            typeCheck();
           });
         },
       },
@@ -55,7 +61,7 @@ if (isWatch) {
   });
   await context.watch();
 } else {
-  execSync('tsc --noEmit', { stdio: 'inherit' });
+  typeCheck();
 
   await esbuild.build(buildOptions);
   console.log('Build complete - CSS inlined into main.js');

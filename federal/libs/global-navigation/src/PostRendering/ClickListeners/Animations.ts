@@ -69,7 +69,6 @@ export const initAnimations = (gnav: HTMLElement): void => {
     popup.addEventListener('toggle', (event: Event) => {
       const newState = (event as ToggleEvent).newState;
       if (newState !== 'open' && !gnav.querySelector(`.feds-popup.${IS_OPEN_CLASS}`)) {
-        // setPopoverBgHeight(gnav, '100%');
         if (isNavDesktop()) return;
         // Bandaid for using escape for closing the popup in mobile
         fedsGnavItems?.classList.remove('subscreen-opening');

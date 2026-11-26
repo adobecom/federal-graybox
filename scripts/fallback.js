@@ -1,4 +1,4 @@
-var div = document.createElement('div');
+const div = document.createElement('div');
 div.style.width = '100%';
 div.style.position = 'absolute';
 div.style.display = 'block';
@@ -9,7 +9,7 @@ div.style.textAlign = 'center';
 div.style.background = '#fff';
 div.style.padding = '12px';
 
-var locFallbackEntries = {
+const locFallbackEntries = {
   'en': 'Your web browser is out of date. For more security, comfort and the best experience on this site, please update to or use a modern browser',
   'de': 'Ihr Browser ist veraltet. Für mehr Sicherheit, Komfort und die beste Erfahrung auf dieser Website, aktualisieren Sie bitte oder verwenden Sie einen modernen Browser',
   'it': 'Il tuo browser non è aggiornato. Per una maggiore sicurezza, comodità e la migliore esperienza su questo sito, si prega di aggiornare o utilizzare un browser moderno.',
@@ -24,16 +24,14 @@ var locFallbackEntries = {
   'ko': '웹 브라우저가 오래되었습니다. 이 사이트에서 더 많은 보안, 편안함 및 최상의 경험을 위해 최신 브라우저로 업데이트하거나 사용하십시오.',
 };
 
-var userLocale = navigator.language || navigator.userLanguage;
-var userLang = userLocale.split('-')[0];
+const userLocale = navigator.language || navigator.userLanguage;
+const userLocalePrefix = userLocale.split('-')[0];
 
-var locFallbackText = locFallbackEntries[userLang] || locFallbackEntries[userLocale];
-if (!locFallbackText) {
-  locFallbackText = locFallbackEntries['en'];
-  userLang = 'en';
-}
+const localizedText = locFallbackEntries[userLocalePrefix] || locFallbackEntries[userLocale];
+const userLang = localizedText ? userLocalePrefix : 'en';
+const locFallbackText = localizedText || locFallbackEntries['en'];
 
-var span = document.createElement('span');
+const span = document.createElement('span');
 span.textContent = locFallbackText
 span.lang = userLang
 div.appendChild(span);

@@ -79,6 +79,17 @@ const getToggleAnalyticsLabel = (
   return `${prefix}|${open ? 'Close' : 'Open'}`;
 };
 
+const closeOtherOpenPopups = (
+  mountpoint: HTMLElement,
+  popup: HTMLElement,
+): void => {
+  mountpoint
+    .querySelectorAll<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`)
+    .forEach(other => {
+      if (other !== popup) closePopup(other);
+    });
+};
+
 // Click-to-toggle + aria reflection for every popup. Mutual exclusion only
 // applies between mega-menu popups; the hamburger does NOT close them
 // (light-dismiss owns that, matching original popover behaviour).
@@ -97,13 +108,7 @@ export const wirePopups = (mountpoint: HTMLElement): void => {
       trigger.addEventListener('click', (event) => {
         event.preventDefault();
         const willOpen = !isPopupOpen(popup);
-        if (willOpen && !isMenuWrapper) {
-          mountpoint
-            .querySelectorAll<HTMLElement>(`.feds-popup.${IS_OPEN_CLASS}`)
-            .forEach(other => {
-              if (other !== popup) closePopup(other);
-            });
-        }
+        if (willOpen && !isMenuWrapper) closeOtherOpenPopups(mountpoint, popup);
         togglePopup(popup);
       });
     });

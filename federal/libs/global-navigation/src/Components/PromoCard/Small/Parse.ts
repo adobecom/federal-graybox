@@ -119,7 +119,7 @@ export const parsePromoCardSmall = (
       try {
         return parseSecondaryCTA(contentSection) as
           Parsed<SecondaryCTA, RecoverableError>;
-      } catch (_error) {
+      } catch {
         return [null, []];
       }
     })();

@@ -1,9 +1,7 @@
-import { Input } from "../Main";
+import type { Input } from "../Main";
 import { RecoverableError } from "../Error/Error";
 import { lanaLog } from "./Log";
 import { getFederatedContentRoot, getMiloConfig } from "./Utils";
-// TODO: avoid circular dependencies between Main and
-// This file (or any other file.
 
 type PlaceholderResponse = {
   columns: string[];
@@ -82,10 +80,10 @@ export function replacePlaceholders(
   s: string,
   placeholders: Map<string, string>
 ): string {
-  const regex = /{{(.*?)}}|%7B%7B(.*?)%7D%7D/g;
+  const regex = /{{([^{}\n\r\u2028\u2029]*)}}|%7B%7B([^%\n\r\u2028\u2029]*)%7D%7D/g;
   const match = regex.test(s);
   if (!match) return s;
-  return s.replace(regex, (_: string, p1?: string, p2?: string) => {
+  return s.replaceAll(regex, (_: string, p1?: string, p2?: string) => {
       const k = p1 ?? p2 ?? '';
       return placeholders.get(k) ?? k;
   });

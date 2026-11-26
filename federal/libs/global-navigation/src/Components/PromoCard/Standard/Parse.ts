@@ -105,7 +105,7 @@ export const parsePromoCard = (
             SecondaryCTA,
             RecoverableError
           >;
-        } catch (_error) {
+        } catch {
           return [null, []];
         }
       })();

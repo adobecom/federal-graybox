@@ -24,7 +24,34 @@ import { readFile } from 'node:fs/promises';
 import { bundleAsync, transform } from 'lightningcss';
 
 /** Escape regex special characters in an absolute path. */
-const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const escapeRegex = (s) => s.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
+
+const skipWhitespace = (css, from) => {
+  let i = from;
+  while (i < css.length && /\s/.test(css[i])) i++;
+  return i;
+};
+
+const findCustomPropColon = (css, nameEnd) => {
+  const i = skipWhitespace(css, nameEnd);
+  return css[i] === ':' ? i : -1;
+};
+
+const collectCustomPropDecls = (css) => {
+  const decls = [];
+  const nameRe = /--[a-zA-Z0-9_-]+/g;
+  let m;
+  while ((m = nameRe.exec(css)) !== null) {
+    const colon = findCustomPropColon(css, nameRe.lastIndex);
+    if (colon === -1) continue;
+    const valueStart = skipWhitespace(css, colon + 1);
+    const valueEnd = css.indexOf(';', valueStart);
+    if (valueEnd === -1) break;
+    decls.push({ name: m[0], valueStart, valueEnd });
+    nameRe.lastIndex = valueEnd + 1;
+  }
+  return decls;
+};
 
 /**
  * Collect every `var(--name, …)` reference name in the given CSS into a
@@ -55,14 +82,13 @@ const collectAllVarRefs = (css) => {
  * only inside custom-property values.
  */
 const collectExternalVarRefs = (css) => {
-  const withoutDeclValues = css.replace(
-    // Given "--some-variable-name: /* value */;" 
-    // The first capture group gets the variable name
-    // the second capture group gets the value from the
-    // colon to the semicolon
-    /(--[a-zA-Z0-9_-]+\s*:\s*)[^;]*(;)/g,
-    '$1$2',
-  );
+  let withoutDeclValues = '';
+  let cursor = 0;
+  for (const { valueStart, valueEnd } of collectCustomPropDecls(css)) {
+    withoutDeclValues += css.slice(cursor, valueStart);
+    cursor = valueEnd;
+  }
+  withoutDeclValues += css.slice(cursor);
   return collectAllVarRefs(withoutDeclValues);
 };
 
@@ -75,21 +101,11 @@ const collectExternalVarRefs = (css) => {
  */
 const buildDeclGraph = (css) => {
   const graph = new Map();
-  /**
-   * First capture group gets variable name example --css-variable-name.
-   * Second capture group gets the value bound to that name.
-   * Example `--css-variable-name: rgba(0,0,0,1)` gets parsed into
-   * (--css-variable-name, rgba(0,0,0,1)).
-   */
-  const declRe = /(--[a-zA-Z0-9_-]+)\s*:\s*([^;]*);/g;
-  let m;
-  while ((m = declRe.exec(css)) !== null) {
-    const variableName = m[1];
-    const variableValue = m[2];
-    const refs = collectAllVarRefs(variableValue);
-    const existing = graph.get(variableName);
+  for (const { name, valueStart, valueEnd } of collectCustomPropDecls(css)) {
+    const refs = collectAllVarRefs(css.slice(valueStart, valueEnd));
+    const existing = graph.get(name);
     if (existing) for (const r of refs) existing.add(r);
-    else graph.set(variableName, refs);
+    else graph.set(name, refs);
   }
   return graph;
 };
@@ -131,9 +147,11 @@ const collectDeclaredRootProps = (css) => {
   let m;
   while ((m = blockRe.exec(css)) !== null) {
     const body = m[1];
-    const declRe = /(--[a-zA-Z0-9_-]+)\s*:/g;
+    const nameRe = /--[a-zA-Z0-9_-]+/g;
     let d;
-    while ((d = declRe.exec(body)) !== null) set.add(d[1]);
+    while ((d = nameRe.exec(body)) !== null) {
+      if (findCustomPropColon(body, nameRe.lastIndex) !== -1) set.add(d[0]);
+    }
   }
   return set;
 };

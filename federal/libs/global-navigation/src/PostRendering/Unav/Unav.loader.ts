@@ -96,7 +96,7 @@ export const preloadAupSdk = (): void => {
   let config: MiloConfig;
   try {
     config = getMiloConfig();
-  } catch (_error) {
+  } catch {
     return;
   }
 
@@ -333,7 +333,7 @@ const initializeUnav = async (
     let config: MiloConfig;
     try {
       config = getMiloConfig();
-    } catch (_error) {
+    } catch {
       throw new Error('MiloConfig not available for UNAV initialization');
     }
 

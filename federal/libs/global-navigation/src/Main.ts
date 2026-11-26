@@ -434,6 +434,11 @@ export const renderGnavString = ({
         ariaLabel: telephone.ariaLabel,
       })}</div>`
     : '';
+  const utilitiesHTML = ((): string => {
+    if (profileEnabled) return '<div data-cs-mask class="feds-profile-new"></div>';
+    if (unavEnabled) return '<div class="feds-utilities"></div>';
+    return '';
+  })();
 
   return `
 <nav class="${localnav ? "localnav" : ""}${isLocalnavWithoutMegaMenu ? " localnav--without-mega-menu" : ""}">
@@ -505,9 +510,7 @@ export const renderGnavString = ({
   ${pinnedTelHTML}
   ${productCTA === null ? '' : productEntryCTA(productCTA)}
   ${notificationsEnabled ? '<div class="feds-notifications-wrapper"></div>' : ''}
-  ${profileEnabled
-    ? '<div data-cs-mask class="feds-profile-new"></div>'
-    : unavEnabled ? '<div class="feds-utilities"></div>' : ''}
+  ${utilitiesHTML}
   ${breadcrumbs === null ? '' : renderBreadcrumbs(breadcrumbs)}
   <a href="#" class="trap-focus-gnav">.</a>
 </nav>
@@ -1091,24 +1094,28 @@ const initBranchBannerOffset = (mountpoint: HTMLElement): void => {
   const existing = document.getElementById(BRANCH_BANNER_ID);
   if (existing) setup(existing);
 
+  const onNodeAdded = (node: Node): void => {
+    const isBanner = node instanceof HTMLElement
+      && node.id === BRANCH_BANNER_ID;
+    if (!isBanner) return;
+    // Let the banner's own styles/layout settle before reading its
+    // computed position/height.
+    requestAnimationFrame(() => setup(node));
+  };
+
+  const onNodeRemoved = (node: Node): void => {
+    const isBanner = node instanceof HTMLElement
+      && node.id === BRANCH_BANNER_ID;
+    if (isBanner) teardown();
+  };
+
   // The preview overlay can add/remove the banner at any point in the page's
   // lifetime (not just once, like the language banner), so this observer is
   // kept running indefinitely rather than disconnecting after first sight.
   new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
-        const isBanner = node instanceof HTMLElement
-          && node.id === BRANCH_BANNER_ID;
-        if (!isBanner) return;
-        // Let the banner's own styles/layout settle before reading its
-        // computed position/height.
-        requestAnimationFrame(() => setup(node));
-      });
-      mutation.removedNodes.forEach((node) => {
-        const isBanner = node instanceof HTMLElement
-          && node.id === BRANCH_BANNER_ID;
-        if (isBanner) teardown();
-      });
+      mutation.addedNodes.forEach(onNodeAdded);
+      mutation.removedNodes.forEach(onNodeRemoved);
     });
   }).observe(document.body, { childList: true });
 };

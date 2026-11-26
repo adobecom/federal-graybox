@@ -152,13 +152,13 @@ const parseContent = (cell: Element): PromoBarContent => {
   let primaryCta: PrimaryCTA | null = null;
   try {
     [primaryCta] = parsePrimaryCTA(primaryCtaP) as Parsed<PrimaryCTA, unknown>;
-  } catch (_) { primaryCta = null; }
+  } catch { primaryCta = null; }
 
   let secondaryCta: SecondaryCTA | null = null;
   try {
     [secondaryCta] = parseSecondaryCTA(secondaryCtaP) as
       Parsed<SecondaryCTA, unknown>;
-  } catch (_) { secondaryCta = null; }
+  } catch { secondaryCta = null; }
 
   return {
     icon, iconAlt, productName, headline, body,

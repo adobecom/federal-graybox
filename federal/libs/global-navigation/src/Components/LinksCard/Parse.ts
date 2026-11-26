@@ -110,7 +110,7 @@ const parseCard = (
           : parseSecondaryCTA(footerCtaParentP) as Parsed<
               SecondaryCTA, RecoverableError
             >;
-      } catch (_error) {
+      } catch {
         return [null, []];
       }
     })();

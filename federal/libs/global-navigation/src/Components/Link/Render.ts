@@ -24,5 +24,6 @@ export const link = ({
   const pendingMerchAttr = isMasFieldLink(strippedHref)
     ? ' data-feds-merch-pending'
     : '';
-  return `<a class="feds-link ${highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(strippedHref)}"${target !== '' ? ` target="${target}"` : ''}${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}${getAnalyticsAttrs(null, daaLl ?? text)}>${textHTML}${svgIcon}</a>`;
+  const targetAttr = target === '' ? '' : ` target="${target}"`;
+  return `<a class="feds-link ${highlight ?? false ? 'feds-link--highlight' : ''}" href="${localizeHref(strippedHref)}"${targetAttr}${pendingMerchAttr}${getAriaAttrs(ariaAttrs, ariaLabel)}${getAnalyticsAttrs(null, daaLl ?? text)}>${textHTML}${svgIcon}</a>`;
 };

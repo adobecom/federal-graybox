@@ -58,7 +58,7 @@ export const isMasFieldLink = (href: string): boolean => {
   if (!isMasLink(href)) return false;
   try {
     return new URL(href).hash.includes('field=');
-  } catch (_error) {
+  } catch {
     return href.includes('field=');
   }
 };
@@ -142,7 +142,7 @@ export const alternative = <ReturnType, InputType>(
     or: (fallbackFn) => alternative((input) => {
       try {
         return primaryFn(input)
-      } catch (_error) {
+      } catch {
         return fallbackFn(input);
       }
     })
@@ -205,8 +205,6 @@ type PersonalizationStateFunctions = [
   () => PersonalizationConfig
 ];
 
-// TODO: Consolidate all global state handlers into
-// a single file (but still probably keep them separate)
 export const [setPersonalizationConfig, getPersonalizationConfig] =
   ((): PersonalizationStateFunctions => {
     let personalizationConfig: PersonalizationConfig | undefined;
@@ -467,7 +465,6 @@ export const fetchAndProcessPlainHTML = async (
   }
 };
 
-// TODO: refactor
 let federatedContentRoot: string;
 export const getFederatedContentRoot = (): string => {
   if (federatedContentRoot) return federatedContentRoot;
@@ -481,7 +478,6 @@ export const getFederatedContentRoot = (): string => {
     'graybox.adobe.com',
   ];
   // Non milo consumers will have its origin from config
-  // TODO: allow the passing of a configured origin
   const origin = window.location.origin;
 
   const isAllowedOrigin = cdnWhitelistedOrigins.some((o) => {
@@ -502,9 +498,6 @@ export const getFederatedContentRoot = (): string => {
   return federatedContentRoot;
 };
 
-// TODO we should match the akamai patterns /locale/federal/
-// at the start of the url
-// and make the check more strict.
 export const federateUrl = (url = ''): string => {
   if (url.includes('localhost:3000')) {
     return url.replace('localhost:3000', 'main--federal--adobecom.aem.page');
@@ -616,9 +609,9 @@ export const sanitize = (str: string): string => {
     .toLocaleLowerCase()
     .trim()
     // Replace any run of non-letter/number characters with a single hyphen.
-    .replace(/[^\p{L}\p{N}\p{M}]+/gu, '-')
+    .replaceAll(/[^\p{L}\p{N}\p{M}]+/gu, '-')
     // Normalization above leaves at most one hyphen at either edge.
-    .replace(/^-|-$/g, '');
+    .replaceAll(/^-|-$/g, '');
 
   if (sanitized === '') return 'id';
 
@@ -750,7 +743,6 @@ export const getAriaAttrs = (
 
 
 export const isDarkMode = (): boolean => {
-  // TODO: Implement dark mode detection
   return true;
 };
 
